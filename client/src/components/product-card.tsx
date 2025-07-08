@@ -21,7 +21,6 @@ export default function ProductCard({ product, onSelect }: ProductCardProps) {
             className="w-20 h-20 object-cover"
           />
           <div className="flex-1 p-4">
-            <h3 className="font-semibold text-neutral-800 mb-1">{product.name}</h3>
             <p className="text-sm text-neutral-600 mb-2">{product.category} · 3 etapas</p>
             <div className="flex items-center justify-between">
               <span className="text-primary font-semibold">

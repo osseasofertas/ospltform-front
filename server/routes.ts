@@ -322,35 +322,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
 async function initializeSampleData() {
   try {
-    // Create sample products
+    // Create sample products using real product images
     const products = [
       {
-        name: "Smartphone Premium XR",
-        category: "Tecnología",
-        imageUrl: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=300&h=200",
+        name: "Camisetas Básicas Pack",
+        category: "Ropa",
+        imageUrl: "/attached_assets/prints/PT2.png",
         minEarning: "2.50",
         maxEarning: "4.00",
       },
       {
-        name: "Auriculares Bluetooth Pro",
-        category: "Audio",
-        imageUrl: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=300&h=200",
+        name: "Alfombra Decorativa",
+        category: "Hogar",
+        imageUrl: "/attached_assets/prints/PT3.png",
         minEarning: "1.80",
         maxEarning: "3.20",
       },
       {
-        name: "Cafetera Eléctrica Deluxe",
-        category: "Hogar",
-        imageUrl: "https://images.unsplash.com/photo-1595981267035-7b04ca84a82d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=300&h=200",
-        minEarning: "1.00",
-        maxEarning: "2.50",
+        name: "Fundas de Asientos Universales",
+        category: "Automotive",
+        imageUrl: "/attached_assets/prints/PT10.png",
+        minEarning: "3.00",
+        maxEarning: "5.00",
       },
       {
-        name: "Reloj Fitness Tracker",
-        category: "Deporte",
-        imageUrl: "https://images.unsplash.com/photo-1575311373937-040b8e1fd5b6?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=300&h=200",
-        minEarning: "1.50",
-        maxEarning: "3.00",
+        name: "Enhebrador Automático",
+        category: "Herramientas",
+        imageUrl: "/attached_assets/prints/PT50.png",
+        minEarning: "1.00",
+        maxEarning: "2.50",
       },
     ];
 

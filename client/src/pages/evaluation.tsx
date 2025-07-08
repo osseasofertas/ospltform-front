@@ -286,7 +286,6 @@ export default function Evaluation() {
                 className="w-16 h-16 object-cover rounded-lg"
               />
               <div className="ml-4">
-                <h3 className="font-semibold text-neutral-800">{currentProduct.name}</h3>
                 <p className="text-sm text-neutral-600">
                   Evaluación en progreso • {answeredCount}/5 respondidas
                 </p>
