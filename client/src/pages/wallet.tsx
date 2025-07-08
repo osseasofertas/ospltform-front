@@ -4,8 +4,9 @@ import { useLocation } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { ArrowLeft, Info, CreditCard, CheckCircle } from "lucide-react";
+import { ArrowLeft, Info, CreditCard, CheckCircle, Mail, Building } from "lucide-react";
 import { useAppState } from "@/hooks/use-app-state";
 import { useToast } from "@/hooks/use-toast";
 import { AppTransaction, AppStats } from "@/types";
@@ -17,6 +18,12 @@ export default function Wallet() {
   const { toast } = useToast();
   const [selectedPayoutMethod, setSelectedPayoutMethod] = useState<string>('');
   const [currentPayoutMethod, setCurrentPayoutMethod] = useState<string>('');
+  const [payoutDetails, setPayoutDetails] = useState({
+    email: '',
+    accountName: '',
+    bankName: '',
+    accountNumber: ''
+  });
 
   const { data: transactions = [] } = useQuery<AppTransaction[]>({
     queryKey: ["/api/transactions", user?.id],
@@ -31,8 +38,12 @@ export default function Wallet() {
   // Load payout method from localStorage on component mount
   useEffect(() => {
     const savedPayoutMethod = localStorage.getItem('payoutMethod');
+    const savedPayoutDetails = localStorage.getItem('payoutDetails');
     if (savedPayoutMethod) {
       setCurrentPayoutMethod(savedPayoutMethod);
+    }
+    if (savedPayoutDetails) {
+      setPayoutDetails(JSON.parse(savedPayoutDetails));
     }
   }, []);
 
@@ -44,7 +55,17 @@ export default function Wallet() {
         const response = await apiRequest(
           'POST',
           '/api/payout-method',
-          { userId: user?.id || 1, method }
+          { 
+            userId: user?.id || 1, 
+            method,
+            details: method === 'PayPal' ? {
+              email: payoutDetails.email
+            } : {
+              accountName: payoutDetails.accountName,
+              bankName: payoutDetails.bankName,
+              accountNumber: payoutDetails.accountNumber
+            }
+          }
         );
         console.log('Payout method registration response:', response);
         return await response.json();
@@ -57,6 +78,7 @@ export default function Wallet() {
       console.log('Payout method registration successful:', data);
       // Store in localStorage
       localStorage.setItem('payoutMethod', selectedPayoutMethod);
+      localStorage.setItem('payoutDetails', JSON.stringify(payoutDetails));
       setCurrentPayoutMethod(selectedPayoutMethod);
       
       // Show success toast
@@ -68,6 +90,12 @@ export default function Wallet() {
       
       // Reset selection
       setSelectedPayoutMethod('');
+      setPayoutDetails({
+        email: '',
+        accountName: '',
+        bankName: '',
+        accountNumber: ''
+      });
     },
     onError: (error) => {
       console.error('Payout method registration error:', error);
@@ -80,7 +108,7 @@ export default function Wallet() {
   });
 
   const handleRegisterPayoutMethod = () => {
-    if (selectedPayoutMethod) {
+    if (selectedPayoutMethod && isFormValid()) {
       payoutMethodMutation.mutate(selectedPayoutMethod);
     }
   };
@@ -88,6 +116,38 @@ export default function Wallet() {
   const handleChangePayoutMethod = () => {
     setCurrentPayoutMethod('');
     setSelectedPayoutMethod('');
+    setPayoutDetails({
+      email: '',
+      accountName: '',
+      bankName: '',
+      accountNumber: ''
+    });
+    localStorage.removeItem('payoutMethod');
+    localStorage.removeItem('payoutDetails');
+  };
+
+  const isFormValid = () => {
+    if (selectedPayoutMethod === 'PayPal') {
+      return payoutDetails.email.trim() !== '' && payoutDetails.email.includes('@');
+    } else if (selectedPayoutMethod === 'Depósito bancario') {
+      return payoutDetails.accountName.trim() !== '' && 
+             payoutDetails.bankName.trim() !== '' && 
+             payoutDetails.accountNumber.trim() !== '';
+    }
+    return false;
+  };
+
+  const getCurrentPayoutInfo = () => {
+    const savedDetails = localStorage.getItem('payoutDetails');
+    if (savedDetails && currentPayoutMethod) {
+      const details = JSON.parse(savedDetails);
+      if (currentPayoutMethod === 'PayPal') {
+        return details.email;
+      } else {
+        return `${details.bankName} - ${details.accountName}`;
+      }
+    }
+    return currentPayoutMethod;
   };
 
   const handleBack = () => {
@@ -146,7 +206,10 @@ export default function Wallet() {
             <div className="space-y-4">
               <div className="flex items-center gap-2 text-green-600">
                 <CheckCircle className="h-5 w-5" />
-                <span className="font-medium">Método de cobro activo: {currentPayoutMethod}</span>
+                <div>
+                  <p className="font-medium">Método de cobro activo: {currentPayoutMethod}</p>
+                  <p className="text-sm text-neutral-600">{getCurrentPayoutInfo()}</p>
+                </div>
               </div>
               <Button 
                 onClick={handleChangePayoutMethod}
@@ -162,17 +225,87 @@ export default function Wallet() {
               <RadioGroup value={selectedPayoutMethod} onValueChange={setSelectedPayoutMethod}>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="PayPal" id="paypal" />
-                  <Label htmlFor="paypal" className="text-sm font-medium">PayPal</Label>
+                  <Label htmlFor="paypal" className="text-sm font-medium flex items-center gap-2">
+                    <Mail className="h-4 w-4" />
+                    PayPal
+                  </Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="Depósito bancario" id="bank" />
-                  <Label htmlFor="bank" className="text-sm font-medium">Depósito bancario</Label>
+                  <Label htmlFor="bank" className="text-sm font-medium flex items-center gap-2">
+                    <Building className="h-4 w-4" />
+                    Depósito bancario
+                  </Label>
                 </div>
               </RadioGroup>
+
+              {/* PayPal Details */}
+              {selectedPayoutMethod === 'PayPal' && (
+                <div className="space-y-3 p-3 bg-blue-50 rounded-lg border">
+                  <Label htmlFor="email" className="text-sm font-medium text-blue-800">
+                    Email de PayPal
+                  </Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="tu-email@ejemplo.com"
+                    value={payoutDetails.email}
+                    onChange={(e) => setPayoutDetails({
+                      ...payoutDetails,
+                      email: e.target.value
+                    })}
+                    className="border-blue-200 focus:border-blue-400"
+                  />
+                  <p className="text-xs text-blue-600">
+                    Ingresa el email asociado a tu cuenta de PayPal
+                  </p>
+                </div>
+              )}
+
+              {/* Bank Details */}
+              {selectedPayoutMethod === 'Depósito bancario' && (
+                <div className="space-y-3 p-3 bg-green-50 rounded-lg border">
+                  <Label className="text-sm font-medium text-green-800">
+                    Datos bancarios básicos
+                  </Label>
+                  <div className="space-y-2">
+                    <Input
+                      placeholder="Nombre del titular"
+                      value={payoutDetails.accountName}
+                      onChange={(e) => setPayoutDetails({
+                        ...payoutDetails,
+                        accountName: e.target.value
+                      })}
+                      className="border-green-200 focus:border-green-400"
+                    />
+                    <Input
+                      placeholder="Nombre del banco"
+                      value={payoutDetails.bankName}
+                      onChange={(e) => setPayoutDetails({
+                        ...payoutDetails,
+                        bankName: e.target.value
+                      })}
+                      className="border-green-200 focus:border-green-400"
+                    />
+                    <Input
+                      placeholder="Número de cuenta"
+                      value={payoutDetails.accountNumber}
+                      onChange={(e) => setPayoutDetails({
+                        ...payoutDetails,
+                        accountNumber: e.target.value
+                      })}
+                      className="border-green-200 focus:border-green-400"
+                    />
+                  </div>
+                  <p className="text-xs text-green-600">
+                    Información básica para procesamiento de pagos
+                  </p>
+                </div>
+              )}
               
               <Button 
                 onClick={handleRegisterPayoutMethod}
-                disabled={!selectedPayoutMethod || payoutMethodMutation.isPending}
+                disabled={!selectedPayoutMethod || !isFormValid() || payoutMethodMutation.isPending}
                 className="w-full"
               >
                 {payoutMethodMutation.isPending ? 'Registrando...' : 'Registrar método'}
