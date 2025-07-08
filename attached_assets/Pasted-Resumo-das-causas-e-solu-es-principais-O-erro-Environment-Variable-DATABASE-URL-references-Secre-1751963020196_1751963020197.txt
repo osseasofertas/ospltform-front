@@ -1,0 +1,96 @@
+Resumo das causas e soluções principais
+O erro “Environment Variable ‘DATABASE_URL’ references Secret ‘database_url’, which does not exist” acontece porque o Vercel detecta uma referência a um secret chamado database_url que não foi criado no Secrets Manager dele 
+community.vercel.com
+. Para corrigir, você pode:
+
+Criar o secret no Vercel (via CLI ou Dashboard) e manter a referência em vercel.json 
+github.com
+.
+
+Remover a referência ao secret em vercel.json e, em vez disso, definir diretamente DATABASE_URL como variável de ambiente no painel de Environment Variables do projeto 
+stackoverflow.com
+.
+
+1. Diagnóstico do erro
+1.1. O que significa a mensagem
+Ao executar vercel --prod ou usar vercel env pull, o CLI verifica se há referências a secrets com o prefixo @.
+
+Se não encontrar um segredo cadastrado com aquele nome, lança:
+
+Environment Variable “DATABASE_URL” references Secret “database_url”, which does not exist. 
+stackoverflow.com
+
+1.2. Por que isso ocorre com Neon/Prisma no Replit
+Localmente você usa .env para armazenar DATABASE_URL, mas esses valores não são automaticamente sincronizados no Vercel 
+github.com
+.
+
+Se a configuração de build (ex: vercel.json) aponta para @database_url, mas você não criou esse secret, o deploy falha.
+
+2. Solução via CLI (Vercel Secrets Manager)
+Adicione o secret no Vercel, passando sua connection string do Neon/Prisma:
+
+bash
+Copiar código
+vercel secrets add database_url "<sua_connection_string>"
+github.com
+
+Referencie o secret no vercel.json (mantendo o @):
+
+json
+Copiar código
+{
+  "build": {
+    "env": {
+      "DATABASE_URL": "@database_url"
+    }
+  }
+}
+github.com
+
+Puxe as variáveis para o seu .env.local (opcional, para testes locais):
+
+bash
+Copiar código
+vercel env pull .env.local
+vercel.com
+
+(Alternativa) se preferir não usar secrets, você pode adicionar diretamente a variável de ambiente via CLI:
+
+bash
+Copiar código
+vercel env add DATABASE_URL
+compositecode.blog
+
+3. Solução via Dashboard (UI)
+Remova a seção "env" do seu vercel.json se estiver usando referências a @DATABASE_URL 
+stackoverflow.com
+.
+
+No Vercel, acesse Settings → Environment Variables.
+
+Clique em Add e preencha:
+
+Key: DATABASE_URL
+
+Value: sua connection string (sem aspas)
+
+Environment: marque Preview e Production
+vercel.com
+
+Redeploy: alterações em env vars só entram em vigor em novas builds 
+vercel.com
+.
+
+4. Considerações finais
+Sem aspas: não coloque " ao redor do valor no Dashboard; isso faz com que o Vercel o trate como parte da string 
+stackoverflow.com
+.
+
+Secrets vs. Env Vars:
+
+Env Vars são visíveis no painel e não exigem CLI.
+
+Secrets são criptografados e só acessíveis via referência @nome 
+vercel.com
+.
