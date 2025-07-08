@@ -33,12 +33,12 @@ export default function Evaluation() {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answeredCount, setAnsweredCount] = useState(0);
   const [stageAnswers, setStageAnswers] = useState<Record<number, any>>({});
-  const [allAnswers, setAllAnswers] = useState<Record<string, any>>({});
   const [draftId, setDraftId] = useState<number | null>(null);
   const [showCompletionModal, setShowCompletionModal] = useState(false);
   const [earnings, setEarnings] = useState<string>("");
   const [retryCount, setRetryCount] = useState(0);
   const [showStageComplete, setShowStageComplete] = useState(false);
+  const [allAnswers, setAllAnswers] = useState<Record<string, any>>({});
 
   // Load draft on mount
   const { data: draftData, isLoading: draftLoading } = useQuery({
@@ -132,36 +132,40 @@ export default function Evaluation() {
     }
   }, [draftData]);
 
-  // Auto-save when answers change with debouncing
-  useEffect(() => {
-    if (Object.keys(stageAnswers).length > 0) {
+  // Create debounced save function
+  const debouncedSave = useCallback(
+    debounce((stageAnswers: Record<number, any>) => {
       const updatedAllAnswers = {
         ...allAnswers,
         [`stage_${currentStage}`]: stageAnswers
       };
-      setAllAnswers(updatedAllAnswers);
-      
-      // Debounce the save operation
-      const timeoutId = setTimeout(() => {
-        const payload = {
-          draftId,
-          userId: user?.id,
-          productId: currentProduct?.id,
-          stage: currentStage,
-          partialAnswers: updatedAllAnswers
-        };
-        saveDraft(payload);
-      }, 500);
-      
-      return () => clearTimeout(timeoutId);
+      const payload = {
+        draftId,
+        userId: user?.id,
+        productId: currentProduct?.id,
+        stage: currentStage,
+        partialAnswers: updatedAllAnswers
+      };
+      saveDraft(payload);
+    }, 500),
+    [draftId, user?.id, currentProduct?.id, currentStage, allAnswers]
+  );
+
+  // Auto-save when answers change
+  useEffect(() => {
+    if (Object.keys(stageAnswers).length > 0) {
+      debouncedSave(stageAnswers);
     }
-  }, [stageAnswers, currentStage, allAnswers]);
+  }, [stageAnswers]);
 
   const handleBack = () => {
     setLocation("/main");
   };
 
   const handleAnswerChange = (questionId: number, answer: any, questionType: string) => {
+    // Check if this is a new answer
+    const isNewAnswer = !stageAnswers[questionId];
+    
     setStageAnswers(prev => ({
       ...prev,
       [questionId]: answer,
@@ -169,15 +173,32 @@ export default function Evaluation() {
 
     // Auto-advance for single-choice and star-rating questions
     if (questionType === 'multiple_choice' || questionType === 'star_rating') {
-      // Debounce the auto-advance to allow for smooth animation
+      // Update answered count only if this is a new answer
+      if (isNewAnswer) {
+        setAnsweredCount(prev => prev + 1);
+      }
+      
+      // Show success toast
+      toast({
+        title: "Progreso guardado",
+        description: "Tu respuesta ha sido registrada",
+      });
+
+      // Auto-advance with smooth animation
       setTimeout(() => {
-        handleNextQuestion();
+        if (currentQuestionIndex < questions.length - 1) {
+          setCurrentQuestionIndex(prev => prev + 1);
+        } else {
+          // All questions answered - show stage complete
+          setShowStageComplete(true);
+        }
       }, 300);
     }
   };
 
   const handleNextQuestion = () => {
-    if (!stageAnswers[questions[currentQuestionIndex]?.id]) {
+    const currentQuestion = questions[currentQuestionIndex];
+    if (!currentQuestion || !stageAnswers[currentQuestion.id]) {
       return; // Don't advance if no answer
     }
 
