@@ -1,13 +1,22 @@
-import { useQuery } from "@tanstack/react-query";
+import { useState, useEffect } from 'react';
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, Info } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { ArrowLeft, Info, CreditCard, CheckCircle } from "lucide-react";
 import { useAppState } from "@/hooks/use-app-state";
+import { useToast } from "@/hooks/use-toast";
 import { AppTransaction, AppStats } from "@/types";
+import { apiRequest } from "@/lib/queryClient";
 
 export default function Wallet() {
   const [, setLocation] = useLocation();
   const { user } = useAppState();
+  const { toast } = useToast();
+  const [selectedPayoutMethod, setSelectedPayoutMethod] = useState<string>('');
+  const [currentPayoutMethod, setCurrentPayoutMethod] = useState<string>('');
 
   const { data: transactions = [] } = useQuery<AppTransaction[]>({
     queryKey: ["/api/transactions", user?.id],
@@ -18,6 +27,57 @@ export default function Wallet() {
     queryKey: ["/api/users", user?.id, "stats"],
     enabled: !!user?.id,
   });
+
+  // Load payout method from localStorage on component mount
+  useEffect(() => {
+    const savedPayoutMethod = localStorage.getItem('payoutMethod');
+    if (savedPayoutMethod) {
+      setCurrentPayoutMethod(savedPayoutMethod);
+    }
+  }, []);
+
+  // Mutation for registering payout method
+  const payoutMethodMutation = useMutation({
+    mutationFn: async (method: string) => {
+      await apiRequest('/api/payout-method', {
+        method: 'POST',
+        body: { userId: user?.id || 1, method }
+      });
+    },
+    onSuccess: () => {
+      // Store in localStorage
+      localStorage.setItem('payoutMethod', selectedPayoutMethod);
+      setCurrentPayoutMethod(selectedPayoutMethod);
+      
+      // Show success toast
+      toast({
+        title: "¡Método registrado!",
+        description: `Tu método de cobro (${selectedPayoutMethod}) se ha registrado con éxito.`,
+        duration: 3000,
+      });
+      
+      // Reset selection
+      setSelectedPayoutMethod('');
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "No se pudo registrar el método de cobro. Inténtalo de nuevo.",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const handleRegisterPayoutMethod = () => {
+    if (selectedPayoutMethod) {
+      payoutMethodMutation.mutate(selectedPayoutMethod);
+    }
+  };
+
+  const handleChangePayoutMethod = () => {
+    setCurrentPayoutMethod('');
+    setSelectedPayoutMethod('');
+  };
 
   const handleBack = () => {
     setLocation("/main");
@@ -59,6 +119,55 @@ export default function Wallet() {
               Saque disponible después de 7 días
             </div>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Payout Method Card */}
+      <Card className="mx-4 mt-4 border border-neutral-200">
+        <CardContent className="p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <CreditCard className="h-5 w-5 text-primary" />
+            <h3 className="text-lg font-semibold text-neutral-800">Método de Cobro</h3>
+          </div>
+          
+          {currentPayoutMethod ? (
+            // Show active payout method
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 text-green-600">
+                <CheckCircle className="h-5 w-5" />
+                <span className="font-medium">Método de cobro activo: {currentPayoutMethod}</span>
+              </div>
+              <Button 
+                onClick={handleChangePayoutMethod}
+                variant="outline"
+                className="w-full"
+              >
+                Cambiar método
+              </Button>
+            </div>
+          ) : (
+            // Show payout method selection
+            <div className="space-y-4">
+              <RadioGroup value={selectedPayoutMethod} onValueChange={setSelectedPayoutMethod}>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="PayPal" id="paypal" />
+                  <Label htmlFor="paypal" className="text-sm font-medium">PayPal</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="Depósito bancario" id="bank" />
+                  <Label htmlFor="bank" className="text-sm font-medium">Depósito bancario</Label>
+                </div>
+              </RadioGroup>
+              
+              <Button 
+                onClick={handleRegisterPayoutMethod}
+                disabled={!selectedPayoutMethod || payoutMethodMutation.isPending}
+                className="w-full"
+              >
+                {payoutMethodMutation.isPending ? 'Registrando...' : 'Registrar método'}
+              </Button>
+            </div>
+          )}
         </CardContent>
       </Card>
 
