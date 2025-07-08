@@ -1,0 +1,83 @@
+Prompt for Replit AI – SafeMoney (English instructions, Spanish UI)
+
+================================================================================
+1. Overall Objective
+--------------------------------------------------------------------------------
+Build a mobile-first web app called **SafeMoney** where users:
+- Register (in Spanish) and receive a R$ 289,00 welcome bonus  
+- Browse a list of products to evaluate  
+- Complete a three-stage questionnaire per product (5 questions each)  
+- Earn between R$ 1,00 and R$ 4,00 for each completed evaluation  
+- View their balance and transaction history in real time  
+
+All on-screen labels, buttons and messages must appear in Spanish.
+
+================================================================================
+2. User Flow & Screens
+--------------------------------------------------------------------------------
+1. **Pantalla de Bienvenida / Registro**  
+   - Title: “Bienvenido a SafeMoney”  
+   - Subtitle: “Regístrate y recibe R$ 289,00 de bono inicial”  
+   - Fields: “Nombre”, “Correo electrónico”, “Contraseña”  
+   - Button: “Crear cuenta”  
+   - Secondary Button: “Prueba con cuenta demo”  
+
+2. **Pantalla Principal / Lista de Productos**  
+   - Header: “Elige un producto para evaluar”  
+   - Product Card: image, product name, “Gana entre R$ X,XX y R$ Y,YY”  
+   - Footer badge: “Evaluaciones disponibles hoy: X/25”  
+
+3. **Pantalla de Evaluación**  
+   - Header: “Producto {{número}} de {{total}} – Etapa {{etapa}} de 3”  
+   - Display 5 questions: types “Elección múltiple”, “Valoración (1–5 estrellas)”, “Respuesta libre”  
+   - Next button: “Siguiente etapa” (disabled until all answered)  
+
+4. **Autosave & Resumir Progreso**  
+   - After each answer, autosave silently  
+   - On app reload, resume at last unanswered question  
+   - Display a toast “Progreso guardado” after each checkpoint  
+
+5. **Pantalla de Resultados**  
+   - After stage 3, show: “¡Completado! Has ganado R$ {{monto}},YY”  
+   - Button: “Ver mi saldo”  
+
+6. **Pantalla de Billetera / Historial**  
+   - Header: “Mi Billetera”  
+   - Big balance: “Saldo disponible: R$ {{balance}},YY”  
+   - List: Fecha, Producto, Etapa, Monto ganado  
+   - Info text: “Saque disponible después de 7 días”  
+
+7. **Pantalla de Perfil / Soporte**  
+   - Profile info: “Nombre: {{nombre}}”, “Correo: {{email}}”, “Registrado: {{fecha}}”  
+   - Button: “Solicitar retiro” (enabled after 7 días)  
+   - Link: “FAQ” and “Contactar soporte”  
+
+================================================================================
+3. Business Rules
+--------------------------------------------------------------------------------
+- **Máximo 25 evaluaciones por día**  
+- **Bono inicial**: R$ 289,00 al registrarse  
+- **Retiro habilitado**: 7 días después del registro  
+- **Ganancias por evaluación**: aleatorio entre valores mínimos y máximos del producto  
+
+================================================================================
+4. Technical Requirements (brief)
+--------------------------------------------------------------------------------
+- Frontend: React 18 + TypeScript, Vite, Tailwind CSS + shadcn/ui, Radix UI, Wouter, TanStack Query  
+- Backend: Node.js + Express + TypeScript, Drizzle ORM, PostgreSQL (Neon)  
+- Data persistence: ACID transactions for checkpoints, draft recovery  
+- Autosave: every answer & end of each stage  
+- Concurrency: optimistic versioning, HTTP 409 on conflict  
+- Retries: up to 3 with exponential back-off  
+- WAL & multi-AZ replicas for durability  
+
+================================================================================
+5. Acceptance Criteria
+--------------------------------------------------------------------------------
+- Spanish UI as specified above  
+- Smooth three-stage evaluation with autosave  
+- Progress resumes on reload  
+- Earnings calculated and displayed correctly  
+- Balance and history update in real time  
+- Mobile-first responsive design  
+- Clear toasts and error messages in Spanish  
