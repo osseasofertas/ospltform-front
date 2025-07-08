@@ -81,7 +81,7 @@ The application uses five main tables:
 
 ## Deployment Strategy
 
-The application is designed for deployment on Replit with the following structure:
+The application is designed for deployment on both Replit and Vercel with the following structure:
 
 ### Build Process
 - **Frontend**: Vite builds React app to `dist/public`
@@ -91,6 +91,7 @@ The application is designed for deployment on Replit with the following structur
 ### Environment Variables
 - `DATABASE_URL`: PostgreSQL connection string for Neon database
 - `NODE_ENV`: Environment setting (development/production)
+- `PGHOST`, `PGUSER`, `PGPASSWORD`, `PGDATABASE`, `PGPORT`: Database connection details
 
 ### Scripts
 - `dev`: Development server with TypeScript compilation
@@ -98,11 +99,29 @@ The application is designed for deployment on Replit with the following structur
 - `start`: Production server startup
 - `db:push`: Database schema deployment
 
+### Vercel Deployment Configuration
+- **vercel.json**: Main deployment configuration with serverless functions
+- **api/index.ts**: Serverless function entry point for Express.js backend
+- **tsconfig.server.json**: TypeScript configuration for server compilation
+- **.vercelignore**: Files excluded from deployment
+- **VERCEL_DEPLOYMENT.md**: Complete deployment guide and troubleshooting
+- **scripts/deploy.sh**: Automated deployment script
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
+
+- **Vercel Deployment Configuration (July 08, 2025)**:
+  - Created complete Vercel deployment setup with vercel.json configuration
+  - Implemented serverless function architecture in api/index.ts
+  - Added TypeScript configuration for server compilation (tsconfig.server.json)
+  - Created comprehensive deployment guide (VERCEL_DEPLOYMENT.md)
+  - Added automated deployment script (scripts/deploy.sh)
+  - Configured environment variables for production deployment
+  - Set up proper CORS configuration for frontend-backend communication
+  - Prepared .vercelignore file for optimized deployment
 
 - **Enhanced User Experience & Visual Design (July 08, 2025)**:
   - Fixed evaluation progress bar to show accurate question counts dynamically
