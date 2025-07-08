@@ -362,51 +362,107 @@ async function initializeSampleData() {
       }
     }
 
-    // Create sample questions for each product
-    const sampleQuestions = [
-      {
-        stage: 1,
-        questionNumber: 1,
-        type: "multiple_choice",
-        question: "¿Cuál es tu rango de edad?",
-        options: ["18-25 años", "26-35 años", "36-45 años", "46+ años"],
-      },
-      {
-        stage: 1,
-        questionNumber: 2,
-        type: "star_rating",
-        question: "¿Qué tan importante es la calidad de este producto?",
-        metadata: { minLabel: "Poco importante", maxLabel: "Muy importante" },
-      },
-      {
-        stage: 1,
-        questionNumber: 3,
-        type: "free_text",
-        question: "¿Qué características adicionales te gustaría ver en este producto?",
-      },
-      {
-        stage: 1,
-        questionNumber: 4,
-        type: "multiple_choice",
-        question: "¿Con qué frecuencia usarías este producto?",
-        options: ["Diariamente", "Semanalmente", "Mensualmente", "Raramente"],
-      },
-      {
-        stage: 1,
-        questionNumber: 5,
-        type: "star_rating",
-        question: "¿Cómo calificarías el precio de este producto?",
-        metadata: { minLabel: "Muy caro", maxLabel: "Muy barato" },
-      },
-    ];
+    // Create comprehensive questions for each stage
+    const stageQuestions = {
+      1: [
+        {
+          questionNumber: 1,
+          type: "multiple_choice",
+          question: "¿Cuál es tu rango de edad?",
+          options: ["18-25 años", "26-35 años", "36-45 años", "46+ años"],
+        },
+        {
+          questionNumber: 2,
+          type: "free_text",
+          question: "¿Qué problema específico esperas resolver con este producto? Explica detalladamente.",
+        },
+        {
+          questionNumber: 3,
+          type: "multiple_choice",
+          question: "¿Cuál es tu nivel de experiencia con productos similares?",
+          options: ["Nunca he usado algo similar", "Principiante", "Intermedio", "Experto"],
+        },
+        {
+          questionNumber: 4,
+          type: "free_text",
+          question: "Describe una situación específica en la que usarías este producto. ¿Dónde, cuándo y cómo?",
+        },
+        {
+          questionNumber: 5,
+          type: "star_rating",
+          question: "¿Qué tan importante es la calidad de este producto para ti?",
+          metadata: { minLabel: "Poco importante", maxLabel: "Muy importante" },
+        },
+      ],
+      2: [
+        {
+          questionNumber: 1,
+          type: "free_text",
+          question: "¿Qué características adicionales te gustaría ver en este producto que no están actualmente disponibles?",
+        },
+        {
+          questionNumber: 2,
+          type: "multiple_choice",
+          question: "¿Con qué frecuencia usarías este producto?",
+          options: ["Diariamente", "Varias veces por semana", "Semanalmente", "Mensualmente", "Raramente"],
+        },
+        {
+          questionNumber: 3,
+          type: "free_text",
+          question: "¿Qué te gusta más de este producto comparado con otros similares en el mercado?",
+        },
+        {
+          questionNumber: 4,
+          type: "multiple_choice",
+          question: "¿Cuál sería tu presupuesto máximo para este tipo de producto?",
+          options: ["Menos de R$ 50", "R$ 50-100", "R$ 100-200", "R$ 200-500", "Más de R$ 500"],
+        },
+        {
+          questionNumber: 5,
+          type: "star_rating",
+          question: "¿Cómo calificarías el precio de este producto?",
+          metadata: { minLabel: "Muy caro", maxLabel: "Muy barato" },
+        },
+      ],
+      3: [
+        {
+          questionNumber: 1,
+          type: "free_text",
+          question: "¿Qué mejoras o cambios sugerirías para hacer este producto más atractivo?",
+        },
+        {
+          questionNumber: 2,
+          type: "multiple_choice",
+          question: "¿Recomendarías este producto a amigos o familiares?",
+          options: ["Definitivamente sí", "Probablemente sí", "Tal vez", "Probablemente no", "Definitivamente no"],
+        },
+        {
+          questionNumber: 3,
+          type: "free_text",
+          question: "¿Qué aspectos negativos o limitaciones ves en este producto?",
+        },
+        {
+          questionNumber: 4,
+          type: "multiple_choice",
+          question: "¿Cuál es la característica más importante para ti en este tipo de producto?",
+          options: ["Precio", "Calidad", "Diseño", "Funcionalidad", "Marca"],
+        },
+        {
+          questionNumber: 5,
+          type: "free_text",
+          question: "En pocas palabras, ¿cuál sería tu reseña general de este producto?",
+        },
+      ],
+    };
 
     // Add questions for each product and stage
     const allProducts = await storage.getProducts();
     for (const product of allProducts) {
       for (let stage = 1; stage <= 3; stage++) {
-        for (const questionTemplate of sampleQuestions) {
-          const existingQuestions = await storage.getQuestionsByProduct(product.id, stage);
-          if (existingQuestions.length === 0) {
+        const existingQuestions = await storage.getQuestionsByProduct(product.id, stage);
+        if (existingQuestions.length === 0) {
+          const questionsForStage = stageQuestions[stage as keyof typeof stageQuestions];
+          for (const questionTemplate of questionsForStage) {
             await storage.createQuestion({
               productId: product.id,
               stage,
@@ -414,7 +470,7 @@ async function initializeSampleData() {
               type: questionTemplate.type,
               question: questionTemplate.question,
               options: questionTemplate.options || null,
-              metadata: questionTemplate.metadata || null,
+              metadata: (questionTemplate as any).metadata || null,
             });
           }
         }
