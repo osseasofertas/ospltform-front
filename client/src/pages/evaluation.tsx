@@ -30,12 +30,15 @@ export default function Evaluation() {
   const queryClient = useQueryClient();
   
   const [currentStage, setCurrentStage] = useState(1);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [answeredCount, setAnsweredCount] = useState(0);
   const [stageAnswers, setStageAnswers] = useState<Record<number, any>>({});
   const [allAnswers, setAllAnswers] = useState<Record<string, any>>({});
   const [draftId, setDraftId] = useState<number | null>(null);
   const [showCompletionModal, setShowCompletionModal] = useState(false);
   const [earnings, setEarnings] = useState<string>("");
   const [retryCount, setRetryCount] = useState(0);
+  const [showStageComplete, setShowStageComplete] = useState(false);
 
   // Load draft on mount
   const { data: draftData, isLoading: draftLoading } = useQuery({
@@ -118,7 +121,14 @@ export default function Evaluation() {
       setDraftId(draft.draftId);
       setCurrentStage(draft.stage);
       setAllAnswers(draft.partialAnswers || {});
-      setStageAnswers(draft.partialAnswers?.[`stage_${draft.stage}`] || {});
+      
+      const stageAnswers = draft.partialAnswers?.[`stage_${draft.stage}`] || {};
+      setStageAnswers(stageAnswers);
+      
+      // Calculate current question index and answered count
+      const answeredQuestions = Object.keys(stageAnswers).length;
+      setAnsweredCount(answeredQuestions);
+      setCurrentQuestionIndex(answeredQuestions);
     }
   }, [draftData]);
 
@@ -151,16 +161,48 @@ export default function Evaluation() {
     setLocation("/main");
   };
 
-  const handleAnswerChange = (questionId: number, answer: any) => {
+  const handleAnswerChange = (questionId: number, answer: any, questionType: string) => {
     setStageAnswers(prev => ({
       ...prev,
       [questionId]: answer,
     }));
+
+    // Auto-advance for single-choice and star-rating questions
+    if (questionType === 'multiple_choice' || questionType === 'star_rating') {
+      // Debounce the auto-advance to allow for smooth animation
+      setTimeout(() => {
+        handleNextQuestion();
+      }, 300);
+    }
+  };
+
+  const handleNextQuestion = () => {
+    if (!stageAnswers[questions[currentQuestionIndex]?.id]) {
+      return; // Don't advance if no answer
+    }
+
+    setAnsweredCount(prev => prev + 1);
+    
+    // Show success toast
+    toast({
+      title: "Progreso guardado",
+      description: "Tu respuesta ha sido registrada",
+    });
+
+    if (currentQuestionIndex < questions.length - 1) {
+      setCurrentQuestionIndex(prev => prev + 1);
+    } else {
+      // All questions answered - show stage complete
+      setShowStageComplete(true);
+    }
   };
 
   const handleNextStage = () => {
     if (currentStage < 3) {
       setCurrentStage(currentStage + 1);
+      setCurrentQuestionIndex(0);
+      setAnsweredCount(0);
+      setShowStageComplete(false);
       setStageAnswers(allAnswers[`stage_${currentStage + 1}`] || {});
     } else {
       // Complete evaluation
@@ -173,7 +215,18 @@ export default function Evaluation() {
   };
 
   const isStageComplete = () => {
-    return questions.every(q => stageAnswers[q.id] !== undefined && stageAnswers[q.id] !== "");
+    return answeredCount === questions.length;
+  };
+
+  const canContinue = () => {
+    const currentQuestion = questions[currentQuestionIndex];
+    if (!currentQuestion) return false;
+    
+    const answer = stageAnswers[currentQuestion.id];
+    if (currentQuestion.type === 'free_text') {
+      return answer && answer.trim() !== '';
+    }
+    return answer !== undefined && answer !== '';
   };
 
   const handleModalClose = () => {
@@ -198,9 +251,8 @@ export default function Evaluation() {
 
   const totalProducts = 4; // This could come from app state
   const currentProductIndex = 1; // This could be calculated from current product
-  const answeredQuestions = Object.keys(stageAnswers).length;
-  const totalStageQuestions = questions.length;
-  const progressPercentage = ((currentStage - 1) / 3) * 100 + (answeredQuestions / (totalStageQuestions * 3)) * 100;
+  const progressPercentage = (answeredCount / 5) * 100;
+  const currentQuestion = questions[currentQuestionIndex];
 
   return (
     <>
@@ -236,63 +288,86 @@ export default function Evaluation() {
               <div className="ml-4">
                 <h3 className="font-semibold text-neutral-800">{currentProduct.name}</h3>
                 <p className="text-sm text-neutral-600">
-                  Evaluación en progreso • {answeredQuestions}/{totalStageQuestions} respondidas
+                  Evaluación en progreso • {answeredCount}/5 respondidas
                 </p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Questions */}
-        <div className="p-4 space-y-6 pb-24">
-          {questions.map((question) => (
-            <Card key={question.id} className="border border-neutral-200">
+        {/* Questions Area */}
+        <div className="p-4 pb-24">
+          {showStageComplete ? (
+            // Stage Completion View
+            <Card className="border border-neutral-200">
+              <CardContent className="p-6 text-center">
+                <div className="bg-primary/10 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                  <CheckCircle className="text-primary h-8 w-8" />
+                </div>
+                <h3 className="text-xl font-semibold text-neutral-800 mb-2">
+                  Has completado la Etapa {currentStage}
+                </h3>
+                <p className="text-neutral-600 mb-6">
+                  Todas las preguntas han sido respondidas correctamente
+                </p>
+                <Button
+                  onClick={handleNextStage}
+                  className="w-full bg-primary text-white py-3 px-6 rounded-lg font-semibold text-lg"
+                >
+                  {currentStage < 3 ? "Siguiente etapa" : "Finalizar evaluación"}
+                </Button>
+              </CardContent>
+            </Card>
+          ) : currentQuestion ? (
+            // Single Question View
+            <Card className="border border-neutral-200">
               <CardContent className="p-4">
                 <h3 className="font-semibold text-neutral-800 mb-4">
-                  {question.questionNumber}. {question.question}
+                  {currentQuestion.questionNumber}. {currentQuestion.question}
                 </h3>
                 
-                {question.type === "multiple_choice" && (
+                {currentQuestion.type === "multiple_choice" && (
                   <QuestionMultipleChoice
-                    question={question}
-                    value={stageAnswers[question.id]}
-                    onChange={(value) => handleAnswerChange(question.id, value)}
+                    question={currentQuestion}
+                    value={stageAnswers[currentQuestion.id]}
+                    onChange={(value) => handleAnswerChange(currentQuestion.id, value, currentQuestion.type)}
                   />
                 )}
                 
-                {question.type === "star_rating" && (
+                {currentQuestion.type === "star_rating" && (
                   <QuestionStarRating
-                    question={question}
-                    value={stageAnswers[question.id]}
-                    onChange={(value) => handleAnswerChange(question.id, value)}
+                    question={currentQuestion}
+                    value={stageAnswers[currentQuestion.id]}
+                    onChange={(value) => handleAnswerChange(currentQuestion.id, value, currentQuestion.type)}
                   />
                 )}
                 
-                {question.type === "free_text" && (
-                  <QuestionFreeText
-                    question={question}
-                    value={stageAnswers[question.id]}
-                    onChange={(value) => handleAnswerChange(question.id, value)}
-                  />
+                {currentQuestion.type === "free_text" && (
+                  <>
+                    <QuestionFreeText
+                      question={currentQuestion}
+                      value={stageAnswers[currentQuestion.id]}
+                      onChange={(value) => handleAnswerChange(currentQuestion.id, value, currentQuestion.type)}
+                    />
+                    <Button
+                      onClick={handleNextQuestion}
+                      disabled={!canContinue()}
+                      className="w-full mt-4 bg-primary text-white py-3 px-6 rounded-lg font-semibold disabled:bg-neutral-300 disabled:cursor-not-allowed"
+                    >
+                      Continuar
+                    </Button>
+                  </>
                 )}
               </CardContent>
             </Card>
-          ))}
+          ) : (
+            <div className="text-center py-8">
+              <p className="text-neutral-600">No hay preguntas disponibles</p>
+            </div>
+          )}
         </div>
 
-        {/* Continue Button */}
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-neutral-200 p-4">
-          <Button
-            onClick={handleNextStage}
-            disabled={!isStageComplete()}
-            className="w-full bg-primary text-white py-3 px-6 rounded-lg font-semibold text-lg hover:bg-primary/90 disabled:bg-neutral-300 disabled:cursor-not-allowed"
-          >
-            {currentStage < 3 ? "Siguiente etapa" : "Finalizar evaluación"}
-          </Button>
-          <p className="text-xs text-neutral-500 mt-2 text-center">
-            Progreso guardado automáticamente
-          </p>
-        </div>
+
       </div>
 
       {/* Completion Modal */}

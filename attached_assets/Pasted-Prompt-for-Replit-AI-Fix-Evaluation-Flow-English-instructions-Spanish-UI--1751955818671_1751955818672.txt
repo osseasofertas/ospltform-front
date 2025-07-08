@@ -1,0 +1,75 @@
+Prompt for Replit AI – Fix Evaluation Flow (English instructions, Spanish UI)
+
+================================================================================
+Context
+--------------------------------------------------------------------------------
+The registration and wallet screens are complete. Now refine the “Evaluación” session so that:
+
+- Users answer **one question at a time** within each stage (5 questions per stage).  
+- The header shows “Evaluación en progreso • X/Y respondidas” and updates as the user advances.  
+- For simple‐choice (radio) and star‐rating questions, selecting an option **automatically advances** to the next question.  
+- For multiple‐choice (checkbox) and open‐ended (textarea) questions, display a **“Continuar”** button to proceed, disabled until at least one selection or non‐empty text.  
+
+All labels, buttons and feedback must appear in Spanish.
+
+================================================================================
+1. Question Component Behavior
+--------------------------------------------------------------------------------
+1.1 Single‐Choice & Rating  
+  • Render one question at a time.  
+  • As soon as the user selects a radio option or clicks a star:  
+    – Save the answer (autosave debounce 300 ms).  
+    – Increment “respondidas” count.  
+    – Immediately load the next question.  
+
+1.2 Multiple‐Choice & Open‐Ended  
+  • Render a group of checkboxes (multiple‐choice) or a `<textarea>` (open‐ended) with `placeholder="Escribe tu respuesta…"` and copy/paste disabled.  
+  • Below the inputs, display a **“Continuar”** button:  
+    – Disabled until at least one checkbox is checked or textarea is non‐empty.  
+    – On click: save the answer, increment “respondidas,” then load next question.  
+
+================================================================================
+2. UI & State Updates
+--------------------------------------------------------------------------------
+2.1 Header & Progress  
+  • Header remains:  
+      Producto {{currentProductIndex}} de {{totalProducts}}  
+      Etapa {{stage}} de 3  
+  • Sub‐header or badge: “Evaluación en progreso • {{answeredCount}}/5 respondidas”  
+  • Animate a small progress bar under the header reflecting `answeredCount/5`.  
+
+2.2 Question Flow  
+  • Load questions via GET `/api/products/{id}/questions?stage={{stage}}`.  
+  • Maintain local state:  
+      – `currentQuestionIndex` (0–4)  
+      – `answeredCount` (0–5)  
+  • When `currentQuestionIndex === 5`: show “Finalizar etapa” button instead of next question.  
+
+================================================================================
+3. Finalizar Etapa & Stage Transition
+--------------------------------------------------------------------------------
+3.1 End of Stage  
+  • After question 5: replace question area with:  
+      – Text: “Has completado la Etapa {{stage}}”  
+      – Button: “Siguiente etapa”  
+  • On click: reset `answeredCount=0`, `currentQuestionIndex=0`, increment `stage`, fetch next-stage questions.  
+
+3.2 End of Evaluation  
+  • After Stage 3 and clicking “Finalizar evaluación”:  
+      POST `/api/evaluations` with all answers → show modal “¡Completado! Has ganado R$ {{earning}},YY”  
+
+================================================================================
+4. Error Handling & Feedback
+--------------------------------------------------------------------------------
+  • On save failure: retry up to 2× with exponential back‐off.  
+  • If still failing: show toast “Error al guardar. Revisa tu conexión” with a “Reintentar” button.  
+  • On successful save/advance: show brief toast “Progreso guardado”.  
+
+================================================================================
+Labels & Buttons (Spanish)
+--------------------------------------------------------------------------------
+  • Radio/Stars: no button—auto‐advance  
+  • Checkbox/Textarea: “Continuar”  
+  • End of stage: “Siguiente etapa”  
+  • Final submit: “Finalizar evaluación”  
+  • Toasts: “Progreso guardado”, “Error al guardar”  
