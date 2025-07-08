@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Wallet } from "lucide-react";
+import { Wallet, AlertCircle } from "lucide-react";
 import { useAppState } from "@/hooks/use-app-state";
 import { useLocation } from "wouter";
 import { AppProduct } from "@/types";
@@ -11,8 +11,9 @@ export default function Main() {
   const { user, setCurrentProduct } = useAppState();
   const [, setLocation] = useLocation();
 
-  const { data: products = [], isLoading } = useQuery<AppProduct[]>({
-    queryKey: ["/api/products"],
+  const { data: products = [], isLoading, error } = useQuery<AppProduct[]>({
+    queryKey: [`/api/products?userId=${user?.id}`],
+    enabled: !!user?.id,
   });
 
   const handleProductSelect = (product: AppProduct) => {
@@ -26,6 +27,51 @@ export default function Main() {
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
           <p className="text-neutral-600">Cargando productos...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Handle daily limit reached
+  if (error && (error as any).message?.includes("Límite diario")) {
+    return (
+      <div className="min-h-screen bg-neutral-50">
+        {/* Header */}
+        <div className="bg-white border-b border-neutral-200 px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-xl font-semibold text-neutral-800">
+                Evaluaciones
+              </h2>
+              <p className="text-sm text-neutral-600">Límite diario alcanzado</p>
+            </div>
+            <button
+              onClick={() => setLocation("/wallet")}
+              className="text-primary hover:text-primary-600 transition-colors"
+            >
+              <Wallet className="h-6 w-6" />
+            </button>
+          </div>
+        </div>
+        
+        {/* Limit Message */}
+        <div className="p-4">
+          <Card className="border border-orange-200 bg-orange-50">
+            <CardContent className="p-6 text-center">
+              <div className="bg-orange-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                <AlertCircle className="text-orange-600 h-8 w-8" />
+              </div>
+              <h3 className="text-xl font-semibold text-neutral-800 mb-2">
+                Límite diario alcanzado
+              </h3>
+              <p className="text-neutral-600 mb-4">
+                Has completado 25 evaluaciones hoy. Vuelve mañana para continuar ganando dinero evaluando productos.
+              </p>
+              <p className="text-sm text-neutral-500">
+                El límite se restablece a las 00:00 horas.
+              </p>
+            </CardContent>
+          </Card>
         </div>
       </div>
     );
@@ -63,8 +109,8 @@ export default function Main() {
         </CardContent>
       </Card>
 
-      {/* Product List */}
-      <div className="p-4 space-y-4">
+      {/* Product Grid - Instagram Style */}
+      <div className="p-4 grid grid-cols-2 gap-4">
         {products.map((product) => (
           <ProductCard
             key={product.id}

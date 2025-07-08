@@ -14,20 +14,24 @@ export default function ProductCard({ product, onSelect }: ProductCardProps) {
       onClick={onSelect}
     >
       <CardContent className="p-0">
-        <div className="flex">
+        {/* Instagram-style square image */}
+        <div className="aspect-square w-full">
           <img 
             src={product.imageUrl} 
             alt={product.name}
-            className="w-20 h-20 object-cover"
+            className="w-full h-full object-cover"
           />
-          <div className="flex-1 p-4">
-            <p className="text-sm text-neutral-600 mb-2">{product.category} · 3 etapas</p>
-            <div className="flex items-center justify-between">
-              <span className="text-primary font-semibold">
+        </div>
+        {/* Product details below image */}
+        <div className="p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-neutral-600 mb-1">{product.category} · 3 etapas</p>
+              <span className="text-primary font-semibold text-sm">
                 Gana entre R$ {product.minEarning} y R$ {product.maxEarning}
               </span>
-              <ChevronRight className="text-neutral-400 h-4 w-4" />
             </div>
+            <ChevronRight className="text-neutral-400 h-4 w-4" />
           </div>
         </div>
       </CardContent>

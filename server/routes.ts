@@ -113,6 +113,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Product routes
   app.get("/api/products", async (req, res) => {
     try {
+      const userId = req.query.userId ? parseInt(req.query.userId as string) : null;
+      
+      // Check daily evaluation limit (25 evaluations per day)
+      if (userId) {
+        const stats = await storage.getUserStats(userId);
+        if (stats.todayEvaluations >= 25) {
+          return res.status(429).json({ 
+            message: "Límite diario alcanzado. Puedes evaluar hasta 25 productos por día.",
+            limitReached: true,
+            todayEvaluations: stats.todayEvaluations,
+            limit: 25
+          });
+        }
+      }
+      
       const products = await storage.getProducts();
       res.json(products);
     } catch (error) {
@@ -322,35 +337,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
 async function initializeSampleData() {
   try {
-    // Create sample products using real product images
+    // Create sample products using real product images (8 products from 343 available)
     const products = [
       {
-        name: "Camisetas Básicas Pack",
+        name: "Producto",
         category: "Ropa",
         imageUrl: "/attached_assets/prints/PT2.png",
         minEarning: "2.50",
         maxEarning: "4.00",
       },
       {
-        name: "Alfombra Decorativa",
+        name: "Producto",
         category: "Hogar",
         imageUrl: "/attached_assets/prints/PT3.png",
         minEarning: "1.80",
         maxEarning: "3.20",
       },
       {
-        name: "Fundas de Asientos Universales",
+        name: "Producto",
         category: "Automotive",
         imageUrl: "/attached_assets/prints/PT10.png",
         minEarning: "3.00",
         maxEarning: "5.00",
       },
       {
-        name: "Enhebrador Automático",
+        name: "Producto",
         category: "Herramientas",
         imageUrl: "/attached_assets/prints/PT50.png",
         minEarning: "1.00",
         maxEarning: "2.50",
+      },
+      {
+        name: "Producto",
+        category: "Electrónicos",
+        imageUrl: "/attached_assets/prints/PT75.png",
+        minEarning: "2.80",
+        maxEarning: "4.20",
+      },
+      {
+        name: "Producto",
+        category: "Deportes",
+        imageUrl: "/attached_assets/prints/PT100.png",
+        minEarning: "1.50",
+        maxEarning: "3.50",
+      },
+      {
+        name: "Producto",
+        category: "Belleza",
+        imageUrl: "/attached_assets/prints/PT150.png",
+        minEarning: "2.20",
+        maxEarning: "3.80",
+      },
+      {
+        name: "Producto",
+        category: "Cocina",
+        imageUrl: "/attached_assets/prints/PT200.png",
+        minEarning: "1.75",
+        maxEarning: "3.25",
       },
     ];
 

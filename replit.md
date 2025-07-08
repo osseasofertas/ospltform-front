@@ -104,14 +104,16 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-- **Enhanced Evaluation System (July 08, 2025)**:
-  - Implemented draft recovery functionality for seamless evaluation resumption
-  - Added comprehensive autosave with 500ms debouncing and retry logic
-  - Enhanced progress tracking with answered questions counter
-  - Added copy/paste/cut prevention in text fields as required
-  - Implemented completion modal with earnings display
-  - Added proper error handling with exponential backoff retries
-  - Updated API endpoints for draft management and evaluation completion
+- **Enhanced User Experience & Visual Design (July 08, 2025)**:
+  - Fixed evaluation progress bar to show accurate question counts dynamically
+  - Implemented Instagram-style product images with square aspect ratio for better visualization
+  - Added daily evaluation limit of 25 products per day with proper error handling
+  - Hidden total product count from users to improve UX flow
+  - Updated product grid to 2-column layout for mobile-first Instagram-style display
+  - Enhanced question variety with strategic mix of multiple choice and open-ended questions
+  - Created comprehensive 15-question evaluation system (5 per stage, 3 open-ended per stage)
+  - Fixed single-click auto-advance for radio buttons and star ratings (300ms delay)
+  - Resolved infinite loop issues in evaluation component for smooth user experience
 
 ## Changelog
 

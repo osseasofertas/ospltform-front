@@ -270,9 +270,8 @@ export default function Evaluation() {
     );
   }
 
-  const totalProducts = 4; // This could come from app state
-  const currentProductIndex = 1; // This could be calculated from current product
-  const progressPercentage = (answeredCount / 5) * 100;
+  // Hide total product count from users for better UX
+  const progressPercentage = (answeredCount / questions.length) * 100;
   const currentQuestion = questions[currentQuestionIndex];
 
   return (
@@ -286,7 +285,7 @@ export default function Evaluation() {
             </button>
             <div className="text-center">
               <h2 className="text-lg font-semibold text-neutral-800">
-                Producto {currentProductIndex} de {totalProducts}
+                Evaluación de Producto
               </h2>
               <p className="text-sm text-neutral-600">Etapa {currentStage} de 3</p>
             </div>
@@ -297,20 +296,21 @@ export default function Evaluation() {
         {/* Progress Bar */}
         <Progress value={progressPercentage} className="h-2" />
 
-        {/* Product Info */}
+        {/* Product Info - Instagram style */}
         <Card className="mx-4 mt-4 border border-neutral-200">
-          <CardContent className="p-4">
-            <div className="flex items-center">
+          <CardContent className="p-0">
+            {/* Instagram-style square image */}
+            <div className="aspect-square w-full">
               <img 
                 src={currentProduct.imageUrl} 
                 alt={currentProduct.name}
-                className="w-16 h-16 object-cover rounded-lg"
+                className="w-full h-full object-cover"
               />
-              <div className="ml-4">
-                <p className="text-sm text-neutral-600">
-                  Evaluación en progreso • {answeredCount}/5 respondidas
-                </p>
-              </div>
+            </div>
+            <div className="p-4">
+              <p className="text-sm text-neutral-600">
+                Evaluación en progreso • {answeredCount}/{questions.length} respondidas
+              </p>
             </div>
           </CardContent>
         </Card>
