@@ -127,6 +127,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = parseInt(req.query.userId as string);
       const productId = parseInt(req.query.productId as string);
       
+      if (isNaN(userId) || isNaN(productId)) {
+        return res.json({ draft: null });
+      }
+      
       const evaluation = await storage.getEvaluation(userId, productId);
       
       if (!evaluation) {

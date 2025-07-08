@@ -39,14 +39,16 @@ export default function Evaluation() {
 
   // Load draft on mount
   const { data: draftData, isLoading: draftLoading } = useQuery({
-    queryKey: ["/api/evaluations/draft", user?.id, currentProduct?.id],
+    queryKey: [`/api/evaluations/draft?userId=${user?.id}&productId=${currentProduct?.id}`],
     enabled: !!user?.id && !!currentProduct?.id,
     retry: false,
   });
 
+
+
   // Get questions for current stage
   const { data: questions = [], isLoading: questionsLoading } = useQuery<AppQuestion[]>({
-    queryKey: ["/api/products", currentProduct?.id, "questions", currentStage],
+    queryKey: [`/api/products/${currentProduct?.id}/questions?stage=${currentStage}`],
     enabled: !!currentProduct?.id,
   });
 
