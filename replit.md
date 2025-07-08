@@ -102,7 +102,18 @@ The application is designed for deployment on Replit with the following structur
 
 Preferred communication style: Simple, everyday language.
 
+## Recent Changes
+
+- **Enhanced Evaluation System (July 08, 2025)**:
+  - Implemented draft recovery functionality for seamless evaluation resumption
+  - Added comprehensive autosave with 500ms debouncing and retry logic
+  - Enhanced progress tracking with answered questions counter
+  - Added copy/paste/cut prevention in text fields as required
+  - Implemented completion modal with earnings display
+  - Added proper error handling with exponential backoff retries
+  - Updated API endpoints for draft management and evaluation completion
+
 ## Changelog
 
-Changelog:
-- July 08, 2025. Initial setup
+- July 08, 2025: Enhanced evaluation system with draft recovery and improved autosave
+- July 08, 2025: Initial setup with basic functionality

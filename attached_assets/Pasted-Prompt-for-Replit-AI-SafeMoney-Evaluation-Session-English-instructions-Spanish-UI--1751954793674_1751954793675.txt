@@ -1,0 +1,74 @@
+Prompt for Replit AI – SafeMoney: Evaluation Session (English instructions, Spanish UI)
+
+================================================================================
+3. Evaluation Session (3 stages, 15 questions)
+--------------------------------------------------------------------------------
+Implement a seamless, resilient evaluation flow for each product. The user must answer 15 questions (5 per stage), including at least 3 open-ended questions, and should not be able to copy/paste into text fields.
+
+3.1 Entry & Draft Recovery  
+  • When user taps a product card, call GET `/api/evaluations/draft?userId={{user}}&productId={{product}}`.  
+    – If a draft exists, load `stage` and `partialAnswers`.  
+    – Else, start at `stage=1` with empty answers.  
+
+3.2 UI Layout & Progress  
+  • Top bar:  
+    – Back button (arrow ‹) on left.  
+    – Title: “Producto {{currentProductIndex}} de {{totalProducts}}”  
+    – Subtitle: “Etapa {{stage}} de 3”  
+  • Progress bar under header (full width), fill = `(stage – 1)/3 + answersInStage/15`.  
+
+3.3 Question Rendering  
+  • For each of the 5 questions in the current stage:  
+    – If `type === "multiple"`: render radio buttons with 4 Spanish-labeled options.  
+    – If `type === "rating"`: render 5-star rating component (“Califica con estrellas”).  
+    – If `type === "text"`: render `<textarea>` with `placeholder="Escribe tu respuesta…"`.  
+        • Attach `onPaste`, `onCopy`, `onCut` handlers that call `preventDefault()`.  
+  • Force user to provide an answer before enabling Next.  
+
+3.4 Autosave & Checkpoint  
+  • On each answer change, update local state and debounce (500 ms) call:  
+    POST `/api/evaluations/draft`  
+      Body: `{ draftId?, userId, productId, stage, partialAnswers }`  
+    → Response: `{ draftId }`  
+  • After successfully saving, show a short toast “Progreso guardado”.  
+
+3.5 Stage Transition  
+  • When user clicks “Siguiente etapa”:  
+    – Ensure all 5 answers present.  
+    – Increment `stage` in local state.  
+    – If new `stage ≤ 3`, load next questions via GET `/api/products/{id}/questions?stage={{stage}}`.  
+    – If `stage === 4` (finished stage 3), go to Final Submission.  
+
+3.6 Final Submission & Earnings  
+  • Upon completing stage 3 and clicking “Finalizar evaluación”:  
+    POST `/api/evaluations`  
+      Body: `{ userId, productId, answers: { stage1: [...], stage2: [...], stage3: [...] } }`  
+    → Response: `{ earning }`  
+  • Show modal:  
+      Title: “¡Completado!”  
+      Text: “Has ganado R$ {{earning}},YY”  
+      Button: “Ver mi saldo” → navigates to Wallet.  
+  • Remove draft via DELETE `/api/evaluations/draft/{draftId}`.  
+
+3.7 Error Handling & Retries  
+  • If any API call fails:  
+    – Retry up to 2 times with exponential back-off.  
+    – On persistent failure, show alert “Error al guardar progreso. Revisa tu conexión.” and allow manual retry.  
+
+================================================================================
+Buttons & Labels (all Spanish)
+--------------------------------------------------------------------------------
+  • Next stage / Finalize:  “Siguiente etapa” / “Finalizar evaluación”  
+  • Toast: “Progreso guardado”  
+  • Modal confirm: “¡Completado! Has ganado R$ {{earning}},YY”  
+  • Retry on error: “Reintentar”  
+
+================================================================================
+Acceptance Criteria
+--------------------------------------------------------------------------------
+  1. User can resume a draft evaluation seamlessly.  
+  2. All 15 questions require answers before final submit.  
+  3. At least 3 open-ended questions per product, with copy/paste disabled.  
+  4. Autosave fires on every answer change and stage completion.  
+  5. Final submission returns and displays the correct earning.  
+  6. UX is responsive, mobile-first, and uses Spanish labels as specified.  

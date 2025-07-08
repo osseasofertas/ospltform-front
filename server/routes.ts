@@ -122,94 +122,106 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Evaluation routes
-  app.post("/api/evaluations", async (req, res) => {
+  app.get("/api/evaluations/draft", async (req, res) => {
     try {
-      const evaluationData = insertEvaluationSchema.parse(req.body);
-      
-      // Check if user already has an incomplete evaluation for this product
-      const existingEvaluation = await storage.getEvaluation(
-        evaluationData.userId, 
-        evaluationData.productId
-      );
-      
-      if (existingEvaluation) {
-        return res.json(existingEvaluation);
-      }
-
-      const evaluation = await storage.createEvaluation(evaluationData);
-      res.json(evaluation);
-    } catch (error) {
-      console.error("Error creating evaluation:", error);
-      res.status(500).json({ message: "Error al crear evaluación" });
-    }
-  });
-
-  app.get("/api/evaluations/:userId/:productId", async (req, res) => {
-    try {
-      const userId = parseInt(req.params.userId);
-      const productId = parseInt(req.params.productId);
+      const userId = parseInt(req.query.userId as string);
+      const productId = parseInt(req.query.productId as string);
       
       const evaluation = await storage.getEvaluation(userId, productId);
       
       if (!evaluation) {
-        return res.status(404).json({ message: "Evaluación no encontrada" });
+        return res.json({ draft: null });
       }
 
-      res.json(evaluation);
-    } catch (error) {
-      console.error("Error fetching evaluation:", error);
-      res.status(500).json({ message: "Error al obtener evaluación" });
-    }
-  });
-
-  app.post("/api/evaluations/save-answers", async (req, res) => {
-    try {
-      const { evaluationId, stage, answers } = saveAnswersSchema.parse(req.body);
-      
-      const evaluation = await storage.getEvaluation(0, 0); // Get by ID would be better
-      if (!evaluation) {
-        return res.status(404).json({ message: "Evaluación no encontrada" });
-      }
-
-      // Update evaluation with answers
-      const updatedAnswers = {
-        ...evaluation.answers,
-        [`stage_${stage}`]: answers,
-      };
-
-      await storage.updateEvaluation(evaluationId, {
-        answers: updatedAnswers,
-        currentStage: stage,
+      res.json({ 
+        draft: {
+          draftId: evaluation.id,
+          stage: evaluation.currentStage,
+          partialAnswers: evaluation.answers
+        }
       });
-
-      res.json({ message: "Respuestas guardadas correctamente" });
     } catch (error) {
-      console.error("Error saving answers:", error);
-      res.status(500).json({ message: "Error al guardar respuestas" });
+      console.error("Error fetching draft:", error);
+      res.status(500).json({ message: "Error al obtener borrador" });
     }
   });
 
-  app.post("/api/evaluations/:id/complete", async (req, res) => {
+  app.post("/api/evaluations/draft", async (req, res) => {
     try {
-      const evaluationId = parseInt(req.params.id);
-      const { userId, earnings } = req.body;
+      const { draftId, userId, productId, stage, partialAnswers } = req.body;
       
-      // Mark evaluation as completed
-      await storage.updateEvaluation(evaluationId, {
+      if (draftId) {
+        // Update existing draft
+        await storage.updateEvaluation(draftId, {
+          currentStage: stage,
+          answers: partialAnswers,
+        });
+        res.json({ draftId });
+      } else {
+        // Create new draft
+        const evaluation = await storage.createEvaluation({
+          userId,
+          productId,
+          currentStage: stage,
+          answers: partialAnswers,
+        });
+        res.json({ draftId: evaluation.id });
+      }
+    } catch (error) {
+      console.error("Error saving draft:", error);
+      res.status(500).json({ message: "Error al guardar borrador" });
+    }
+  });
+
+  app.delete("/api/evaluations/draft/:draftId", async (req, res) => {
+    try {
+      const draftId = parseInt(req.params.draftId);
+      await storage.updateEvaluation(draftId, { completed: true });
+      res.json({ message: "Borrador eliminado" });
+    } catch (error) {
+      console.error("Error deleting draft:", error);
+      res.status(500).json({ message: "Error al eliminar borrador" });
+    }
+  });
+
+  app.post("/api/evaluations", async (req, res) => {
+    try {
+      const { userId, productId, answers } = req.body;
+      
+      // Calculate earnings based on product
+      const product = await storage.getProduct(productId);
+      if (!product) {
+        return res.status(404).json({ message: "Producto no encontrado" });
+      }
+      
+      const minEarning = parseFloat(product.minEarning);
+      const maxEarning = parseFloat(product.maxEarning);
+      const earning = (Math.random() * (maxEarning - minEarning) + minEarning).toFixed(2);
+      
+      // Create completed evaluation
+      const evaluation = await storage.createEvaluation({
+        userId,
+        productId,
+        currentStage: 3,
         completed: true,
+        answers,
+      });
+      
+      // Update with earnings
+      await storage.updateEvaluation(evaluation.id, {
+        totalEarned: earning,
         completedAt: new Date(),
-        totalEarned: earnings,
       });
 
       // Update user balance
-      await storage.updateUserBalance(userId, earnings);
+      await storage.updateUserBalance(userId, earning);
 
       // Create transaction
       await storage.createTransaction({
         userId,
-        evaluationId,
+        evaluationId: evaluation.id,
         type: 'evaluation_stage',
-        amount: earnings,
+        amount: earning,
         description: 'Evaluación completada',
       });
 
@@ -229,7 +241,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         await storage.updateUserDailyEvaluations(userId, dailyCount);
       }
 
-      res.json({ message: "Evaluación completada exitosamente" });
+      res.json({ earning });
     } catch (error) {
       console.error("Error completing evaluation:", error);
       res.status(500).json({ message: "Error al completar evaluación" });
@@ -237,10 +249,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Question routes
-  app.get("/api/questions/:productId/:stage", async (req, res) => {
+  app.get("/api/products/:productId/questions", async (req, res) => {
     try {
       const productId = parseInt(req.params.productId);
-      const stage = parseInt(req.params.stage);
+      const stage = parseInt(req.query.stage as string);
       
       const questions = await storage.getQuestionsByProduct(productId, stage);
       res.json(questions);
@@ -249,6 +261,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Error al obtener preguntas" });
     }
   });
+
+
 
   // User routes
   app.get("/api/users/:id", async (req, res) => {

@@ -8,13 +8,28 @@ interface QuestionFreeTextProps {
 }
 
 export default function QuestionFreeText({ question, value, onChange }: QuestionFreeTextProps) {
+  const handlePaste = (e: React.ClipboardEvent) => {
+    e.preventDefault();
+  };
+
+  const handleCopy = (e: React.ClipboardEvent) => {
+    e.preventDefault();
+  };
+
+  const handleCut = (e: React.ClipboardEvent) => {
+    e.preventDefault();
+  };
+
   return (
     <Textarea
       value={value || ""}
       onChange={(e) => onChange(e.target.value)}
+      onPaste={handlePaste}
+      onCopy={handleCopy}
+      onCut={handleCut}
       rows={4}
       className="w-full p-3 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
-      placeholder="Comparte tus ideas y sugerencias..."
+      placeholder="Escribe tu respuesta..."
     />
   );
 }
