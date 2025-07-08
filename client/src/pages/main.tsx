@@ -84,9 +84,9 @@ export default function Main() {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-xl font-semibold text-neutral-800">
-              Elige un producto para evaluar
+              Productos Disponibles
             </h2>
-            <p className="text-sm text-neutral-600">Gana hasta R$ 4,00 por evaluación</p>
+            <p className="text-sm text-neutral-600">Elige y evalúa productos para ganar dinero</p>
           </div>
           <Badge className="bg-primary/10 text-primary">
             {user?.dailyEvaluationsUsed || 0}/25 disponibles
