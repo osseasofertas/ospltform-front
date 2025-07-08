@@ -9,6 +9,7 @@ import Evaluation from "@/pages/evaluation";
 import Results from "@/pages/results";
 import Wallet from "@/pages/wallet";
 import Profile from "@/pages/profile";
+import Support from "@/pages/support";
 import BottomNavigation from "@/components/bottom-navigation";
 import { useAppState } from "@/hooks/use-app-state";
 import NotFound from "@/pages/not-found";
@@ -26,6 +27,7 @@ function Router() {
         <Route path="/results" component={Results} />
         <Route path="/wallet" component={Wallet} />
         <Route path="/profile" component={Profile} />
+        <Route path="/support" component={Support} />
         <Route component={NotFound} />
       </Switch>
       {user && <BottomNavigation />}

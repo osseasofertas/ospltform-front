@@ -1,5 +1,5 @@
 import { useLocation } from "wouter";
-import { Home, Wallet, User } from "lucide-react";
+import { Home, Wallet, User, HelpCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default function BottomNavigation() {
@@ -11,6 +11,7 @@ export default function BottomNavigation() {
     { path: "/main", icon: Home, label: "Inicio" },
     { path: "/wallet", icon: Wallet, label: "Billetera" },
     { path: "/profile", icon: User, label: "Perfil" },
+    { path: "/support", icon: HelpCircle, label: "Soporte" },
   ];
 
   return (
@@ -21,12 +22,12 @@ export default function BottomNavigation() {
             key={path}
             onClick={() => setLocation(path)}
             className={cn(
-              "flex flex-col items-center p-2 transition-colors",
+              "flex flex-col items-center p-2 transition-colors min-w-0 flex-1",
               isActive(path) ? "text-primary" : "text-neutral-400 hover:text-neutral-600"
             )}
           >
             <Icon className="h-5 w-5 mb-1" />
-            <span className="text-xs">{label}</span>
+            <span className="text-xs truncate">{label}</span>
           </button>
         ))}
       </div>
