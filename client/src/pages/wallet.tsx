@@ -39,12 +39,21 @@ export default function Wallet() {
   // Mutation for registering payout method
   const payoutMethodMutation = useMutation({
     mutationFn: async (method: string) => {
-      await apiRequest('/api/payout-method', {
-        method: 'POST',
-        body: { userId: user?.id || 1, method }
-      });
+      console.log('Registering payout method:', method, 'for user:', user?.id || 1);
+      try {
+        const response = await apiRequest('/api/payout-method', {
+          method: 'POST',
+          body: { userId: user?.id || 1, method }
+        });
+        console.log('Payout method registration response:', response);
+        return response;
+      } catch (error) {
+        console.error('Error registering payout method:', error);
+        throw error;
+      }
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log('Payout method registration successful:', data);
       // Store in localStorage
       localStorage.setItem('payoutMethod', selectedPayoutMethod);
       setCurrentPayoutMethod(selectedPayoutMethod);
@@ -60,9 +69,10 @@ export default function Wallet() {
       setSelectedPayoutMethod('');
     },
     onError: (error) => {
+      console.error('Payout method registration error:', error);
       toast({
         title: "Error",
-        description: "No se pudo registrar el método de cobro. Inténtalo de nuevo.",
+        description: `No se pudo registrar el método de cobro: ${error.message}`,
         variant: "destructive",
       });
     }

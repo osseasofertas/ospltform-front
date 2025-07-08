@@ -334,10 +334,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Payout method registration
   app.post("/api/payout-method", async (req, res) => {
     try {
+      console.log('Received payout method registration request:', req.body);
       const { userId, method } = req.body;
       
       // Validate method
       if (!method || !['PayPal', 'Depósito bancario'].includes(method)) {
+        console.log('Invalid payout method:', method);
         return res.status(400).json({ error: 'Invalid payout method' });
       }
       
