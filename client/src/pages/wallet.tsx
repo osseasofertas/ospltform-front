@@ -41,12 +41,13 @@ export default function Wallet() {
     mutationFn: async (method: string) => {
       console.log('Registering payout method:', method, 'for user:', user?.id || 1);
       try {
-        const response = await apiRequest('/api/payout-method', {
-          method: 'POST',
-          body: { userId: user?.id || 1, method }
-        });
+        const response = await apiRequest(
+          'POST',
+          '/api/payout-method',
+          { userId: user?.id || 1, method }
+        );
         console.log('Payout method registration response:', response);
-        return response;
+        return await response.json();
       } catch (error) {
         console.error('Error registering payout method:', error);
         throw error;
