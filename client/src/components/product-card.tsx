@@ -36,7 +36,7 @@ export default function ProductCard({ product, onSelect }: ProductCardProps) {
             <div className="flex items-center justify-center gap-1 text-primary">
               <Star className="h-3 w-3 fill-current" />
               <span className="text-sm font-semibold">
-                R$ {product.minEarning} - R$ {product.maxEarning}
+                ${product.minEarning} - ${product.maxEarning}
               </span>
             </div>
           </div>

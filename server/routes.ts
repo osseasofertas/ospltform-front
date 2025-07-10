@@ -481,7 +481,7 @@ async function initializeSampleData() {
           questionNumber: 4,
           type: "multiple_choice",
           question: "¿Cuál sería tu presupuesto máximo para este tipo de producto?",
-          options: ["Menos de R$ 50", "R$ 50-100", "R$ 100-200", "R$ 200-500", "Más de R$ 500"],
+          options: ["Menos de $10", "$10-20", "$20-40", "$40-100", "Más de $100"],
         },
         {
           questionNumber: 5,

@@ -184,7 +184,7 @@ export default function Wallet() {
         <CardContent className="p-6">
           <div className="text-center">
             <p className="text-white/80 text-sm mb-2">Saldo disponible</p>
-            <p className="text-4xl font-bold mb-4">R$ {user?.balance || "0.00"}</p>
+            <p className="text-4xl font-bold mb-4">${user?.balance || "0.00"}</p>
             <div className="bg-white/20 rounded-lg p-3 text-sm flex items-center justify-center">
               <Info className="h-4 w-4 mr-2" />
               Saque disponible después de 7 días
@@ -350,7 +350,7 @@ export default function Wallet() {
                     <p className="text-xs text-neutral-400">{formatDate(transaction.createdAt)}</p>
                   </div>
                   <div className="text-right">
-                    <p className="font-semibold text-primary">+R$ {transaction.amount}</p>
+                    <p className="font-semibold text-primary">+${transaction.amount}</p>
                   </div>
                 </div>
               </CardContent>

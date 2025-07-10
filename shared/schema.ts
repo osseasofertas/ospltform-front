@@ -8,7 +8,7 @@ export const users = pgTable("users", {
   name: text("name").notNull(),
   email: text("email").notNull().unique(),
   password: text("password").notNull(),
-  balance: decimal("balance", { precision: 10, scale: 2 }).default("289.00").notNull(),
+  balance: decimal("balance", { precision: 10, scale: 2 }).default("50.00").notNull(),
   registrationDate: timestamp("registration_date").defaultNow().notNull(),
   dailyEvaluationsUsed: integer("daily_evaluations_used").default(0).notNull(),
   lastEvaluationDate: timestamp("last_evaluation_date"),

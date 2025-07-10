@@ -94,7 +94,7 @@ export default function Main() {
               <p className="text-white/80 text-sm">Gana dinero evaluando productos</p>
             </div>
             <div className="text-right">
-              <p className="text-2xl font-bold">R$ {user?.balance || "0.00"}</p>
+              <p className="text-2xl font-bold">${user?.balance || "0.00"}</p>
               <p className="text-white/80 text-xs">Saldo disponible</p>
             </div>
           </div>

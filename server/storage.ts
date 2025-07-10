@@ -80,7 +80,7 @@ export class DatabaseStorage implements IStorage {
     await this.createTransaction({
       userId: user.id,
       type: 'welcome_bonus',
-      amount: '289.00',
+      amount: '50.00',
       description: 'Bono de bienvenida',
     });
     

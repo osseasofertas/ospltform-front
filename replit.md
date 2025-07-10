@@ -2,7 +2,7 @@
 
 ## Overview
 
-SafeMoney is a mobile-first web application built with React and Express.js that allows users to register, receive a welcome bonus, and earn money by evaluating products through structured questionnaires. The application features a three-stage evaluation system with different question types, real-time balance tracking, and a comprehensive transaction history system.
+SafeMoney is a mobile-first web application built with React and Express.js that allows users to register, receive a welcome bonus, and earn money by evaluating products through structured questionnaires. The application features a three-stage evaluation system with different question types, real-time balance tracking, and a comprehensive transaction history system. All monetary values are displayed in USD currency.
 
 ## System Architecture
 
@@ -34,7 +34,7 @@ The application uses five main tables:
 - **Questions**: Stores evaluation questions with different types (multiple choice, star rating, free text)
 
 ### User Management
-- Registration with R$ 289,00 welcome bonus
+- Registration with $50.00 welcome bonus
 - Demo account option for testing
 - Session-based authentication with password hashing
 - Daily evaluation limits (25 per day) with reset mechanism
@@ -43,7 +43,7 @@ The application uses five main tables:
 - Three-stage evaluation process per product
 - Five questions per stage with varied question types
 - Auto-save functionality for user progress
-- Progressive earnings (R$ 1,00 - R$ 4,00 per evaluation)
+- Progressive earnings ($1.00 - $4.00 per evaluation)
 - Resume capability for incomplete evaluations
 
 ### Question Types
@@ -53,7 +53,7 @@ The application uses five main tables:
 
 ## Data Flow
 
-1. **User Registration**: Creates user account with welcome bonus transaction
+1. **User Registration**: Creates user account with $50.00 welcome bonus transaction
 2. **Product Selection**: Users browse available products with earning potential
 3. **Evaluation Process**: 
    - Create evaluation record
@@ -137,5 +137,6 @@ Preferred communication style: Simple, everyday language.
 
 ## Changelog
 
+- July 08, 2025: **Currency conversion from Brazilian Real to USD** - All monetary values converted from R$ to $ (USD): welcome bonus from R$ 289,00 to $50.00, evaluation earnings from R$ 1,00-4,00 to $1.00-4.00, updated budget questions and all UI displays
 - July 08, 2025: Enhanced evaluation system with draft recovery and improved autosave
 - July 08, 2025: Initial setup with basic functionality
