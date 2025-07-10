@@ -32,11 +32,11 @@ export default function Welcome() {
     e.preventDefault();
     setIsLoading(true);
 
-    // Check if login is blocked due to recent logout
+    // Check if login is blocked due to recent logout (global block for ANY email)
     const { isLoginBlocked, getDaysUntilLoginAllowed } = useAppState.getState();
     
-    if (isLoginBlocked(formData.email)) {
-      const daysRemaining = getDaysUntilLoginAllowed(formData.email);
+    if (isLoginBlocked()) {
+      const daysRemaining = getDaysUntilLoginAllowed();
       toast({
         title: "Login Blocked",
         description: `For security reasons, login is blocked for ${daysRemaining} more days after logout.`,

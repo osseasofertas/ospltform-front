@@ -26,7 +26,7 @@ interface AppState {
     completedAt: string;
     earning: string;
   }>;
-  logoutLockouts: Record<string, string>; // email -> logout date
+  globalLogoutDate: string | null; // Global logout date for all future logins
   
   // Actions
   setUser: (user: AppUser | null) => void;
@@ -42,8 +42,8 @@ interface AppState {
   incrementDailyEvaluations: () => void;
   resetDailyEvaluationsIfNeeded: () => void;
   logout: () => void;
-  isLoginBlocked: (email: string) => boolean;
-  getDaysUntilLoginAllowed: (email: string) => number;
+  isLoginBlocked: () => boolean;
+  getDaysUntilLoginAllowed: () => number;
 }
 
 export const useAppState = create<AppState>()(
@@ -60,7 +60,7 @@ export const useAppState = create<AppState>()(
       },
       transactions: [],
       completedEvaluations: [],
-      logoutLockouts: {},
+      globalLogoutDate: null,
       
       setUser: (user) => {
         set({ user });
@@ -190,50 +190,26 @@ export const useAppState = create<AppState>()(
       },
       
       logout: () => {
-        const state = get();
-        const userEmail = state.user?.email;
-        
-        if (userEmail) {
-          // Record logout date for 7-day lockout - this persists in localStorage
-          const newLockouts = {
-            ...state.logoutLockouts,
-            [userEmail]: new Date().toISOString()
-          };
-          
-          set({ 
-            user: null, 
-            currentProduct: null, 
-            currentEvaluation: null,
-            userStats: {
-              totalEvaluations: 0,
-              todayEvaluations: 0,
-              totalEarned: "0.00",
-              lastEvaluationDate: new Date().toDateString(),
-            },
-            transactions: [],
-            completedEvaluations: [],
-            logoutLockouts: newLockouts // Keep lockout data even after logout
-          });
-        } else {
-          set({ 
-            user: null, 
-            currentProduct: null, 
-            currentEvaluation: null,
-            userStats: {
-              totalEvaluations: 0,
-              todayEvaluations: 0,
-              totalEarned: "0.00",
-              lastEvaluationDate: new Date().toDateString(),
-            },
-            transactions: [],
-            completedEvaluations: []
-          });
-        }
+        // Record global logout date for 7-day lockout on ANY login
+        set({ 
+          user: null, 
+          currentProduct: null, 
+          currentEvaluation: null,
+          userStats: {
+            totalEvaluations: 0,
+            todayEvaluations: 0,
+            totalEarned: "0.00",
+            lastEvaluationDate: new Date().toDateString(),
+          },
+          transactions: [],
+          completedEvaluations: [],
+          globalLogoutDate: new Date().toISOString() // Global logout blocks all future logins
+        });
       },
       
-      isLoginBlocked: (email) => {
+      isLoginBlocked: () => {
         const state = get();
-        const logoutDate = state.logoutLockouts[email];
+        const logoutDate = state.globalLogoutDate;
         
         if (!logoutDate) return false;
         
@@ -244,9 +220,9 @@ export const useAppState = create<AppState>()(
         return daysDiff < 7;
       },
       
-      getDaysUntilLoginAllowed: (email) => {
+      getDaysUntilLoginAllowed: () => {
         const state = get();
-        const logoutDate = state.logoutLockouts[email];
+        const logoutDate = state.globalLogoutDate;
         
         if (!logoutDate) return 0;
         
