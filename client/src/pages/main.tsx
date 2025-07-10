@@ -31,14 +31,14 @@ export default function Main() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-neutral-600">Cargando productos...</p>
+          <p className="text-neutral-600">Loading products...</p>
         </div>
       </div>
     );
   }
 
   // Handle daily limit reached
-  if (error && (error as any).message?.includes("Límite diario")) {
+  if (error && (error as any).message?.includes("Daily limit")) {
     return (
       <div className="min-h-screen bg-neutral-50">
         {/* Header */}
@@ -46,9 +46,9 @@ export default function Main() {
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-xl font-semibold text-neutral-800">
-                Evaluaciones
+                Evaluations
               </h2>
-              <p className="text-sm text-neutral-600">Límite diario alcanzado</p>
+              <p className="text-sm text-neutral-600">Daily limit reached</p>
             </div>
             <button
               onClick={() => setLocation("/wallet")}
@@ -67,13 +67,13 @@ export default function Main() {
                 <AlertCircle className="text-orange-600 h-8 w-8" />
               </div>
               <h3 className="text-xl font-semibold text-neutral-800 mb-2">
-                Límite diario alcanzado
+                Daily limit reached
               </h3>
               <p className="text-neutral-600 mb-4">
-                Has completado 25 evaluaciones hoy. Vuelve mañana para continuar ganando dinero evaluando productos.
+                You've completed 25 evaluations today. Come back tomorrow to continue earning money by evaluating products.
               </p>
               <p className="text-sm text-neutral-500">
-                El límite se restablece a las 00:00 horas.
+                The limit resets at 00:00 hours.
               </p>
             </CardContent>
           </Card>
@@ -90,12 +90,12 @@ export default function Main() {
           {/* Welcome section */}
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h1 className="text-2xl font-bold">¡Hola, {user?.name || 'Usuario'}!</h1>
-              <p className="text-white/80 text-sm">Gana dinero evaluando productos</p>
+              <h1 className="text-2xl font-bold">Hello, {user?.name || 'User'}!</h1>
+              <p className="text-white/80 text-sm">Earn money by evaluating products</p>
             </div>
             <div className="text-right">
               <p className="text-2xl font-bold">${user?.balance || "0.00"}</p>
-              <p className="text-white/80 text-xs">Saldo disponible</p>
+              <p className="text-white/80 text-xs">Available balance</p>
             </div>
           </div>
 
@@ -106,29 +106,29 @@ export default function Main() {
               className="bg-white/20 backdrop-blur-sm rounded-lg p-3 text-center hover:bg-white/30 transition-colors"
             >
               <Wallet className="h-5 w-5 mx-auto mb-1" />
-              <span className="text-xs font-medium">Mi Billetera</span>
+              <span className="text-xs font-medium">My Wallet</span>
             </button>
             <button
               onClick={() => setLocation('/profile')}
               className="bg-white/20 backdrop-blur-sm rounded-lg p-3 text-center hover:bg-white/30 transition-colors"
             >
               <User className="h-5 w-5 mx-auto mb-1" />
-              <span className="text-xs font-medium">Perfil</span>
+              <span className="text-xs font-medium">Profile</span>
             </button>
             <button
               onClick={() => setLocation('/support')}
               className="bg-white/20 backdrop-blur-sm rounded-lg p-3 text-center hover:bg-white/30 transition-colors"
             >
               <HelpCircle className="h-5 w-5 mx-auto mb-1" />
-              <span className="text-xs font-medium">Soporte</span>
+              <span className="text-xs font-medium">Support</span>
             </button>
           </div>
 
           {/* Detailed daily progress */}
           <div className="bg-white/20 backdrop-blur-sm rounded-lg p-4">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium">Progreso diario</span>
-              <span className="text-sm">{stats?.todayEvaluations || 0}/25 evaluaciones</span>
+              <span className="text-sm font-medium">Daily progress</span>
+              <span className="text-sm">{stats?.todayEvaluations || 0}/25 evaluations</span>
             </div>
             <div className="w-full bg-white/20 rounded-full h-2 mb-2">
               <div 
@@ -137,13 +137,13 @@ export default function Main() {
               ></div>
             </div>
             <div className="flex justify-between text-xs text-white/80">
-              <span>Completadas: {stats?.todayEvaluations || 0}</span>
-              <span>Restantes: {25 - (stats?.todayEvaluations || 0)}</span>
+              <span>Completed: {stats?.todayEvaluations || 0}</span>
+              <span>Remaining: {25 - (stats?.todayEvaluations || 0)}</span>
             </div>
             {(stats?.todayEvaluations || 0) >= 25 && (
               <div className="mt-2 text-center">
                 <span className="text-xs bg-white/30 px-2 py-1 rounded-full">
-                  🎉 ¡Límite diario alcanzado!
+                  🎉 Daily limit reached!
                 </span>
               </div>
             )}
@@ -154,9 +154,9 @@ export default function Main() {
       {/* Products section header */}
       <div className="bg-white border-b border-neutral-200 px-4 py-3">
         <h2 className="text-lg font-semibold text-neutral-800">
-          Productos Disponibles
+          Available Products
         </h2>
-        <p className="text-sm text-neutral-600">Selecciona un producto para comenzar a evaluar</p>
+        <p className="text-sm text-neutral-600">Select a product to start evaluating</p>
       </div>
 
       {/* Product Grid - Instagram Style */}

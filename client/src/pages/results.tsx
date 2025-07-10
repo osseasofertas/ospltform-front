@@ -27,30 +27,30 @@ export default function Results() {
         </div>
         
         {/* Success Message */}
-        <h1 className="text-3xl font-bold text-white mb-4">¡Completado!</h1>
-        <p className="text-xl text-white mb-2">Has ganado</p>
-        <p className="text-4xl font-bold text-white mb-8">R$ {earnings}</p>
+        <h1 className="text-3xl font-bold text-white mb-4">Completed!</h1>
+        <p className="text-xl text-white mb-2">You earned</p>
+        <p className="text-4xl font-bold text-white mb-8">${earnings}</p>
         
         {/* Earnings Breakdown */}
         <Card className="bg-white/10 backdrop-blur-sm border-white/20 mb-8">
           <CardContent className="p-4">
             <div className="space-y-2 text-white/90">
               <div className="flex justify-between items-center">
-                <span>Etapa 1 completada</span>
-                <span>R$ 1,00</span>
+                <span>Stage 1 completed</span>
+                <span>$1.00</span>
               </div>
               <div className="flex justify-between items-center">
-                <span>Etapa 2 completada</span>
-                <span>R$ 1,15</span>
+                <span>Stage 2 completed</span>
+                <span>$1.15</span>
               </div>
               <div className="flex justify-between items-center">
-                <span>Etapa 3 completada</span>
-                <span>R$ 1,10</span>
+                <span>Stage 3 completed</span>
+                <span>$1.10</span>
               </div>
               <div className="border-t border-white/20 pt-2 mt-2">
                 <div className="flex justify-between items-center text-white font-semibold">
-                  <span>Total ganado</span>
-                  <span>R$ {earnings}</span>
+                  <span>Total earned</span>
+                  <span>${earnings}</span>
                 </div>
               </div>
             </div>
@@ -63,14 +63,14 @@ export default function Results() {
             onClick={handleViewWallet}
             className="w-full bg-white text-primary py-3 px-6 rounded-lg font-semibold text-lg hover:bg-neutral-100 shadow-lg"
           >
-            Ver mi saldo
+            View my balance
           </Button>
           <Button
             onClick={handleContinueEvaluating}
             variant="outline"
             className="w-full bg-white/20 text-white py-3 px-6 rounded-lg font-semibold border border-white/30 hover:bg-white/30"
           >
-            Continuar evaluando
+            Continue evaluating
           </Button>
         </div>
       </div>

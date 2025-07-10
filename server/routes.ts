@@ -32,7 +32,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check if user already exists
       const existingUser = await storage.getUserByEmail(userData.email);
       if (existingUser) {
-        return res.status(400).json({ message: "El usuario ya existe" });
+        return res.status(400).json({ message: "User already exists" });
       }
 
       const user = await storage.createUser(userData);
@@ -49,7 +49,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error("Registration error:", error);
-      res.status(400).json({ message: "Error al registrar usuario" });
+      res.status(400).json({ message: "Error registering user" });
     }
   });
 
@@ -59,12 +59,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const user = await storage.getUserByEmail(email);
       if (!user) {
-        return res.status(401).json({ message: "Credenciales inválidas" });
+        return res.status(401).json({ message: "Invalid credentials" });
       }
 
       const isValidPassword = await storage.verifyPassword(password, user.password);
       if (!isValidPassword) {
-        return res.status(401).json({ message: "Credenciales inválidas" });
+        return res.status(401).json({ message: "Invalid credentials" });
       }
 
       res.json({ 
@@ -80,14 +80,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error("Login error:", error);
-      res.status(400).json({ message: "Error al iniciar sesión" });
+      res.status(400).json({ message: "Error logging in" });
     }
   });
 
   app.post("/api/auth/demo", async (req, res) => {
     try {
       const demoUser = await storage.createUser({
-        name: "Usuario Demo",
+        name: "Demo User",
         email: `demo_${Date.now()}@demo.com`,
         password: "demo123",
         isDemo: true,
@@ -106,7 +106,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error("Demo user creation error:", error);
-      res.status(500).json({ message: "Error al crear usuario demo" });
+      res.status(500).json({ message: "Error creating demo user" });
     }
   });
 
@@ -120,7 +120,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const stats = await storage.getUserStats(userId);
         if (stats.todayEvaluations >= 25) {
           return res.status(429).json({ 
-            message: "Límite diario alcanzado. Puedes evaluar hasta 25 productos por día.",
+            message: "Daily limit reached. You can evaluate up to 25 products per day.",
             limitReached: true,
             todayEvaluations: stats.todayEvaluations,
             limit: 25
@@ -132,7 +132,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(products);
     } catch (error) {
       console.error("Error fetching products:", error);
-      res.status(500).json({ message: "Error al obtener productos" });
+      res.status(500).json({ message: "Error fetching products" });
     }
   });
 
@@ -161,7 +161,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error("Error fetching draft:", error);
-      res.status(500).json({ message: "Error al obtener borrador" });
+      res.status(500).json({ message: "Error fetching draft" });
     }
   });
 
@@ -188,7 +188,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     } catch (error) {
       console.error("Error saving draft:", error);
-      res.status(500).json({ message: "Error al guardar borrador" });
+      res.status(500).json({ message: "Error saving draft" });
     }
   });
 
@@ -196,10 +196,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const draftId = parseInt(req.params.draftId);
       await storage.updateEvaluation(draftId, { completed: true });
-      res.json({ message: "Borrador eliminado" });
+      res.json({ message: "Draft deleted" });
     } catch (error) {
       console.error("Error deleting draft:", error);
-      res.status(500).json({ message: "Error al eliminar borrador" });
+      res.status(500).json({ message: "Error deleting draft" });
     }
   });
 
@@ -210,7 +210,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Calculate earnings based on product
       const product = await storage.getProduct(productId);
       if (!product) {
-        return res.status(404).json({ message: "Producto no encontrado" });
+        return res.status(404).json({ message: "Product not found" });
       }
       
       const minEarning = parseFloat(product.minEarning);
@@ -241,7 +241,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         evaluationId: evaluation.id,
         type: 'evaluation_stage',
         amount: earning,
-        description: 'Evaluación completada',
+        description: 'Evaluation completed',
       });
 
       // Update daily evaluations count
@@ -263,7 +263,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ earning });
     } catch (error) {
       console.error("Error completing evaluation:", error);
-      res.status(500).json({ message: "Error al completar evaluación" });
+      res.status(500).json({ message: "Error completing evaluation" });
     }
   });
 
@@ -277,7 +277,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(questions);
     } catch (error) {
       console.error("Error fetching questions:", error);
-      res.status(500).json({ message: "Error al obtener preguntas" });
+      res.status(500).json({ message: "Error fetching questions" });
     }
   });
 
@@ -290,7 +290,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const user = await storage.getUser(userId);
       
       if (!user) {
-        return res.status(404).json({ message: "Usuario no encontrado" });
+        return res.status(404).json({ message: "User not found" });
       }
 
       res.json({ 
@@ -304,7 +304,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error("Error fetching user:", error);
-      res.status(500).json({ message: "Error al obtener usuario" });
+      res.status(500).json({ message: "Error fetching user" });
     }
   });
 
@@ -315,7 +315,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(stats);
     } catch (error) {
       console.error("Error fetching user stats:", error);
-      res.status(500).json({ message: "Error al obtener estadísticas" });
+      res.status(500).json({ message: "Error fetching statistics" });
     }
   });
 
@@ -327,7 +327,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(transactions);
     } catch (error) {
       console.error("Error fetching transactions:", error);
-      res.status(500).json({ message: "Error al obtener transacciones" });
+      res.status(500).json({ message: "Error fetching transactions" });
     }
   });
 
@@ -338,7 +338,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { userId, method } = req.body;
       
       // Validate method
-      if (!method || !['PayPal', 'Depósito bancario'].includes(method)) {
+      if (!method || !['PayPal', 'Bank deposit'].includes(method)) {
         console.log('Invalid payout method:', method);
         return res.status(400).json({ error: 'Invalid payout method' });
       }
@@ -363,57 +363,57 @@ async function initializeSampleData() {
     // Create sample products using real product images (8 products from 343 available)
     const products = [
       {
-        name: "Producto",
-        category: "Ropa",
+        name: "Product",
+        category: "Clothing",
         imageUrl: "/attached_assets/prints/PT2.png",
         minEarning: "2.50",
         maxEarning: "4.00",
       },
       {
-        name: "Producto",
-        category: "Hogar",
+        name: "Product",
+        category: "Home",
         imageUrl: "/attached_assets/prints/PT3.png",
         minEarning: "1.80",
         maxEarning: "3.20",
       },
       {
-        name: "Producto",
+        name: "Product",
         category: "Automotive",
         imageUrl: "/attached_assets/prints/PT10.png",
         minEarning: "3.00",
         maxEarning: "5.00",
       },
       {
-        name: "Producto",
-        category: "Herramientas",
+        name: "Product",
+        category: "Tools",
         imageUrl: "/attached_assets/prints/PT50.png",
         minEarning: "1.00",
         maxEarning: "2.50",
       },
       {
-        name: "Producto",
-        category: "Electrónicos",
+        name: "Product",
+        category: "Electronics",
         imageUrl: "/attached_assets/prints/PT75.png",
         minEarning: "2.80",
         maxEarning: "4.20",
       },
       {
-        name: "Producto",
-        category: "Deportes",
+        name: "Product",
+        category: "Sports",
         imageUrl: "/attached_assets/prints/PT100.png",
         minEarning: "1.50",
         maxEarning: "3.50",
       },
       {
-        name: "Producto",
-        category: "Belleza",
+        name: "Product",
+        category: "Beauty",
         imageUrl: "/attached_assets/prints/PT150.png",
         minEarning: "2.20",
         maxEarning: "3.80",
       },
       {
-        name: "Producto",
-        category: "Cocina",
+        name: "Product",
+        category: "Kitchen",
         imageUrl: "/attached_assets/prints/PT200.png",
         minEarning: "1.75",
         maxEarning: "3.25",
@@ -434,89 +434,89 @@ async function initializeSampleData() {
         {
           questionNumber: 1,
           type: "multiple_choice",
-          question: "¿Cuál es tu rango de edad?",
-          options: ["18-25 años", "26-35 años", "36-45 años", "46+ años"],
+          question: "What is your age range?",
+          options: ["18-25 years", "26-35 years", "36-45 years", "46+ years"],
         },
         {
           questionNumber: 2,
           type: "free_text",
-          question: "¿Qué problema específico esperas resolver con este producto? Explica detalladamente.",
+          question: "What specific problem do you expect to solve with this product? Explain in detail.",
         },
         {
           questionNumber: 3,
           type: "multiple_choice",
-          question: "¿Cuál es tu nivel de experiencia con productos similares?",
-          options: ["Nunca he usado algo similar", "Principiante", "Intermedio", "Experto"],
+          question: "What is your experience level with similar products?",
+          options: ["Never used anything similar", "Beginner", "Intermediate", "Expert"],
         },
         {
           questionNumber: 4,
           type: "free_text",
-          question: "Describe una situación específica en la que usarías este producto. ¿Dónde, cuándo y cómo?",
+          question: "Describe a specific situation where you would use this product. Where, when, and how?",
         },
         {
           questionNumber: 5,
           type: "star_rating",
-          question: "¿Qué tan importante es la calidad de este producto para ti?",
-          metadata: { minLabel: "Poco importante", maxLabel: "Muy importante" },
+          question: "How important is the quality of this product to you?",
+          metadata: { minLabel: "Not important", maxLabel: "Very important" },
         },
       ],
       2: [
         {
           questionNumber: 1,
           type: "free_text",
-          question: "¿Qué características adicionales te gustaría ver en este producto que no están actualmente disponibles?",
+          question: "What additional features would you like to see in this product that are not currently available?",
         },
         {
           questionNumber: 2,
           type: "multiple_choice",
-          question: "¿Con qué frecuencia usarías este producto?",
-          options: ["Diariamente", "Varias veces por semana", "Semanalmente", "Mensualmente", "Raramente"],
+          question: "How often would you use this product?",
+          options: ["Daily", "Several times per week", "Weekly", "Monthly", "Rarely"],
         },
         {
           questionNumber: 3,
           type: "free_text",
-          question: "¿Qué te gusta más de este producto comparado con otros similares en el mercado?",
+          question: "What do you like most about this product compared to similar ones on the market?",
         },
         {
           questionNumber: 4,
           type: "multiple_choice",
-          question: "¿Cuál sería tu presupuesto máximo para este tipo de producto?",
-          options: ["Menos de $10", "$10-20", "$20-40", "$40-100", "Más de $100"],
+          question: "What would be your maximum budget for this type of product?",
+          options: ["Less than $10", "$10-20", "$20-40", "$40-100", "More than $100"],
         },
         {
           questionNumber: 5,
           type: "star_rating",
-          question: "¿Cómo calificarías el precio de este producto?",
-          metadata: { minLabel: "Muy caro", maxLabel: "Muy barato" },
+          question: "How would you rate the price of this product?",
+          metadata: { minLabel: "Very expensive", maxLabel: "Very cheap" },
         },
       ],
       3: [
         {
           questionNumber: 1,
           type: "free_text",
-          question: "¿Qué mejoras o cambios sugerirías para hacer este producto más atractivo?",
+          question: "What improvements or changes would you suggest to make this product more attractive?",
         },
         {
           questionNumber: 2,
           type: "multiple_choice",
-          question: "¿Recomendarías este producto a amigos o familiares?",
-          options: ["Definitivamente sí", "Probablemente sí", "Tal vez", "Probablemente no", "Definitivamente no"],
+          question: "Would you recommend this product to friends or family?",
+          options: ["Definitely yes", "Probably yes", "Maybe", "Probably no", "Definitely no"],
         },
         {
           questionNumber: 3,
           type: "free_text",
-          question: "¿Qué aspectos negativos o limitaciones ves en este producto?",
+          question: "What negative aspects or limitations do you see in this product?",
         },
         {
           questionNumber: 4,
           type: "multiple_choice",
-          question: "¿Cuál es la característica más importante para ti en este tipo de producto?",
-          options: ["Precio", "Calidad", "Diseño", "Funcionalidad", "Marca"],
+          question: "What is the most important characteristic for you in this type of product?",
+          options: ["Price", "Quality", "Design", "Functionality", "Brand"],
         },
         {
           questionNumber: 5,
           type: "free_text",
-          question: "En pocas palabras, ¿cuál sería tu reseña general de este producto?",
+          question: "In a few words, what would be your overall review of this product?",
         },
       ],
     };

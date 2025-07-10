@@ -81,7 +81,7 @@ export class DatabaseStorage implements IStorage {
       userId: user.id,
       type: 'welcome_bonus',
       amount: '50.00',
-      description: 'Bono de bienvenida',
+      description: 'Welcome bonus',
     });
     
     return user;

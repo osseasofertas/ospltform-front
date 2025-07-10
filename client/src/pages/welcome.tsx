@@ -32,16 +32,16 @@ export default function Welcome() {
 
       setUser(data.user);
       toast({
-        title: isRegistering ? "¡Cuenta creada!" : "¡Bienvenido!",
+        title: isRegistering ? "Account created!" : "Welcome!",
         description: isRegistering 
-          ? "Has recibido R$ 289,00 de bono inicial" 
-          : "Has iniciado sesión correctamente",
+          ? "You've received $50.00 initial bonus" 
+          : "You've successfully logged in",
       });
       setLocation("/main");
     } catch (error) {
       toast({
         title: "Error",
-        description: "Hubo un problema con tu solicitud",
+        description: "There was a problem with your request",
         variant: "destructive",
       });
     } finally {
@@ -57,14 +57,14 @@ export default function Welcome() {
 
       setUser(data.user);
       toast({
-        title: "Cuenta demo activada",
-        description: "Puedes explorar todas las funciones",
+        title: "Demo account activated",
+        description: "You can explore all features",
       });
       setLocation("/main");
     } catch (error) {
       toast({
         title: "Error",
-        description: "No se pudo crear la cuenta demo",
+        description: "Could not create demo account",
         variant: "destructive",
       });
     } finally {
@@ -80,9 +80,9 @@ export default function Welcome() {
           <div className="bg-white rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4 shadow-lg">
             <Shield className="text-primary text-3xl" />
           </div>
-          <h1 className="text-3xl font-bold text-white mb-2">Bienvenido a SafeMoney</h1>
+          <h1 className="text-3xl font-bold text-white mb-2">Welcome to SafeMoney</h1>
           <p className="text-white/90 text-lg">
-            {isRegistering ? "Regístrate y recibe R$ 289,00 de bono inicial" : "Inicia sesión en tu cuenta"}
+            {isRegistering ? "Sign up and receive $50.00 initial bonus" : "Log in to your account"}
           </p>
         </div>
 
@@ -93,14 +93,14 @@ export default function Welcome() {
               {isRegistering && (
                 <div>
                   <Label htmlFor="name" className="block text-sm font-medium text-neutral-700 mb-2">
-                    Nombre
+                    Name
                   </Label>
                   <Input
                     id="name"
                     type="text"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    placeholder="Tu nombre completo"
+                    placeholder="Your full name"
                     className="w-full px-4 py-3 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                     required
                   />
@@ -109,14 +109,14 @@ export default function Welcome() {
               
               <div>
                 <Label htmlFor="email" className="block text-sm font-medium text-neutral-700 mb-2">
-                  Correo electrónico
+                  Email
                 </Label>
                 <Input
                   id="email"
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  placeholder="tu@email.com"
+                  placeholder="your@email.com"
                   className="w-full px-4 py-3 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                   required
                 />
@@ -124,7 +124,7 @@ export default function Welcome() {
               
               <div>
                 <Label htmlFor="password" className="block text-sm font-medium text-neutral-700 mb-2">
-                  Contraseña
+                  Password
                 </Label>
                 <Input
                   id="password"
@@ -142,7 +142,7 @@ export default function Welcome() {
                 disabled={isLoading}
                 className="w-full bg-primary text-white py-3 px-6 rounded-lg font-semibold text-lg hover:bg-primary/90 shadow-lg"
               >
-                {isLoading ? "Cargando..." : isRegistering ? "Crear cuenta" : "Iniciar sesión"}
+                {isLoading ? "Loading..." : isRegistering ? "Create account" : "Log in"}
               </Button>
             </form>
             
@@ -151,7 +151,7 @@ export default function Welcome() {
                 onClick={() => setIsRegistering(!isRegistering)}
                 className="text-sm text-neutral-600 hover:text-primary"
               >
-                {isRegistering ? "¿Ya tienes cuenta? Inicia sesión" : "¿No tienes cuenta? Regístrate"}
+                {isRegistering ? "Already have an account? Log in" : "Don't have an account? Sign up"}
               </button>
             </div>
             
@@ -162,7 +162,7 @@ export default function Welcome() {
                 variant="outline"
                 className="w-full bg-neutral-100 text-neutral-700 py-3 px-6 rounded-lg font-medium hover:bg-neutral-200"
               >
-                Prueba con cuenta demo
+                Try with demo account
               </Button>
             </div>
           </CardContent>

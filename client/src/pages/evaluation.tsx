@@ -64,8 +64,8 @@ export default function Evaluation() {
     onSuccess: (data) => {
       setDraftId(data.draftId);
       toast({
-        title: "Progreso guardado",
-        description: "Tus respuestas han sido guardadas automáticamente",
+        title: "Progress saved",
+        description: "Your answers have been automatically saved",
       });
       setRetryCount(0);
     },
@@ -84,8 +84,8 @@ export default function Evaluation() {
         }, Math.pow(2, retryCount) * 1000);
       } else {
         toast({
-          title: "Error al guardar progreso",
-          description: "Revisa tu conexión. Puedes reintentar manualmente.",
+          title: "Error saving progress",
+          description: "Check your connection. You can retry manually.",
           variant: "destructive",
         });
       }
@@ -180,8 +180,8 @@ export default function Evaluation() {
       
       // Show success toast
       toast({
-        title: "Progreso guardado",
-        description: "Tu respuesta ha sido registrada",
+        title: "Progress saved",
+        description: "Your answer has been recorded",
       });
 
       // Auto-advance with smooth animation
@@ -206,8 +206,8 @@ export default function Evaluation() {
     
     // Show success toast
     toast({
-      title: "Progreso guardado",
-      description: "Tu respuesta ha sido registrada",
+      title: "Progress saved",
+      description: "Your answer has been recorded",
     });
 
     if (currentQuestionIndex < questions.length - 1) {
@@ -264,7 +264,7 @@ export default function Evaluation() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-neutral-600">Cargando preguntas...</p>
+          <p className="text-neutral-600">Loading questions...</p>
         </div>
       </div>
     );
@@ -285,9 +285,9 @@ export default function Evaluation() {
             </button>
             <div className="text-center">
               <h2 className="text-lg font-semibold text-neutral-800">
-                Evaluación de Producto
+                Product Evaluation
               </h2>
-              <p className="text-sm text-neutral-600">Etapa {currentStage} de 3</p>
+              <p className="text-sm text-neutral-600">Stage {currentStage} of 3</p>
             </div>
             <div className="w-6"></div>
           </div>
@@ -309,7 +309,7 @@ export default function Evaluation() {
             </div>
             <div className="p-4">
               <p className="text-sm text-neutral-600">
-                Evaluación en progreso • {answeredCount}/{questions.length} respondidas
+                Evaluation in progress • {answeredCount}/{questions.length} answered
               </p>
             </div>
           </CardContent>
@@ -325,16 +325,16 @@ export default function Evaluation() {
                   <CheckCircle className="text-primary h-8 w-8" />
                 </div>
                 <h3 className="text-xl font-semibold text-neutral-800 mb-2">
-                  Has completado la Etapa {currentStage}
+                  You have completed Stage {currentStage}
                 </h3>
                 <p className="text-neutral-600 mb-6">
-                  Todas las preguntas han sido respondidas correctamente
+                  All questions have been answered correctly
                 </p>
                 <Button
                   onClick={handleNextStage}
                   className="w-full bg-primary text-white py-3 px-6 rounded-lg font-semibold text-lg"
                 >
-                  {currentStage < 3 ? "Siguiente etapa" : "Finalizar evaluación"}
+                  {currentStage < 3 ? "Next stage" : "Finish evaluation"}
                 </Button>
               </CardContent>
             </Card>
@@ -374,7 +374,7 @@ export default function Evaluation() {
                       disabled={!canContinue()}
                       className="w-full mt-4 bg-primary text-white py-3 px-6 rounded-lg font-semibold disabled:bg-neutral-300 disabled:cursor-not-allowed"
                     >
-                      Continuar
+                      Continue
                     </Button>
                   </>
                 )}
@@ -382,7 +382,7 @@ export default function Evaluation() {
             </Card>
           ) : (
             <div className="text-center py-8">
-              <p className="text-neutral-600">No hay preguntas disponibles</p>
+              <p className="text-neutral-600">No questions available</p>
             </div>
           )}
         </div>
@@ -398,18 +398,18 @@ export default function Evaluation() {
               <CheckCircle className="text-primary h-8 w-8" />
             </div>
             <DialogTitle className="text-xl font-bold text-neutral-800">
-              ¡Completado!
+              Completed!
             </DialogTitle>
           </DialogHeader>
           <div className="text-center space-y-4">
             <p className="text-lg text-neutral-700">
-              Has ganado <span className="font-bold text-primary">R$ {earnings}</span>
+              You earned <span className="font-bold text-primary">${earnings}</span>
             </p>
             <Button
               onClick={handleModalClose}
               className="w-full bg-primary text-white py-3 px-6 rounded-lg font-semibold"
             >
-              Ver mi saldo
+              View my balance
             </Button>
           </div>
         </DialogContent>

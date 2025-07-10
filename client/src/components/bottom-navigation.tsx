@@ -8,10 +8,10 @@ export default function BottomNavigation() {
   const isActive = (path: string) => location === path;
 
   const navItems = [
-    { path: "/main", icon: Home, label: "Inicio" },
-    { path: "/wallet", icon: Wallet, label: "Billetera" },
-    { path: "/profile", icon: User, label: "Perfil" },
-    { path: "/support", icon: HelpCircle, label: "Soporte" },
+    { path: "/main", icon: Home, label: "Home" },
+    { path: "/wallet", icon: Wallet, label: "Wallet" },
+    { path: "/profile", icon: User, label: "Profile" },
+    { path: "/support", icon: HelpCircle, label: "Support" },
   ];
 
   return (

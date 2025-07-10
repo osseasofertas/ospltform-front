@@ -83,8 +83,8 @@ export default function Wallet() {
       
       // Show success toast
       toast({
-        title: "¡Método registrado!",
-        description: `Tu método de cobro (${selectedPayoutMethod}) se ha registrado con éxito.`,
+        title: "Method registered!",
+        description: `Your payout method (${selectedPayoutMethod}) has been successfully registered.`,
         duration: 3000,
       });
       
@@ -101,7 +101,7 @@ export default function Wallet() {
       console.error('Payout method registration error:', error);
       toast({
         title: "Error",
-        description: `No se pudo registrar el método de cobro: ${error.message}`,
+        description: `Could not register payout method: ${error.message}`,
         variant: "destructive",
       });
     }
@@ -129,7 +129,7 @@ export default function Wallet() {
   const isFormValid = () => {
     if (selectedPayoutMethod === 'PayPal') {
       return payoutDetails.email.trim() !== '' && payoutDetails.email.includes('@');
-    } else if (selectedPayoutMethod === 'Depósito bancario') {
+    } else if (selectedPayoutMethod === 'Bank deposit') {
       return payoutDetails.accountName.trim() !== '' && 
              payoutDetails.bankName.trim() !== '' && 
              payoutDetails.accountNumber.trim() !== '';
@@ -160,9 +160,9 @@ export default function Wallet() {
     const diffTime = Math.abs(now.getTime() - date.getTime());
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     
-    if (diffDays === 1) return "Ayer";
-    if (diffDays < 1) return "Hace unas horas";
-    if (diffDays < 7) return `Hace ${diffDays} días`;
+    if (diffDays === 1) return "Yesterday";
+    if (diffDays < 1) return "A few hours ago";
+    if (diffDays < 7) return `${diffDays} days ago`;
     return date.toLocaleDateString();
   };
 
@@ -174,7 +174,7 @@ export default function Wallet() {
           <button onClick={handleBack} className="text-neutral-600 hover:text-neutral-800">
             <ArrowLeft className="h-5 w-5" />
           </button>
-          <h2 className="text-xl font-semibold text-neutral-800">Mi Billetera</h2>
+          <h2 className="text-xl font-semibold text-neutral-800">My Wallet</h2>
           <div className="w-6"></div>
         </div>
       </div>
@@ -183,11 +183,11 @@ export default function Wallet() {
       <Card className="bg-gradient-to-r from-primary to-secondary mx-4 mt-4 text-white">
         <CardContent className="p-6">
           <div className="text-center">
-            <p className="text-white/80 text-sm mb-2">Saldo disponible</p>
+            <p className="text-white/80 text-sm mb-2">Available balance</p>
             <p className="text-4xl font-bold mb-4">${user?.balance || "0.00"}</p>
             <div className="bg-white/20 rounded-lg p-3 text-sm flex items-center justify-center">
               <Info className="h-4 w-4 mr-2" />
-              Saque disponible después de 7 días
+              Withdrawal available after 7 days
             </div>
           </div>
         </CardContent>
@@ -198,7 +198,7 @@ export default function Wallet() {
         <CardContent className="p-6">
           <div className="flex items-center gap-2 mb-4">
             <CreditCard className="h-5 w-5 text-primary" />
-            <h3 className="text-lg font-semibold text-neutral-800">Método de Cobro</h3>
+            <h3 className="text-lg font-semibold text-neutral-800">Payout Method</h3>
           </div>
           
           {currentPayoutMethod ? (
@@ -207,7 +207,7 @@ export default function Wallet() {
               <div className="flex items-center gap-2 text-green-600">
                 <CheckCircle className="h-5 w-5" />
                 <div>
-                  <p className="font-medium">Método de cobro activo: {currentPayoutMethod}</p>
+                  <p className="font-medium">Active payout method: {currentPayoutMethod}</p>
                   <p className="text-sm text-neutral-600">{getCurrentPayoutInfo()}</p>
                 </div>
               </div>
@@ -216,7 +216,7 @@ export default function Wallet() {
                 variant="outline"
                 className="w-full"
               >
-                Cambiar método
+                Change method
               </Button>
             </div>
           ) : (
@@ -231,10 +231,10 @@ export default function Wallet() {
                   </Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="Depósito bancario" id="bank" />
+                  <RadioGroupItem value="Bank deposit" id="bank" />
                   <Label htmlFor="bank" className="text-sm font-medium flex items-center gap-2">
                     <Building className="h-4 w-4" />
-                    Depósito bancario
+                    Bank deposit
                   </Label>
                 </div>
               </RadioGroup>
@@ -243,12 +243,12 @@ export default function Wallet() {
               {selectedPayoutMethod === 'PayPal' && (
                 <div className="space-y-3 p-3 bg-blue-50 rounded-lg border">
                   <Label htmlFor="email" className="text-sm font-medium text-blue-800">
-                    Email de PayPal
+                    PayPal Email
                   </Label>
                   <Input
                     id="email"
                     type="email"
-                    placeholder="tu-email@ejemplo.com"
+                    placeholder="your-email@example.com"
                     value={payoutDetails.email}
                     onChange={(e) => setPayoutDetails({
                       ...payoutDetails,
@@ -257,20 +257,20 @@ export default function Wallet() {
                     className="border-blue-200 focus:border-blue-400"
                   />
                   <p className="text-xs text-blue-600">
-                    Ingresa el email asociado a tu cuenta de PayPal
+                    Enter the email associated with your PayPal account
                   </p>
                 </div>
               )}
 
               {/* Bank Details */}
-              {selectedPayoutMethod === 'Depósito bancario' && (
+              {selectedPayoutMethod === 'Bank deposit' && (
                 <div className="space-y-3 p-3 bg-green-50 rounded-lg border">
                   <Label className="text-sm font-medium text-green-800">
-                    Datos bancarios básicos
+                    Basic bank details
                   </Label>
                   <div className="space-y-2">
                     <Input
-                      placeholder="Nombre del titular"
+                      placeholder="Account holder name"
                       value={payoutDetails.accountName}
                       onChange={(e) => setPayoutDetails({
                         ...payoutDetails,
@@ -279,7 +279,7 @@ export default function Wallet() {
                       className="border-green-200 focus:border-green-400"
                     />
                     <Input
-                      placeholder="Nombre del banco"
+                      placeholder="Bank name"
                       value={payoutDetails.bankName}
                       onChange={(e) => setPayoutDetails({
                         ...payoutDetails,
@@ -288,7 +288,7 @@ export default function Wallet() {
                       className="border-green-200 focus:border-green-400"
                     />
                     <Input
-                      placeholder="Número de cuenta"
+                      placeholder="Account number"
                       value={payoutDetails.accountNumber}
                       onChange={(e) => setPayoutDetails({
                         ...payoutDetails,
@@ -298,7 +298,7 @@ export default function Wallet() {
                     />
                   </div>
                   <p className="text-xs text-green-600">
-                    Información básica para procesamiento de pagos
+                    Basic information for payment processing
                   </p>
                 </div>
               )}
@@ -308,7 +308,7 @@ export default function Wallet() {
                 disabled={!selectedPayoutMethod || !isFormValid() || payoutMethodMutation.isPending}
                 className="w-full"
               >
-                {payoutMethodMutation.isPending ? 'Registrando...' : 'Registrar método'}
+                {payoutMethodMutation.isPending ? 'Registering...' : 'Register method'}
               </Button>
             </div>
           )}
@@ -321,7 +321,7 @@ export default function Wallet() {
           <CardContent className="p-4">
             <div className="text-center">
               <p className="text-2xl font-bold text-primary">{Number(stats?.totalEvaluations) || 0}</p>
-              <p className="text-sm text-neutral-600">Evaluaciones</p>
+              <p className="text-sm text-neutral-600">Evaluations</p>
             </div>
           </CardContent>
         </Card>
@@ -329,7 +329,7 @@ export default function Wallet() {
           <CardContent className="p-4">
             <div className="text-center">
               <p className="text-2xl font-bold text-accent">{Number(stats?.todayEvaluations) || 0}</p>
-              <p className="text-sm text-neutral-600">Hoy</p>
+              <p className="text-sm text-neutral-600">Today</p>
             </div>
           </CardContent>
         </Card>
@@ -337,7 +337,7 @@ export default function Wallet() {
 
       {/* Transaction History */}
       <div className="p-4">
-        <h3 className="text-lg font-semibold text-neutral-800 mb-4">Historial de transacciones</h3>
+        <h3 className="text-lg font-semibold text-neutral-800 mb-4">Transaction History</h3>
         
         <div className="space-y-3">
           {transactions.map((transaction) => (
@@ -346,7 +346,7 @@ export default function Wallet() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="font-semibold text-neutral-800">{transaction.description}</p>
-                    <p className="text-sm text-neutral-600">{transaction.type === 'welcome_bonus' ? 'Registro completado' : 'Evaluación completada'}</p>
+                    <p className="text-sm text-neutral-600">{transaction.type === 'welcome_bonus' ? 'Registration completed' : 'Evaluation completed'}</p>
                     <p className="text-xs text-neutral-400">{formatDate(transaction.createdAt)}</p>
                   </div>
                   <div className="text-right">
