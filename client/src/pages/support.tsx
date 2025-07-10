@@ -88,7 +88,7 @@ export default function Support() {
                     What is the daily evaluation limit?
                   </h4>
                   <p className="text-sm text-neutral-600 ml-4">
-                    Up to <strong>25 evaluations</strong> per day; your progress is shown on the main screen.
+                    Up to <strong>10 evaluations</strong> per day; your progress is shown on the main screen.
                   </p>
                 </div>
                 <div>

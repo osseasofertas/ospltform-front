@@ -118,7 +118,7 @@ Preferred communication style: Simple, everyday language.
   - Email-only login creates user profiles automatically with $50.00 starting balance
   - All user data stored in browser localStorage through Zustand persist middleware
   - Global 7-day security lockout: after ANY logout, ALL login attempts blocked for 7 days
-  - Daily evaluation limits (25/day) enforced entirely in frontend with automatic reset
+  - Daily evaluation limits (10/day) enforced entirely in frontend with automatic reset
   - Complete transaction history and balance management in localStorage
   - Real-time statistics tracking without any database dependencies
   - Universal blocking system prevents access with any email after logout
@@ -156,7 +156,7 @@ Preferred communication style: Simple, everyday language.
 - **Enhanced User Experience & Visual Design (July 08, 2025)**:
   - Fixed evaluation progress bar to show accurate question counts dynamically
   - Implemented Instagram-style product images with square aspect ratio for better visualization
-  - Added daily evaluation limit of 25 products per day with proper error handling
+  - Added daily evaluation limit of 10 products per day with proper error handling
   - Hidden total product count from users to improve UX flow
   - Updated product grid to 2-column layout for mobile-first Instagram-style display
   - Enhanced question variety with strategic mix of multiple choice and open-ended questions

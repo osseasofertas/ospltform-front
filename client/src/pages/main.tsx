@@ -19,7 +19,7 @@ export default function Main() {
   const isLoading = false;
 
   // Check daily limit locally
-  const isDailyLimitReached = userStats.todayEvaluations >= 25;
+  const isDailyLimitReached = userStats.todayEvaluations >= 10;
 
   const handleProductSelect = (product: AppProduct) => {
     setCurrentProduct(product);
@@ -70,7 +70,7 @@ export default function Main() {
                 Daily limit reached
               </h3>
               <p className="text-neutral-600 mb-4">
-                You've completed 25 evaluations today. Come back tomorrow to continue earning money by evaluating products.
+                You've completed 10 evaluations today. Come back tomorrow to continue earning money by evaluating products.
               </p>
               <p className="text-sm text-neutral-500">
                 The limit resets at 00:00 hours.
@@ -128,19 +128,19 @@ export default function Main() {
           <div className="bg-white/20 backdrop-blur-sm rounded-lg p-4">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-medium">Daily progress</span>
-              <span className="text-sm">{userStats.todayEvaluations}/25 evaluations</span>
+              <span className="text-sm">{userStats.todayEvaluations}/10 evaluations</span>
             </div>
             <div className="w-full bg-white/20 rounded-full h-2 mb-2">
               <div 
                 className="bg-white rounded-full h-2 transition-all duration-300"
-                style={{ width: `${Math.min((userStats.todayEvaluations / 25) * 100, 100)}%` }}
+                style={{ width: `${Math.min((userStats.todayEvaluations / 10) * 100, 100)}%` }}
               ></div>
             </div>
             <div className="flex justify-between text-xs text-white/80">
               <span>Completed: {userStats.todayEvaluations}</span>
-              <span>Remaining: {25 - userStats.todayEvaluations}</span>
+              <span>Remaining: {10 - userStats.todayEvaluations}</span>
             </div>
-            {userStats.todayEvaluations >= 25 && (
+            {userStats.todayEvaluations >= 10 && (
               <div className="mt-2 text-center">
                 <span className="text-xs bg-white/30 px-2 py-1 rounded-full">
                   🎉 Daily limit reached!
