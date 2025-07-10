@@ -67,6 +67,13 @@ export const useAppState = create<AppState>()(
             amount: '50.00',
             description: 'Welcome bonus'
           });
+          // Set initial balance to $50.00
+          set({
+            user: {
+              ...user,
+              balance: '50.00'
+            }
+          });
         }
       },
       

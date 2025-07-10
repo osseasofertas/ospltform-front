@@ -54,28 +54,7 @@ export default function Welcome() {
     }
   };
 
-  const handleDemo = async () => {
-    setIsLoading(true);
-    try {
-      const response = await apiRequest("POST", "/api/auth/demo", {});
-      const data = await response.json();
 
-      setUser(data.user);
-      toast({
-        title: "Demo account activated",
-        description: "You can explore all features",
-      });
-      setLocation("/main");
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Could not create demo account",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary to-secondary p-6 flex flex-col justify-center">
@@ -136,8 +115,6 @@ export default function Welcome() {
                 {isLoading ? "Loading..." : "Log in"}
               </Button>
             </form>
-            
-            
           </CardContent>
         </Card>
       </div>
