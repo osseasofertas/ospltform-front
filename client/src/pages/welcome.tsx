@@ -33,6 +33,20 @@ export default function Welcome() {
     e.preventDefault();
     setIsLoading(true);
 
+    // Check if login is blocked due to recent logout
+    const { isLoginBlocked, getDaysUntilLoginAllowed } = useAppState.getState();
+    
+    if (isLoginBlocked(formData.email)) {
+      const daysRemaining = getDaysUntilLoginAllowed(formData.email);
+      toast({
+        title: "Login Blocked",
+        description: `For security reasons, login is blocked for ${daysRemaining} more days after logout.`,
+        variant: "destructive",
+      });
+      setIsLoading(false);
+      return;
+    }
+
     try {
       const response = await apiRequest("POST", "/api/auth/login", { ...formData, password: "default" });
       const data = await response.json();

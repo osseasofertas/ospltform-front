@@ -122,6 +122,7 @@ Preferred communication style: Simple, everyday language.
   - Transaction history and balance management completely client-side
   - Removed database dependencies for user operations and statistics
   - Maintained evaluation completion rewards and progress tracking in localStorage
+  - Added 7-day security lockout system: after logout, users cannot login again for 7 days
 
 - **Authentication System Streamlining & Email Enhancement (July 10, 2025)**:
   - Removed registration functionality, keeping only login system

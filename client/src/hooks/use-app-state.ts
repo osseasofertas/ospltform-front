@@ -26,6 +26,7 @@ interface AppState {
     completedAt: string;
     earning: string;
   }>;
+  logoutLockouts: Record<string, string>; // email -> logout date
   
   // Actions
   setUser: (user: AppUser | null) => void;
@@ -41,6 +42,8 @@ interface AppState {
   incrementDailyEvaluations: () => void;
   resetDailyEvaluationsIfNeeded: () => void;
   logout: () => void;
+  isLoginBlocked: (email: string) => boolean;
+  getDaysUntilLoginAllowed: (email: string) => number;
 }
 
 export const useAppState = create<AppState>()(
@@ -57,6 +60,7 @@ export const useAppState = create<AppState>()(
       },
       transactions: [],
       completedEvaluations: [],
+      logoutLockouts: {},
       
       setUser: (user) => {
         set({ user });
@@ -185,19 +189,60 @@ export const useAppState = create<AppState>()(
         }
       },
       
-      logout: () => set({ 
-        user: null, 
-        currentProduct: null, 
-        currentEvaluation: null,
-        userStats: {
-          totalEvaluations: 0,
-          todayEvaluations: 0,
-          totalEarned: "0.00",
-          lastEvaluationDate: new Date().toDateString(),
-        },
-        transactions: [],
-        completedEvaluations: []
-      }),
+      logout: () => {
+        const state = get();
+        const userEmail = state.user?.email;
+        
+        if (userEmail) {
+          // Record logout date for 7-day lockout
+          set(state => ({
+            logoutLockouts: {
+              ...state.logoutLockouts,
+              [userEmail]: new Date().toISOString()
+            }
+          }));
+        }
+        
+        set({ 
+          user: null, 
+          currentProduct: null, 
+          currentEvaluation: null,
+          userStats: {
+            totalEvaluations: 0,
+            todayEvaluations: 0,
+            totalEarned: "0.00",
+            lastEvaluationDate: new Date().toDateString(),
+          },
+          transactions: [],
+          completedEvaluations: []
+        });
+      },
+      
+      isLoginBlocked: (email) => {
+        const state = get();
+        const logoutDate = state.logoutLockouts[email];
+        
+        if (!logoutDate) return false;
+        
+        const logout = new Date(logoutDate);
+        const now = new Date();
+        const daysDiff = Math.floor((now.getTime() - logout.getTime()) / (1000 * 60 * 60 * 24));
+        
+        return daysDiff < 7;
+      },
+      
+      getDaysUntilLoginAllowed: (email) => {
+        const state = get();
+        const logoutDate = state.logoutLockouts[email];
+        
+        if (!logoutDate) return 0;
+        
+        const logout = new Date(logoutDate);
+        const now = new Date();
+        const daysDiff = Math.floor((now.getTime() - logout.getTime()) / (1000 * 60 * 60 * 24));
+        
+        return Math.max(0, 7 - daysDiff);
+      },
     }),
     {
       name: 'safemoney-app-state',
