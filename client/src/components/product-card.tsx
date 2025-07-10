@@ -32,7 +32,7 @@ export default function ProductCard({ product, onSelect }: ProductCardProps) {
         {/* Product details and button */}
         <div className="p-3 space-y-3">
           <div className="text-center">
-            <p className="text-sm text-neutral-600 mb-1">3 etapas de evaluación</p>
+            <p className="text-sm text-neutral-600 mb-1">3 evaluation stages</p>
             <div className="flex items-center justify-center gap-1 text-primary">
               <Star className="h-3 w-3 fill-current" />
               <span className="text-sm font-semibold">
@@ -47,7 +47,7 @@ export default function ProductCard({ product, onSelect }: ProductCardProps) {
             className="w-full bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white font-semibold py-3 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md"
           >
             <div className="flex items-center justify-center gap-2">
-              <span>Evaluar Producto</span>
+              <span>Evaluate Product</span>
               <ChevronRight className="h-4 w-4" />
             </div>
           </Button>
