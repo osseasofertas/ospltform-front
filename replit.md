@@ -138,6 +138,7 @@ Preferred communication style: Simple, everyday language.
   - Converted product categories and descriptions to English
   - Updated server-side error messages and API responses
   - Translated transaction descriptions and user feedback messages
+  - Completed support/FAQ page translation with updated content for localStorage system
   - Maintained consistent English terminology across frontend and backend
   - Ensured all user-facing content is now in English for better accessibility
 

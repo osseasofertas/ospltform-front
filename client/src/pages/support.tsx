@@ -24,8 +24,8 @@ export default function Support() {
             <ArrowLeft className="h-5 w-5" />
           </button>
           <div className="text-center">
-            <h2 className="text-xl font-semibold text-neutral-800">Preguntas Frecuentes (FAQ)</h2>
-            <p className="text-xs text-neutral-500">Última modificación: 26/06 – 08:55</p>
+            <h2 className="text-xl font-semibold text-neutral-800">Frequently Asked Questions (FAQ)</h2>
+            <p className="text-xs text-neutral-500">Last updated: 07/10 – 05:15</p>
           </div>
           <div className="w-6"></div>
         </div>
@@ -36,177 +36,177 @@ export default function Support() {
         <div className="flex items-center gap-2 mb-6">
           <HelpCircle className="h-5 w-5 text-primary" />
           <p className="text-sm text-neutral-600">
-            Encuentra respuestas a las preguntas más comunes sobre SafeMoney
+            Find answers to the most common questions about SafeMoney
           </p>
         </div>
 
         <Accordion type="single" collapsible className="space-y-3">
-          {/* General y Acceso */}
+          {/* General and Access */}
           <AccordionItem value="general" className="border border-neutral-200 rounded-lg">
             <AccordionTrigger className="px-4 py-3 hover:no-underline">
-              <span className="font-medium text-neutral-800">General y Acceso</span>
+              <span className="font-medium text-neutral-800">General and Access</span>
             </AccordionTrigger>
             <AccordionContent className="px-4 pb-4">
               <div className="space-y-4">
                 <div>
                   <h4 className="font-medium text-neutral-800 mb-2">
-                    ¿Cómo inicio sesión en la aplicación?
+                    How do I log into the application?
                   </h4>
                   <p className="text-sm text-neutral-600 ml-4">
-                    Ingresa tu <strong>Correo electrónico</strong> y <strong>Contraseña</strong> en la pantalla de inicio y toca "Iniciar Sesión".
+                    Enter your <strong>Email address</strong> on the login screen and tap "Log in". No password required.
                   </p>
                 </div>
                 <div>
                   <h4 className="font-medium text-neutral-800 mb-2">
-                    ¿Qué hago si olvido mi contraseña?
+                    What if I can't access my account?
                   </h4>
                   <p className="text-sm text-neutral-600 ml-4">
-                    Actualmente no hay recuperación automática. Por favor, contacta a soporte técnico.
+                    Simply enter any email address to create a new account with $50.00 starting balance.
                   </p>
                 </div>
               </div>
             </AccordionContent>
           </AccordionItem>
 
-          {/* Evaluación de Productos */}
+          {/* Product Evaluation */}
           <AccordionItem value="evaluacion" className="border border-neutral-200 rounded-lg">
             <AccordionTrigger className="px-4 py-3 hover:no-underline">
-              <span className="font-medium text-neutral-800">Evaluación de Productos</span>
+              <span className="font-medium text-neutral-800">Product Evaluation</span>
             </AccordionTrigger>
             <AccordionContent className="px-4 pb-4">
               <div className="space-y-4">
                 <div>
                   <h4 className="font-medium text-neutral-800 mb-2">
-                    ¿Cómo puedo empezar a evaluar productos?
+                    How do I start evaluating products?
                   </h4>
                   <p className="text-sm text-neutral-600 ml-4">
-                    En la pantalla principal, toca "Evaluar Productos" para iniciar el cuestionario.
+                    On the main screen, tap any product card to start the evaluation questionnaire.
                   </p>
                 </div>
                 <div>
                   <h4 className="font-medium text-neutral-800 mb-2">
-                    ¿Cuál es el límite diario de evaluaciones?
+                    What is the daily evaluation limit?
                   </h4>
                   <p className="text-sm text-neutral-600 ml-4">
-                    Hasta <strong>25 evaluaciones</strong> por día; tu progreso se muestra en la pantalla principal.
+                    Up to <strong>25 evaluations</strong> per day; your progress is shown on the main screen.
                   </p>
                 </div>
                 <div>
                   <h4 className="font-medium text-neutral-800 mb-2">
-                    ¿Cuánto puedo ganar por evaluación?
+                    How much can I earn per evaluation?
                   </h4>
                   <p className="text-sm text-neutral-600 ml-4">
-                    Entre <strong>R$ 1,00</strong> y <strong>R$ 4,00</strong>, según el producto y complejidad; el rango aparece en cada tarjeta de producto.
+                    Between <strong>$1.00</strong> and <strong>$4.00</strong>, depending on the product and complexity; the range appears on each product card.
                   </p>
                 </div>
                 <div>
                   <h4 className="font-medium text-neutral-800 mb-2">
-                    ¿Dónde veo mis ganancias recientes?
+                    Where can I see my recent earnings?
                   </h4>
                   <p className="text-sm text-neutral-600 ml-4">
-                    En la sección "Ganancias Recientes" de la pantalla principal, con producto, fecha y monto.
+                    In the "Recent Earnings" section on the main screen, with product, date and amount details.
                   </p>
                 </div>
               </div>
             </AccordionContent>
           </AccordionItem>
 
-          {/* Mi Billetera y Ganancias */}
+          {/* My Wallet and Earnings */}
           <AccordionItem value="billetera" className="border border-neutral-200 rounded-lg">
             <AccordionTrigger className="px-4 py-3 hover:no-underline">
-              <span className="font-medium text-neutral-800">Mi Billetera y Ganancias</span>
+              <span className="font-medium text-neutral-800">My Wallet and Earnings</span>
             </AccordionTrigger>
             <AccordionContent className="px-4 pb-4">
               <div className="space-y-4">
                 <div>
                   <h4 className="font-medium text-neutral-800 mb-2">
-                    ¿Cómo veo mi saldo total?
+                    How do I see my total balance?
                   </h4>
                   <p className="text-sm text-neutral-600 ml-4">
-                    Tu saldo aparece en grande en "Mi Billetera" encima de la lista de transacciones.
+                    Your balance appears prominently in "My Wallet" above the transaction list.
                   </p>
                 </div>
                 <div>
                   <h4 className="font-medium text-neutral-800 mb-2">
-                    ¿Qué significan "Ganho Hoje" y "Avaliações Hoje"?
+                    What do "Today's Earnings" and "Today's Evaluations" mean?
                   </h4>
                   <p className="text-sm text-neutral-600 ml-4">
-                    "Ganho Hoje" es lo que ganaste hoy; "Avaliações Hoje" es cuántas completaste hoy.
+                    "Today's Earnings" shows what you earned today; "Today's Evaluations" shows how many you completed today.
                   </p>
                 </div>
                 <div>
                   <h4 className="font-medium text-neutral-800 mb-2">
-                    ¿Cómo retiro mis fondos?
+                    How do I withdraw my funds?
                   </h4>
                   <p className="text-sm text-neutral-600 ml-4">
-                    En "Mi Billetera", toca "Retirar Fondos" y sigue las instrucciones.
+                    In "My Wallet", tap "Withdraw Funds" and follow the instructions.
                   </p>
                 </div>
                 <div>
                   <h4 className="font-medium text-neutral-800 mb-2">
-                    ¿Por qué mis retiros están bloqueados?
+                    Why are my withdrawals blocked?
                   </h4>
                   <p className="text-sm text-neutral-600 ml-4">
-                    Por seguridad, los nuevos usuarios esperan un periodo antes de retirar.
+                    For security reasons, new users must wait a period before withdrawing funds.
                   </p>
                 </div>
                 <div>
                   <h4 className="font-medium text-neutral-800 mb-2">
-                    ¿Cuánto tiempo debo esperar para el primer retiro?
+                    How long do I need to wait for my first withdrawal?
                   </h4>
                   <p className="text-sm text-neutral-600 ml-4">
-                    La app muestra cuántos días faltan antes de habilitar el retiro.
+                    The app shows how many days remain before withdrawals are enabled.
                   </p>
                 </div>
                 <div>
                   <h4 className="font-medium text-neutral-800 mb-2">
-                    ¿Dónde veo mi historial de ganancias?
+                    Where can I see my earnings history?
                   </h4>
                   <p className="text-sm text-neutral-600 ml-4">
-                    En "Historial de Ganancias" dentro de "Mi Billetera", con detalles de cada evaluación.
+                    In "Earnings History" within "My Wallet", with details from each evaluation.
                   </p>
                 </div>
               </div>
             </AccordionContent>
           </AccordionItem>
 
-          {/* Gestión de Perfil */}
+          {/* Profile Management */}
           <AccordionItem value="perfil" className="border border-neutral-200 rounded-lg">
             <AccordionTrigger className="px-4 py-3 hover:no-underline">
-              <span className="font-medium text-neutral-800">Gestión de Perfil</span>
+              <span className="font-medium text-neutral-800">Profile Management</span>
             </AccordionTrigger>
             <AccordionContent className="px-4 pb-4">
               <div className="space-y-4">
                 <div>
                   <h4 className="font-medium text-neutral-800 mb-2">
-                    ¿Cómo edito mi perfil?
+                    How do I edit my profile?
                   </h4>
                   <p className="text-sm text-neutral-600 ml-4">
-                    En "Perfil", toca "Editar Perfil" para actualizar tu nombre o contraseña.
+                    Profile information is automatically managed. Your data is stored locally on your device.
                   </p>
                 </div>
                 <div>
                   <h4 className="font-medium text-neutral-800 mb-2">
-                    ¿Dónde veo mis estadísticas de evaluación y ganancias?
+                    Where can I see my evaluation and earnings statistics?
                   </h4>
                   <p className="text-sm text-neutral-600 ml-4">
-                    En "Perfil", verás totales de evaluaciones, ganancias y estadísticas diarias.
+                    In "Profile", you'll see totals for evaluations, earnings and daily statistics.
                   </p>
                 </div>
                 <div>
                   <h4 className="font-medium text-neutral-800 mb-2">
-                    ¿Puedo ajustar configuraciones en mi perfil?
+                    Can I adjust settings in my profile?
                   </h4>
                   <p className="text-sm text-neutral-600 ml-4">
-                    Hay una opción "Configuración", pero solo muestra información básica. Contacta soporte para cambios avanzados.
+                    Basic profile information is shown. Contact support for advanced changes.
                   </p>
                 </div>
                 <div>
                   <h4 className="font-medium text-neutral-800 mb-2">
-                    ¿Cómo cierro sesión?
+                    How do I log out?
                   </h4>
                   <p className="text-sm text-neutral-600 ml-4">
-                    En "Perfil", toca "Salir" para terminar tu sesión.
+                    In "Profile", tap "Log out" to end your session.
                   </p>
                 </div>
               </div>
