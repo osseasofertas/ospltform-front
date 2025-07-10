@@ -137,16 +137,7 @@ export default function Welcome() {
               </Button>
             </form>
             
-            <div className="mt-6 pt-4 border-t border-neutral-200">
-              <Button
-                onClick={handleDemo}
-                disabled={isLoading}
-                variant="outline"
-                className="w-full bg-neutral-100 text-neutral-700 py-3 px-6 rounded-lg font-medium hover:bg-neutral-200"
-              >
-                Try with demo account
-              </Button>
-            </div>
+            
           </CardContent>
         </Card>
       </div>
