@@ -1,5 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -8,155 +7,110 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { ArrowLeft, CheckCircle } from "lucide-react";
 import { useAppState } from "@/hooks/use-app-state";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
-import { AppQuestion, AppEvaluation } from "@/types";
+import { AppQuestion } from "@/types";
+import { getQuestionsByStage } from "@/data/questions";
 import QuestionMultipleChoice from "@/components/question-multiple-choice";
 import QuestionStarRating from "@/components/question-star-rating";
 import QuestionFreeText from "@/components/question-free-text";
 
-// Debounce utility function
-function debounce<T extends (...args: any[]) => any>(func: T, wait: number): T {
-  let timeout: NodeJS.Timeout;
-  return ((...args: any[]) => {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => func(...args), wait);
-  }) as T;
-}
+// Frontend-only evaluation component
 
 export default function Evaluation() {
   const [, setLocation] = useLocation();
-  const { user, currentProduct, setCurrentEvaluation } = useAppState();
+  const { user, currentProduct, completeEvaluation, incrementDailyEvaluations } = useAppState();
   const { toast } = useToast();
-  const queryClient = useQueryClient();
   
   const [currentStage, setCurrentStage] = useState(1);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answeredCount, setAnsweredCount] = useState(0);
   const [stageAnswers, setStageAnswers] = useState<Record<number, any>>({});
-  const [draftId, setDraftId] = useState<number | null>(null);
   const [showCompletionModal, setShowCompletionModal] = useState(false);
   const [earnings, setEarnings] = useState<string>("");
-  const [retryCount, setRetryCount] = useState(0);
   const [showStageComplete, setShowStageComplete] = useState(false);
   const [allAnswers, setAllAnswers] = useState<Record<string, any>>({});
 
-  // Load draft on mount
-  const { data: draftData, isLoading: draftLoading } = useQuery({
-    queryKey: [`/api/evaluations/draft?userId=${user?.id}&productId=${currentProduct?.id}`],
-    enabled: !!user?.id && !!currentProduct?.id,
-    retry: false,
-  });
+  // Frontend-only questions - no API call needed
+  const questions = currentProduct ? getQuestionsByStage(currentProduct.id, currentStage) : [];
+  const isLoading = false;
 
-
-
-  // Get questions for current stage
-  const { data: questions = [], isLoading: questionsLoading } = useQuery<AppQuestion[]>({
-    queryKey: [`/api/products/${currentProduct?.id}/questions?stage=${currentStage}`],
-    enabled: !!currentProduct?.id,
-  });
-
-  // Save draft mutation with retry logic
-  const { mutate: saveDraft } = useMutation({
-    mutationFn: async (payload: any) => {
-      const response = await apiRequest("POST", "/api/evaluations/draft", payload);
-      return response.json();
-    },
-    onSuccess: (data) => {
-      setDraftId(data.draftId);
-      toast({
-        title: "Progress saved",
-        description: "Your answers have been automatically saved",
-      });
-      setRetryCount(0);
-    },
-    onError: () => {
-      if (retryCount < 2) {
-        setRetryCount(prev => prev + 1);
-        // Retry with exponential backoff
-        setTimeout(() => {
-          saveDraft({
-            draftId,
-            userId: user?.id,
-            productId: currentProduct?.id,
-            stage: currentStage,
-            partialAnswers: { ...allAnswers, [`stage_${currentStage}`]: stageAnswers }
-          });
-        }, Math.pow(2, retryCount) * 1000);
-      } else {
-        toast({
-          title: "Error saving progress",
-          description: "Check your connection. You can retry manually.",
-          variant: "destructive",
-        });
-      }
-    },
-  });
-
-  // Complete evaluation mutation
-  const { mutate: completeEvaluation } = useMutation({
-    mutationFn: async (answers: Record<string, any>) => {
-      const response = await apiRequest("POST", "/api/evaluations", {
-        userId: user?.id,
-        productId: currentProduct?.id,
-        answers,
-      });
-      return response.json();
-    },
-    onSuccess: (data) => {
-      setEarnings(data.earning);
-      setShowCompletionModal(true);
-      // Delete draft
-      if (draftId) {
-        apiRequest("DELETE", `/api/evaluations/draft/${draftId}`, {});
-      }
-      // Invalidate user data to refresh balance
-      queryClient.invalidateQueries({ queryKey: ["/api/users"] });
-    },
-  });
-
-  // Load draft data on component mount
-  useEffect(() => {
-    if (draftData?.draft) {
-      const draft = draftData.draft;
-      setDraftId(draft.draftId);
-      setCurrentStage(draft.stage);
-      setAllAnswers(draft.partialAnswers || {});
-      
-      const stageAnswers = draft.partialAnswers?.[`stage_${draft.stage}`] || {};
-      setStageAnswers(stageAnswers);
-      
-      // Calculate current question index and answered count
-      const answeredQuestions = Object.keys(stageAnswers).length;
-      setAnsweredCount(answeredQuestions);
-      setCurrentQuestionIndex(answeredQuestions);
+  // Frontend-only save function - saves to localStorage via Zustand
+  const saveDraftToLocalStorage = (answers: Record<string, any>) => {
+    if (currentProduct && user) {
+      const draftKey = `evaluation_draft_${user.id}_${currentProduct.id}`;
+      const draftData = {
+        userId: user.id,
+        productId: currentProduct.id,
+        stage: currentStage,
+        answers: answers,
+        lastSaved: new Date().toISOString()
+      };
+      localStorage.setItem(draftKey, JSON.stringify(draftData));
     }
-  }, [draftData]);
+  };
 
-  // Create debounced save function
-  const debouncedSave = useCallback(
-    debounce((stageAnswers: Record<number, any>) => {
+  // Frontend-only completion function
+  const completeEvaluationLocal = (finalAnswers: Record<string, any>) => {
+    if (currentProduct && user) {
+      // Calculate random earning within product range
+      const minEarning = parseFloat(currentProduct.minEarning);
+      const maxEarning = parseFloat(currentProduct.maxEarning);
+      const earning = (minEarning + (Math.random() * (maxEarning - minEarning))).toFixed(2);
+      
+      // Use the app state function to handle completion
+      completeEvaluation(currentProduct.id, earning);
+      incrementDailyEvaluations();
+      
+      setEarnings(earning);
+      setShowCompletionModal(true);
+      
+      // Clear draft from localStorage
+      const draftKey = `evaluation_draft_${user.id}_${currentProduct.id}`;
+      localStorage.removeItem(draftKey);
+      
+      toast({
+        title: "Evaluation completed!",
+        description: `You earned $${earning} for this evaluation`,
+      });
+    }
+  };
+
+  // Load draft data from localStorage on component mount
+  useEffect(() => {
+    if (currentProduct && user) {
+      const draftKey = `evaluation_draft_${user.id}_${currentProduct.id}`;
+      const savedDraft = localStorage.getItem(draftKey);
+      
+      if (savedDraft) {
+        try {
+          const draft = JSON.parse(savedDraft);
+          setCurrentStage(draft.stage || 1);
+          setAllAnswers(draft.answers || {});
+          
+          const stageAnswers = draft.answers?.[`stage_${draft.stage || 1}`] || {};
+          setStageAnswers(stageAnswers);
+          
+          // Calculate current question index and answered count
+          const answeredQuestions = Object.keys(stageAnswers).length;
+          setAnsweredCount(answeredQuestions);
+          setCurrentQuestionIndex(answeredQuestions);
+        } catch (error) {
+          console.error("Error loading draft from localStorage:", error);
+        }
+      }
+    }
+  }, [currentProduct, user]);
+
+  // Auto-save to localStorage when answers change
+  useEffect(() => {
+    if (Object.keys(stageAnswers).length > 0) {
       const updatedAllAnswers = {
         ...allAnswers,
         [`stage_${currentStage}`]: stageAnswers
       };
-      const payload = {
-        draftId,
-        userId: user?.id,
-        productId: currentProduct?.id,
-        stage: currentStage,
-        partialAnswers: updatedAllAnswers
-      };
-      saveDraft(payload);
-    }, 500),
-    [draftId, user?.id, currentProduct?.id, currentStage, allAnswers]
-  );
-
-  // Auto-save when answers change
-  useEffect(() => {
-    if (Object.keys(stageAnswers).length > 0) {
-      debouncedSave(stageAnswers);
+      setAllAnswers(updatedAllAnswers);
+      saveDraftToLocalStorage(updatedAllAnswers);
     }
-  }, [stageAnswers]);
+  }, [stageAnswers, currentStage]);
 
   const handleBack = () => {
     setLocation("/main");
@@ -180,8 +134,8 @@ export default function Evaluation() {
       
       // Show success toast
       toast({
-        title: "Progress saved",
-        description: "Your answer has been recorded",
+        title: "Answer saved",
+        description: "Your progress is automatically saved",
       });
 
       // Auto-advance with smooth animation
@@ -206,8 +160,8 @@ export default function Evaluation() {
     
     // Show success toast
     toast({
-      title: "Progress saved",
-      description: "Your answer has been recorded",
+      title: "Answer saved", 
+      description: "Your progress is automatically saved",
     });
 
     if (currentQuestionIndex < questions.length - 1) {
@@ -231,7 +185,7 @@ export default function Evaluation() {
         ...allAnswers,
         [`stage_${currentStage}`]: stageAnswers
       };
-      completeEvaluation(finalAnswers);
+      completeEvaluationLocal(finalAnswers);
     }
   };
 
@@ -259,7 +213,7 @@ export default function Evaluation() {
     return <div>No product selected</div>;
   }
 
-  if (draftLoading || questionsLoading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">

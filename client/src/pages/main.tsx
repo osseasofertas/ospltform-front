@@ -1,10 +1,10 @@
-import { useQuery } from "@tanstack/react-query";
+import { getProducts } from "@/data/products";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Wallet, AlertCircle, User, HelpCircle, TrendingUp } from "lucide-react";
 import { useAppState } from "@/hooks/use-app-state";
 import { useLocation } from "wouter";
-import { AppProduct, AppStats } from "@/types";
+import { AppProduct } from "@/types";
 import ProductCard from "@/components/product-card";
 
 export default function Main() {
@@ -14,10 +14,9 @@ export default function Main() {
   // Reset daily evaluations if it's a new day
   resetDailyEvaluationsIfNeeded();
 
-  const { data: products = [], isLoading } = useQuery<AppProduct[]>({
-    queryKey: ["/api/products"],
-    enabled: !!user?.id,
-  });
+  // Frontend-only products - no API call needed
+  const products = getProducts();
+  const isLoading = false;
 
   // Check daily limit locally
   const isDailyLimitReached = userStats.todayEvaluations >= 25;
