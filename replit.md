@@ -113,6 +113,14 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **Authentication System Streamlining & Email Enhancement (July 10, 2025)**:
+  - Removed registration functionality, keeping only login system
+  - Added email masks for popular English-speaking country domains (@gmail.com, @yahoo.com, @outlook.com, @hotmail.com, @icloud.com, @aol.com, @protonmail.com)
+  - Implemented clickable email domain suggestions for quick completion
+  - Added payment email instruction text: "Fill in with your payment email"
+  - Simplified user authentication flow for better user experience
+  - Maintained demo account functionality for testing purposes
+
 - **Complete Spanish to English Translation (July 10, 2025)**:
   - Translated all Spanish content throughout the application to English
   - Updated all user interface text, error messages, and navigation elements
