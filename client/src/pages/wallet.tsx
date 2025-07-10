@@ -320,7 +320,7 @@ export default function Wallet() {
         <Card className="border border-neutral-200">
           <CardContent className="p-4">
             <div className="text-center">
-              <p className="text-2xl font-bold text-primary">{stats?.totalEvaluations || 0}</p>
+              <p className="text-2xl font-bold text-primary">{Number(stats?.totalEvaluations) || 0}</p>
               <p className="text-sm text-neutral-600">Evaluaciones</p>
             </div>
           </CardContent>
@@ -328,7 +328,7 @@ export default function Wallet() {
         <Card className="border border-neutral-200">
           <CardContent className="p-4">
             <div className="text-center">
-              <p className="text-2xl font-bold text-accent">{stats?.todayEvaluations || 0}</p>
+              <p className="text-2xl font-bold text-accent">{Number(stats?.todayEvaluations) || 0}</p>
               <p className="text-sm text-neutral-600">Hoy</p>
             </div>
           </CardContent>

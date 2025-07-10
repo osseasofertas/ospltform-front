@@ -200,9 +200,10 @@ export class DatabaseStorage implements IStorage {
     todayEvaluations: number;
     totalEarned: string;
   }> {
-    const [stats] = await db
+    // Get total completed evaluations and total earned
+    const [completedStats] = await db
       .select({
-        totalEvaluations: sql<number>`COUNT(*)`,
+        totalEvaluations: sql<number>`COUNT(*)::int`,
         totalEarned: sql<string>`COALESCE(SUM(${evaluations.totalEarned}), 0)`,
       })
       .from(evaluations)
@@ -214,6 +215,7 @@ export class DatabaseStorage implements IStorage {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
+    // Get today's completed evaluations
     const [todayStats] = await db
       .select({
         todayEvaluations: sql<number>`COUNT(*)`,
@@ -225,10 +227,27 @@ export class DatabaseStorage implements IStorage {
         sql`${evaluations.completedAt} >= ${today}`
       ));
 
+    // Get user's daily evaluations used from users table (this includes today's count)
+    const [user] = await db
+      .select({
+        dailyEvaluationsUsed: users.dailyEvaluationsUsed,
+        lastEvaluationDate: users.lastEvaluationDate
+      })
+      .from(users)
+      .where(eq(users.id, userId));
+
+    // Calculate actual today evaluations from user's daily count
+    let actualTodayEvaluations = 0;
+    if (user?.lastEvaluationDate) {
+      const lastEvalDate = new Date(user.lastEvaluationDate);
+      const isToday = lastEvalDate.toDateString() === today.toDateString();
+      actualTodayEvaluations = isToday ? (user.dailyEvaluationsUsed || 0) : 0;
+    }
+
     return {
-      totalEvaluations: stats.totalEvaluations || 0,
-      todayEvaluations: todayStats.todayEvaluations || 0,
-      totalEarned: stats.totalEarned || '0.00',
+      totalEvaluations: completedStats.totalEvaluations || 0,
+      todayEvaluations: actualTodayEvaluations,
+      totalEarned: completedStats.totalEarned || '0.00',
     };
   }
 }
