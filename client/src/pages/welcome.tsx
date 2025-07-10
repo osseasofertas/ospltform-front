@@ -6,7 +6,6 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useAppState } from "@/hooks/use-app-state";
-import { apiRequest } from "@/lib/queryClient";
 import { Shield } from "lucide-react";
 
 export default function Welcome() {
@@ -47,25 +46,23 @@ export default function Welcome() {
       return;
     }
 
-    try {
-      const response = await apiRequest("POST", "/api/auth/login", { ...formData, password: "default" });
-      const data = await response.json();
+    // Frontend-only login - create user profile from email
+    const newUser = {
+      id: Date.now(), // Generate unique ID
+      name: formData.email.split('@')[0], // Use email username as name
+      email: formData.email,
+      balance: "50.00", // Default starting balance
+      registrationDate: new Date().toISOString(),
+      isDemo: false
+    };
 
-      setUser(data.user);
-      toast({
-        title: "Welcome!",
-        description: "You've successfully logged in",
-      });
-      setLocation("/main");
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "There was a problem with your login",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
+    setUser(newUser);
+    toast({
+      title: "Welcome!",
+      description: "You've successfully logged in",
+    });
+    setLocation("/main");
+    setIsLoading(false);
   };
 
 

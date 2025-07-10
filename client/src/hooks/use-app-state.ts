@@ -194,28 +194,41 @@ export const useAppState = create<AppState>()(
         const userEmail = state.user?.email;
         
         if (userEmail) {
-          // Record logout date for 7-day lockout
-          set(state => ({
-            logoutLockouts: {
-              ...state.logoutLockouts,
-              [userEmail]: new Date().toISOString()
-            }
-          }));
+          // Record logout date for 7-day lockout - this persists in localStorage
+          const newLockouts = {
+            ...state.logoutLockouts,
+            [userEmail]: new Date().toISOString()
+          };
+          
+          set({ 
+            user: null, 
+            currentProduct: null, 
+            currentEvaluation: null,
+            userStats: {
+              totalEvaluations: 0,
+              todayEvaluations: 0,
+              totalEarned: "0.00",
+              lastEvaluationDate: new Date().toDateString(),
+            },
+            transactions: [],
+            completedEvaluations: [],
+            logoutLockouts: newLockouts // Keep lockout data even after logout
+          });
+        } else {
+          set({ 
+            user: null, 
+            currentProduct: null, 
+            currentEvaluation: null,
+            userStats: {
+              totalEvaluations: 0,
+              todayEvaluations: 0,
+              totalEarned: "0.00",
+              lastEvaluationDate: new Date().toDateString(),
+            },
+            transactions: [],
+            completedEvaluations: []
+          });
         }
-        
-        set({ 
-          user: null, 
-          currentProduct: null, 
-          currentEvaluation: null,
-          userStats: {
-            totalEvaluations: 0,
-            todayEvaluations: 0,
-            totalEarned: "0.00",
-            lastEvaluationDate: new Date().toDateString(),
-          },
-          transactions: [],
-          completedEvaluations: []
-        });
       },
       
       isLoginBlocked: (email) => {
