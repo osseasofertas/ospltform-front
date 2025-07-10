@@ -55,29 +55,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/auth/login", async (req, res) => {
     try {
-      const { email, password } = loginSchema.parse(req.body);
+      const { email, password } = req.body;
       
-      const user = await storage.getUserByEmail(email);
-      if (!user) {
-        return res.status(401).json({ message: "Invalid credentials" });
-      }
+      // Allow any login, create a user profile based on email
+      const userData = {
+        id: Math.floor(Math.random() * 100000), // Generate random ID
+        name: email.split('@')[0] || "User", // Use email username as name
+        email: email,
+        balance: "50.00", // Default starting balance
+        registrationDate: new Date().toISOString(),
+        dailyEvaluationsUsed: 0,
+        isDemo: false
+      };
 
-      const isValidPassword = await storage.verifyPassword(password, user.password);
-      if (!isValidPassword) {
-        return res.status(401).json({ message: "Invalid credentials" });
-      }
-
-      res.json({ 
-        user: { 
-          id: user.id, 
-          name: user.name, 
-          email: user.email, 
-          balance: user.balance,
-          registrationDate: user.registrationDate,
-          dailyEvaluationsUsed: user.dailyEvaluationsUsed,
-          isDemo: user.isDemo
-        } 
-      });
+      res.json({ user: userData });
     } catch (error) {
       console.error("Login error:", error);
       res.status(400).json({ message: "Error logging in" });

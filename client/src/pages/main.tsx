@@ -8,18 +8,19 @@ import { AppProduct, AppStats } from "@/types";
 import ProductCard from "@/components/product-card";
 
 export default function Main() {
-  const { user, setCurrentProduct } = useAppState();
+  const { user, setCurrentProduct, userStats, resetDailyEvaluationsIfNeeded } = useAppState();
   const [, setLocation] = useLocation();
 
-  const { data: products = [], isLoading, error } = useQuery<AppProduct[]>({
-    queryKey: [`/api/products?userId=${user?.id}`],
+  // Reset daily evaluations if it's a new day
+  resetDailyEvaluationsIfNeeded();
+
+  const { data: products = [], isLoading } = useQuery<AppProduct[]>({
+    queryKey: ["/api/products"],
     enabled: !!user?.id,
   });
 
-  const { data: stats } = useQuery<AppStats>({
-    queryKey: ["/api/users", user?.id, "stats"],
-    enabled: !!user?.id,
-  });
+  // Check daily limit locally
+  const isDailyLimitReached = userStats.todayEvaluations >= 25;
 
   const handleProductSelect = (product: AppProduct) => {
     setCurrentProduct(product);
@@ -38,7 +39,7 @@ export default function Main() {
   }
 
   // Handle daily limit reached
-  if (error && (error as any).message?.includes("Daily limit")) {
+  if (isDailyLimitReached) {
     return (
       <div className="min-h-screen bg-neutral-50">
         {/* Header */}
@@ -128,19 +129,19 @@ export default function Main() {
           <div className="bg-white/20 backdrop-blur-sm rounded-lg p-4">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-medium">Daily progress</span>
-              <span className="text-sm">{stats?.todayEvaluations || 0}/25 evaluations</span>
+              <span className="text-sm">{userStats.todayEvaluations}/25 evaluations</span>
             </div>
             <div className="w-full bg-white/20 rounded-full h-2 mb-2">
               <div 
                 className="bg-white rounded-full h-2 transition-all duration-300"
-                style={{ width: `${Math.min(((stats?.todayEvaluations || 0) / 25) * 100, 100)}%` }}
+                style={{ width: `${Math.min((userStats.todayEvaluations / 25) * 100, 100)}%` }}
               ></div>
             </div>
             <div className="flex justify-between text-xs text-white/80">
-              <span>Completed: {stats?.todayEvaluations || 0}</span>
-              <span>Remaining: {25 - (stats?.todayEvaluations || 0)}</span>
+              <span>Completed: {userStats.todayEvaluations}</span>
+              <span>Remaining: {25 - userStats.todayEvaluations}</span>
             </div>
-            {(stats?.todayEvaluations || 0) >= 25 && (
+            {userStats.todayEvaluations >= 25 && (
               <div className="mt-2 text-center">
                 <span className="text-xs bg-white/30 px-2 py-1 rounded-full">
                   🎉 Daily limit reached!

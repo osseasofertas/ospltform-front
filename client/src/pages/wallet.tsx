@@ -14,7 +14,7 @@ import { apiRequest } from "@/lib/queryClient";
 
 export default function Wallet() {
   const [, setLocation] = useLocation();
-  const { user } = useAppState();
+  const { user, transactions, userStats } = useAppState();
   const { toast } = useToast();
   const [selectedPayoutMethod, setSelectedPayoutMethod] = useState<string>('');
   const [currentPayoutMethod, setCurrentPayoutMethod] = useState<string>('');
@@ -23,16 +23,6 @@ export default function Wallet() {
     accountName: '',
     bankName: '',
     accountNumber: ''
-  });
-
-  const { data: transactions = [] } = useQuery<AppTransaction[]>({
-    queryKey: ["/api/transactions", user?.id],
-    enabled: !!user?.id,
-  });
-
-  const { data: stats } = useQuery<AppStats>({
-    queryKey: ["/api/users", user?.id, "stats"],
-    enabled: !!user?.id,
   });
 
   // Load payout method from localStorage on component mount
@@ -320,7 +310,7 @@ export default function Wallet() {
         <Card className="border border-neutral-200">
           <CardContent className="p-4">
             <div className="text-center">
-              <p className="text-2xl font-bold text-primary">{Number(stats?.totalEvaluations) || 0}</p>
+              <p className="text-2xl font-bold text-primary">{userStats.totalEvaluations}</p>
               <p className="text-sm text-neutral-600">Evaluations</p>
             </div>
           </CardContent>
@@ -328,7 +318,7 @@ export default function Wallet() {
         <Card className="border border-neutral-200">
           <CardContent className="p-4">
             <div className="text-center">
-              <p className="text-2xl font-bold text-accent">{Number(stats?.todayEvaluations) || 0}</p>
+              <p className="text-2xl font-bold text-accent">{userStats.todayEvaluations}</p>
               <p className="text-sm text-neutral-600">Today</p>
             </div>
           </CardContent>
@@ -347,7 +337,7 @@ export default function Wallet() {
                   <div>
                     <p className="font-semibold text-neutral-800">{transaction.description}</p>
                     <p className="text-sm text-neutral-600">{transaction.type === 'welcome_bonus' ? 'Registration completed' : 'Evaluation completed'}</p>
-                    <p className="text-xs text-neutral-400">{formatDate(transaction.createdAt)}</p>
+                    <p className="text-xs text-neutral-400">{formatDate(transaction.date)}</p>
                   </div>
                   <div className="text-right">
                     <p className="font-semibold text-primary">+${transaction.amount}</p>
