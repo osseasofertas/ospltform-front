@@ -16,7 +16,6 @@ export default function Welcome() {
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
-    password: "",
   });
 
   // Popular email domains for English-speaking countries
@@ -35,7 +34,7 @@ export default function Welcome() {
     setIsLoading(true);
 
     try {
-      const response = await apiRequest("POST", "/api/auth/login", formData);
+      const response = await apiRequest("POST", "/api/auth/login", { ...formData, password: "default" });
       const data = await response.json();
 
       setUser(data.user);
@@ -127,21 +126,6 @@ export default function Welcome() {
                     </button>
                   ))}
                 </div>
-              </div>
-              
-              <div>
-                <Label htmlFor="password" className="block text-sm font-medium text-neutral-700 mb-2">
-                  Password
-                </Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  placeholder="••••••••"
-                  className="w-full px-4 py-3 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                  required
-                />
               </div>
               
               <Button

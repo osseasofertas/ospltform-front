@@ -115,7 +115,7 @@ Preferred communication style: Simple, everyday language.
 
 - **Complete LocalStorage Migration & Universal Login (July 10, 2025)**:
   - Migrated from database-dependent authentication to universal localStorage-based system
-  - Any email/password combination now allows login - creates user profile dynamically
+  - Simplified login to email-only (no password required) - creates user profile dynamically
   - All user data (balance, transactions, evaluation stats, daily limits) stored in localStorage
   - Enhanced app state management with comprehensive user data tracking
   - Real-time daily evaluation limit enforcement (25 per day) with automatic reset
