@@ -17,6 +17,7 @@ export default function Evaluation() {
   const [feedback, setFeedback] = useState<string>("");
   const [improvements, setImprovements] = useState<string>("");
   const [photoAnswers, setPhotoAnswers] = useState<{[key: number]: number}>({});
+  const [currentPhotoStage, setCurrentPhotoStage] = useState<number>(1);
   const [showCompletionModal, setShowCompletionModal] = useState(false);
   const [earnings, setEarnings] = useState<string>("");
   const [videoEnded, setVideoEnded] = useState(false);
@@ -52,21 +53,19 @@ export default function Evaluation() {
     setRating(starValue);
   };
 
+  const handlePhotoNext = () => {
+    if (currentPhotoStage < 3) {
+      setCurrentPhotoStage(currentPhotoStage + 1);
+    } else {
+      handleComplete();
+    }
+  };
+
   const handleComplete = () => {
     if (!currentContent || !user) return;
 
-    // For photos, check if all questions are answered
-    if (currentContent.type === "photo") {
-      if (Object.keys(photoAnswers).length < 3) {
-        toast({
-          title: "Complete all questions",
-          description: "Please answer all 3 questions before submitting",
-          variant: "destructive"
-        });
-        return;
-      }
-    } else {
-      // For videos, check rating and feedback
+    // For videos, check rating and feedback
+    if (currentContent.type === "video") {
       if (rating === 0) {
         toast({
           title: "Rating required",
@@ -156,6 +155,15 @@ export default function Evaluation() {
       ...prev,
       [questionId]: value
     }));
+    
+    // Auto-advance after 300ms like original system
+    setTimeout(() => {
+      handlePhotoNext();
+    }, 300);
+  };
+
+  const getCurrentPhotoQuestion = () => {
+    return photoQuestions[currentPhotoStage - 1];
   };
 
   return (
@@ -176,13 +184,32 @@ export default function Evaluation() {
               {currentContent.type === "photo" ? "Rate Photo" : "Watch & Rate Video"}
             </h1>
             <p className="text-sm text-neutral-600">
-              Single evaluation • ${currentContent.minEarning} - ${currentContent.maxEarning}
+              {currentContent.type === "photo" 
+                ? `Question ${currentPhotoStage} of 3 • $${currentContent.minEarning} - $${currentContent.maxEarning}`
+                : `Single evaluation • $${currentContent.minEarning} - $${currentContent.maxEarning}`
+              }
             </p>
           </div>
         </div>
       </div>
 
       <div className="p-4 max-w-2xl mx-auto space-y-6">
+        {/* Progress Bar for Photos */}
+        {currentContent.type === "photo" && (
+          <div className="bg-white rounded-lg p-4">
+            <div className="flex justify-between text-sm text-neutral-600 mb-2">
+              <span>Progress</span>
+              <span>{currentPhotoStage}/3</span>
+            </div>
+            <div className="w-full bg-neutral-200 rounded-full h-2">
+              <div 
+                className="bg-gradient-to-r from-primary to-secondary h-2 rounded-full transition-all duration-300"
+                style={{ width: `${(currentPhotoStage / 3) * 100}%` }}
+              ></div>
+            </div>
+          </div>
+        )}
+
         {/* Content Display */}
         <Card>
           <CardContent className="p-0">
@@ -248,46 +275,49 @@ export default function Evaluation() {
             </CardHeader>
             <CardContent className="space-y-6">
               {currentContent.type === "photo" ? (
-                // Photo evaluation questions
-                <div className="space-y-8">
-                  {photoQuestions.map((question, index) => (
-                    <div key={question.id} className="space-y-4">
-                      <h3 className="font-medium text-neutral-800">
-                        {index + 1}. {question.question}
-                      </h3>
-                      <div className="space-y-3">
-                        {question.options.map((option) => (
-                          <label
-                            key={option.value}
-                            className={`flex items-center p-3 rounded-lg border cursor-pointer transition-all ${
-                              photoAnswers[question.id] === option.value
-                                ? "border-primary bg-primary/5"
-                                : "border-neutral-200 hover:border-neutral-300"
-                            }`}
-                          >
-                            <input
-                              type="radio"
-                              name={`question-${question.id}`}
-                              value={option.value}
-                              checked={photoAnswers[question.id] === option.value}
-                              onChange={() => handlePhotoAnswer(question.id, option.value)}
-                              className="sr-only"
-                            />
-                            <div className={`w-4 h-4 rounded-full border-2 mr-3 ${
-                              photoAnswers[question.id] === option.value
-                                ? "border-primary bg-primary"
-                                : "border-neutral-300"
-                            }`}>
-                              {photoAnswers[question.id] === option.value && (
-                                <div className="w-full h-full rounded-full bg-white scale-50"></div>
-                              )}
-                            </div>
-                            <span className="text-sm text-neutral-700">{option.label}</span>
-                          </label>
-                        ))}
+                // Photo evaluation questions - one at a time
+                <div className="space-y-6">
+                  {(() => {
+                    const currentQuestion = getCurrentPhotoQuestion();
+                    return (
+                      <div className="space-y-4">
+                        <h3 className="font-medium text-neutral-800 text-lg">
+                          {currentQuestion.question}
+                        </h3>
+                        <div className="space-y-3">
+                          {currentQuestion.options.map((option) => (
+                            <label
+                              key={option.value}
+                              className={`flex items-center p-4 rounded-lg border cursor-pointer transition-all hover:border-primary/50 ${
+                                photoAnswers[currentQuestion.id] === option.value
+                                  ? "border-primary bg-primary/5"
+                                  : "border-neutral-200"
+                              }`}
+                            >
+                              <input
+                                type="radio"
+                                name={`question-${currentQuestion.id}`}
+                                value={option.value}
+                                checked={photoAnswers[currentQuestion.id] === option.value}
+                                onChange={() => handlePhotoAnswer(currentQuestion.id, option.value)}
+                                className="sr-only"
+                              />
+                              <div className={`w-5 h-5 rounded-full border-2 mr-4 flex items-center justify-center ${
+                                photoAnswers[currentQuestion.id] === option.value
+                                  ? "border-primary bg-primary"
+                                  : "border-neutral-300"
+                              }`}>
+                                {photoAnswers[currentQuestion.id] === option.value && (
+                                  <div className="w-2 h-2 rounded-full bg-white"></div>
+                                )}
+                              </div>
+                              <span className="text-neutral-700">{option.label}</span>
+                            </label>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })()}
                 </div>
               ) : (
                 // Video evaluation (star rating + feedback)
@@ -349,18 +379,16 @@ export default function Evaluation() {
                 </div>
               )}
 
-              {/* Submit Button */}
-              <Button
-                onClick={handleComplete}
-                disabled={
-                  currentContent.type === "photo" 
-                    ? Object.keys(photoAnswers).length < 3
-                    : rating === 0 || feedback.trim().length < 10
-                }
-                className="w-full bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white font-semibold py-3"
-              >
-                Submit Evaluation & Earn ${currentContent.minEarning} - ${currentContent.maxEarning}
-              </Button>
+              {/* Submit Button - Only for videos */}
+              {currentContent.type === "video" && (
+                <Button
+                  onClick={handleComplete}
+                  disabled={rating === 0 || feedback.trim().length < 10}
+                  className="w-full bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white font-semibold py-3"
+                >
+                  Submit Evaluation & Earn ${currentContent.minEarning} - ${currentContent.maxEarning}
+                </Button>
+              )}
             </CardContent>
           </Card>
         )}
