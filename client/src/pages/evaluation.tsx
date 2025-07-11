@@ -1,373 +1,305 @@
-import { useState, useEffect } from "react";
-import { useLocation } from "wouter";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { ArrowLeft, CheckCircle } from "lucide-react";
+import { ArrowLeft, Trophy, Star, Play, Pause } from "lucide-react";
+import { useLocation } from "wouter";
 import { useAppState } from "@/hooks/use-app-state";
-import { useToast } from "@/hooks/use-toast";
-import { AppQuestion } from "@/types";
-import { getQuestionsByStage } from "@/data/questions";
-import QuestionMultipleChoice from "@/components/question-multiple-choice";
-import QuestionStarRating from "@/components/question-star-rating";
-import QuestionFreeText from "@/components/question-free-text";
-
-// Frontend-only evaluation component
+import { toast } from "@/hooks/use-toast";
 
 export default function Evaluation() {
   const [, setLocation] = useLocation();
-  const { user, currentProduct, completeEvaluation, incrementDailyEvaluations } = useAppState();
-  const { toast } = useToast();
+  const { user, currentContent, completeEvaluation, incrementDailyEvaluations } = useAppState();
+  const videoRef = useRef<HTMLVideoElement>(null);
   
-  const [currentStage, setCurrentStage] = useState(1);
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [answeredCount, setAnsweredCount] = useState(0);
-  const [stageAnswers, setStageAnswers] = useState<Record<number, any>>({});
+  const [rating, setRating] = useState<number>(0);
+  const [feedback, setFeedback] = useState<string>("");
+  const [improvements, setImprovements] = useState<string>("");
   const [showCompletionModal, setShowCompletionModal] = useState(false);
   const [earnings, setEarnings] = useState<string>("");
-  const [showStageComplete, setShowStageComplete] = useState(false);
-  const [allAnswers, setAllAnswers] = useState<Record<string, any>>({});
+  const [videoEnded, setVideoEnded] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
 
-  // Frontend-only questions - no API call needed
-  const questions = currentProduct ? getQuestionsByStage(currentProduct.id, currentStage) : [];
-  const isLoading = false;
-
-  // Frontend-only save function - saves to localStorage via Zustand
-  const saveDraftToLocalStorage = (answers: Record<string, any>) => {
-    if (currentProduct && user) {
-      const draftKey = `evaluation_draft_${user.id}_${currentProduct.id}`;
-      const draftData = {
-        userId: user.id,
-        productId: currentProduct.id,
-        stage: currentStage,
-        answers: answers,
-        lastSaved: new Date().toISOString()
-      };
-      localStorage.setItem(draftKey, JSON.stringify(draftData));
-    }
-  };
-
-  // Frontend-only completion function
-  const completeEvaluationLocal = (finalAnswers: Record<string, any>) => {
-    if (currentProduct && user) {
-      // Calculate random earning within product range
-      const minEarning = parseFloat(currentProduct.minEarning);
-      const maxEarning = parseFloat(currentProduct.maxEarning);
-      const earning = (minEarning + (Math.random() * (maxEarning - minEarning))).toFixed(2);
-      
-      // Use the app state function to handle completion
-      completeEvaluation(currentProduct.id, earning);
-      incrementDailyEvaluations();
-      
-      setEarnings(earning);
-      setShowCompletionModal(true);
-      
-      // Clear draft from localStorage
-      const draftKey = `evaluation_draft_${user.id}_${currentProduct.id}`;
-      localStorage.removeItem(draftKey);
-      
-      toast({
-        title: "Evaluation completed!",
-        description: `You earned $${earning} for this evaluation`,
-      });
-    }
-  };
-
-  // Load draft data from localStorage on component mount
   useEffect(() => {
-    if (currentProduct && user) {
-      const draftKey = `evaluation_draft_${user.id}_${currentProduct.id}`;
-      const savedDraft = localStorage.getItem(draftKey);
-      
-      if (savedDraft) {
-        try {
-          const draft = JSON.parse(savedDraft);
-          setCurrentStage(draft.stage || 1);
-          setAllAnswers(draft.answers || {});
-          
-          const stageAnswers = draft.answers?.[`stage_${draft.stage || 1}`] || {};
-          setStageAnswers(stageAnswers);
-          
-          // Calculate current question index and answered count
-          const answeredQuestions = Object.keys(stageAnswers).length;
-          setAnsweredCount(answeredQuestions);
-          setCurrentQuestionIndex(answeredQuestions);
-        } catch (error) {
-          console.error("Error loading draft from localStorage:", error);
-        }
-      }
+    if (!currentContent || !user) {
+      setLocation("/");
+      return;
     }
-  }, [currentProduct, user]);
+  }, [currentContent, user, setLocation]);
 
-  // Auto-save to localStorage when answers change
-  useEffect(() => {
-    if (Object.keys(stageAnswers).length > 0) {
-      const updatedAllAnswers = {
-        ...allAnswers,
-        [`stage_${currentStage}`]: stageAnswers
-      };
-      setAllAnswers(updatedAllAnswers);
-      saveDraftToLocalStorage(updatedAllAnswers);
+  const handleVideoPlay = () => {
+    if (videoRef.current) {
+      videoRef.current.play();
+      setIsPlaying(true);
     }
-  }, [stageAnswers, currentStage]);
-
-  const handleBack = () => {
-    setLocation("/main");
   };
 
-  const handleAnswerChange = (questionId: number, answer: any, questionType: string) => {
-    // Check if this is a new answer
-    const isNewAnswer = !stageAnswers[questionId];
-    
-    setStageAnswers(prev => ({
-      ...prev,
-      [questionId]: answer,
-    }));
+  const handleVideoPause = () => {
+    if (videoRef.current) {
+      videoRef.current.pause();
+      setIsPlaying(false);
+    }
+  };
 
-    // Auto-advance for single-choice and star-rating questions
-    if (questionType === 'multiple_choice' || questionType === 'star_rating') {
-      // Update answered count only if this is a new answer
-      if (isNewAnswer) {
-        setAnsweredCount(prev => prev + 1);
-      }
-      
-      // Show success toast
+  const handleVideoEnded = () => {
+    setVideoEnded(true);
+    setIsPlaying(false);
+  };
+
+  const handleStarClick = (starValue: number) => {
+    setRating(starValue);
+  };
+
+  const handleComplete = () => {
+    if (!currentContent || !user) return;
+
+    if (rating === 0) {
       toast({
-        title: "Answer saved",
-        description: "Your progress is automatically saved",
+        title: "Rating required",
+        description: "Please provide a rating before submitting",
+        variant: "destructive"
       });
-
-      // Auto-advance with smooth animation
-      setTimeout(() => {
-        if (currentQuestionIndex < questions.length - 1) {
-          setCurrentQuestionIndex(prev => prev + 1);
-        } else {
-          // All questions answered - show stage complete
-          setShowStageComplete(true);
-        }
-      }, 300);
-    }
-  };
-
-  const handleNextQuestion = () => {
-    const currentQuestion = questions[currentQuestionIndex];
-    if (!currentQuestion || !stageAnswers[currentQuestion.id]) {
-      return; // Don't advance if no answer
+      return;
     }
 
-    setAnsweredCount(prev => prev + 1);
+    if (feedback.trim().length < 10) {
+      toast({
+        title: "Feedback required",
+        description: "Please provide at least 10 characters of feedback",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Calculate random earning within content range
+    const minEarning = parseFloat(currentContent.minEarning);
+    const maxEarning = parseFloat(currentContent.maxEarning);
+    const earning = (minEarning + (Math.random() * (maxEarning - minEarning))).toFixed(2);
     
-    // Show success toast
+    // Complete evaluation
+    completeEvaluation(currentContent.id, earning);
+    incrementDailyEvaluations();
+    
+    setEarnings(earning);
+    setShowCompletionModal(true);
+    
     toast({
-      title: "Answer saved", 
-      description: "Your progress is automatically saved",
+      title: "Evaluation completed!",
+      description: `You earned $${earning} for this evaluation`,
     });
-
-    if (currentQuestionIndex < questions.length - 1) {
-      setCurrentQuestionIndex(prev => prev + 1);
-    } else {
-      // All questions answered - show stage complete
-      setShowStageComplete(true);
-    }
   };
 
-  const handleNextStage = () => {
-    if (currentStage < 3) {
-      setCurrentStage(currentStage + 1);
-      setCurrentQuestionIndex(0);
-      setAnsweredCount(0);
-      setShowStageComplete(false);
-      setStageAnswers(allAnswers[`stage_${currentStage + 1}`] || {});
-    } else {
-      // Complete evaluation
-      const finalAnswers = {
-        ...allAnswers,
-        [`stage_${currentStage}`]: stageAnswers
-      };
-      completeEvaluationLocal(finalAnswers);
-    }
+  const handleReturnHome = () => {
+    setLocation("/");
   };
 
-  const isStageComplete = () => {
-    return answeredCount === questions.length;
-  };
-
-  const canContinue = () => {
-    const currentQuestion = questions[currentQuestionIndex];
-    if (!currentQuestion) return false;
-    
-    const answer = stageAnswers[currentQuestion.id];
-    if (currentQuestion.type === 'free_text') {
-      return answer && answer.trim() !== '';
-    }
-    return answer !== undefined && answer !== '';
-  };
-
-  const handleModalClose = () => {
-    setShowCompletionModal(false);
-    setLocation("/wallet");
-  };
-
-  if (!currentProduct) {
-    return <div>No product selected</div>;
+  if (!currentContent) {
+    return null;
   }
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-neutral-600">Loading questions...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Hide total product count from users for better UX
-  const progressPercentage = (answeredCount / questions.length) * 100;
-  const currentQuestion = questions[currentQuestionIndex];
+  const canSubmit = currentContent.type === "photo" || (currentContent.type === "video" && videoEnded);
 
   return (
-    <>
-      <div className="min-h-screen bg-neutral-50">
-        {/* Header */}
-        <div className="bg-white border-b border-neutral-200 px-4 py-4">
-          <div className="flex items-center justify-between">
-            <button onClick={handleBack} className="text-neutral-600 hover:text-neutral-800">
-              <ArrowLeft className="h-5 w-5" />
-            </button>
-            <div className="text-center">
-              <h2 className="text-lg font-semibold text-neutral-800">
-                Product Evaluation
-              </h2>
-              <p className="text-sm text-neutral-600">Stage {currentStage} of 3</p>
-            </div>
-            <div className="w-6"></div>
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 to-secondary/5">
+      {/* Header */}
+      <div className="bg-white border-b border-neutral-200 px-4 py-3">
+        <div className="flex items-center gap-3">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setLocation("/")}
+            className="p-1"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <div>
+            <h1 className="text-lg font-semibold text-neutral-800">
+              {currentContent.type === "photo" ? "Rate Photo" : "Watch & Rate Video"}
+            </h1>
+            <p className="text-sm text-neutral-600">
+              Single evaluation • ${currentContent.minEarning} - ${currentContent.maxEarning}
+            </p>
           </div>
         </div>
+      </div>
 
-        {/* Progress Bar */}
-        <Progress value={progressPercentage} className="h-2" />
-
-        {/* Product Info - Instagram style */}
-        <Card className="mx-4 mt-4 border border-neutral-200">
+      <div className="p-4 max-w-2xl mx-auto space-y-6">
+        {/* Content Display */}
+        <Card>
           <CardContent className="p-0">
-            {/* Instagram-style square image */}
-            <div className="aspect-square w-full">
-              <img 
-                src={currentProduct.imageUrl} 
-                alt={currentProduct.name}
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div className="p-4">
-              <p className="text-sm text-neutral-600">
-                Evaluation in progress • {answeredCount}/{questions.length} answered
-              </p>
-            </div>
+            {currentContent.type === "photo" ? (
+              <div className="aspect-square w-full">
+                <img 
+                  src={currentContent.url} 
+                  alt={currentContent.title}
+                  className="w-full h-full object-cover rounded-lg"
+                />
+              </div>
+            ) : (
+              <div className="relative">
+                <video
+                  ref={videoRef}
+                  src={currentContent.url}
+                  className="w-full aspect-video rounded-lg bg-black"
+                  onEnded={handleVideoEnded}
+                  onPlay={() => setIsPlaying(true)}
+                  onPause={() => setIsPlaying(false)}
+                  controls={false}
+                />
+                
+                {/* Custom video controls */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  {!isPlaying && !videoEnded && (
+                    <Button
+                      onClick={handleVideoPlay}
+                      size="lg"
+                      className="rounded-full w-16 h-16 bg-white/90 hover:bg-white text-black"
+                    >
+                      <Play className="h-8 w-8 ml-1" />
+                    </Button>
+                  )}
+                </div>
+
+                {/* Video message */}
+                {!videoEnded && (
+                  <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <p className="text-sm text-yellow-800">
+                      ⏳ Please watch the entire video before rating options become available
+                    </p>
+                  </div>
+                )}
+
+                {videoEnded && (
+                  <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                    <p className="text-sm text-green-800">
+                      ✅ Video completed! You can now rate and provide feedback
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
           </CardContent>
         </Card>
 
-        {/* Questions Area */}
-        <div className="p-4 pb-24">
-          {showStageComplete ? (
-            // Stage Completion View
-            <Card className="border border-neutral-200">
-              <CardContent className="p-6 text-center">
-                <div className="bg-primary/10 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                  <CheckCircle className="text-primary h-8 w-8" />
-                </div>
-                <h3 className="text-xl font-semibold text-neutral-800 mb-2">
-                  You have completed Stage {currentStage}
-                </h3>
-                <p className="text-neutral-600 mb-6">
-                  All questions have been answered correctly
-                </p>
-                <Button
-                  onClick={handleNextStage}
-                  className="w-full bg-primary text-white py-3 px-6 rounded-lg font-semibold text-lg"
-                >
-                  {currentStage < 3 ? "Next stage" : "Finish evaluation"}
-                </Button>
-              </CardContent>
-            </Card>
-          ) : currentQuestion ? (
-            // Single Question View
-            <Card className="border border-neutral-200">
-              <CardContent className="p-4">
-                <h3 className="font-semibold text-neutral-800 mb-4">
-                  {currentQuestion.questionNumber}. {currentQuestion.question}
-                </h3>
-                
-                {currentQuestion.type === "multiple_choice" && (
-                  <QuestionMultipleChoice
-                    question={currentQuestion}
-                    value={stageAnswers[currentQuestion.id]}
-                    onChange={(value) => handleAnswerChange(currentQuestion.id, value, currentQuestion.type)}
-                  />
-                )}
-                
-                {currentQuestion.type === "star_rating" && (
-                  <QuestionStarRating
-                    question={currentQuestion}
-                    value={stageAnswers[currentQuestion.id]}
-                    onChange={(value) => handleAnswerChange(currentQuestion.id, value, currentQuestion.type)}
-                  />
-                )}
-                
-                {currentQuestion.type === "free_text" && (
-                  <>
-                    <QuestionFreeText
-                      question={currentQuestion}
-                      value={stageAnswers[currentQuestion.id]}
-                      onChange={(value) => handleAnswerChange(currentQuestion.id, value, currentQuestion.type)}
-                    />
-                    <Button
-                      onClick={handleNextQuestion}
-                      disabled={!canContinue()}
-                      className="w-full mt-4 bg-primary text-white py-3 px-6 rounded-lg font-semibold disabled:bg-neutral-300 disabled:cursor-not-allowed"
+        {/* Rating and Feedback */}
+        {canSubmit && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Evaluation</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Star Rating */}
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-3">
+                  Overall Rating
+                </label>
+                <div className="flex gap-2">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      onClick={() => handleStarClick(star)}
+                      className="focus:outline-none transition-all duration-150"
                     >
-                      Continue
-                    </Button>
-                  </>
+                      <Star
+                        className={`h-8 w-8 ${
+                          star <= rating
+                            ? "text-yellow-400 fill-yellow-400"
+                            : "text-neutral-300"
+                        }`}
+                      />
+                    </button>
+                  ))}
+                </div>
+                {rating > 0 && (
+                  <p className="text-sm text-neutral-600 mt-2">
+                    You rated this {rating} out of 5 stars
+                  </p>
                 )}
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="text-center py-8">
-              <p className="text-neutral-600">No questions available</p>
-            </div>
-          )}
-        </div>
+              </div>
 
+              {/* Feedback */}
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-2">
+                  What did you think about this {currentContent.type}?
+                </label>
+                <Textarea
+                  value={feedback}
+                  onChange={(e) => setFeedback(e.target.value)}
+                  placeholder="Share your thoughts about the content..."
+                  className="min-h-[100px]"
+                />
+              </div>
 
+              {/* Improvements */}
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-2">
+                  What could be improved? (Optional)
+                </label>
+                <Textarea
+                  value={improvements}
+                  onChange={(e) => setImprovements(e.target.value)}
+                  placeholder="Suggestions for improvement..."
+                  className="min-h-[80px]"
+                />
+              </div>
+
+              {/* Submit Button */}
+              <Button
+                onClick={handleComplete}
+                disabled={rating === 0 || feedback.trim().length < 10}
+                className="w-full bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white font-semibold py-3"
+              >
+                Submit Evaluation & Earn ${currentContent.minEarning} - ${currentContent.maxEarning}
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Video controls overlay when playing */}
+        {currentContent.type === "video" && isPlaying && (
+          <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50">
+            <Button
+              onClick={handleVideoPause}
+              className="rounded-full bg-black/80 hover:bg-black text-white"
+            >
+              <Pause className="h-5 w-5" />
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Completion Modal */}
       <Dialog open={showCompletionModal} onOpenChange={setShowCompletionModal}>
-        <DialogContent className="max-w-sm mx-auto">
-          <DialogHeader className="text-center">
-            <div className="bg-primary/10 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-              <CheckCircle className="text-primary h-8 w-8" />
-            </div>
-            <DialogTitle className="text-xl font-bold text-neutral-800">
-              Completed!
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-center">
+              <div className="flex flex-col items-center gap-4">
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+                  <Trophy className="h-8 w-8 text-green-600" />
+                </div>
+                <span className="text-xl">Evaluation Complete!</span>
+              </div>
             </DialogTitle>
           </DialogHeader>
+          
           <div className="text-center space-y-4">
-            <p className="text-lg text-neutral-700">
-              You earned <span className="font-bold text-primary">${earnings}</span>
+            <div className="text-3xl font-bold text-green-600">
+              +${earnings}
+            </div>
+            <p className="text-neutral-600">
+              Great job! Your evaluation has been submitted and your earning has been added to your balance.
             </p>
+            
             <Button
-              onClick={handleModalClose}
-              className="w-full bg-primary text-white py-3 px-6 rounded-lg font-semibold"
+              onClick={handleReturnHome}
+              className="w-full bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white font-semibold"
             >
-              View my balance
+              Return to Home
             </Button>
           </div>
         </DialogContent>
       </Dialog>
-    </>
+    </div>
   );
 }

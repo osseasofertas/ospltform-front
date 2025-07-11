@@ -113,6 +113,16 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **Content-Based Evaluation System with Video Support (July 11, 2025)**:
+  - Converted from product evaluation to content evaluation system
+  - Added support for 2 videos + 8 photos daily, rotating every 7 days
+  - Implemented new reward structure: $6-$10 for photos, $20-$40 for videos
+  - Created single-stage evaluation system with star rating and text feedback
+  - Added video completion requirement - users must watch entire video before rating
+  - Built content rotation system that changes every 7 days automatically
+  - Prepared structure for frontend-only hosting without backend dependencies
+  - Updated OnlyFans-style blue branding throughout application
+
 - **Complete Frontend-Only Authentication & Global Security System (July 10, 2025)**:
   - 100% frontend-only authentication using localStorage (no backend API calls)
   - Email-only login creates user profiles automatically with $50.00 starting balance

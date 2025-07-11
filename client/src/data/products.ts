@@ -1,85 +1,59 @@
-import { AppProduct } from "@/types";
+import { AppContent } from "@/types";
 
-// Frontend-only product data - no backend dependency
-export const mockProducts: AppProduct[] = [
-  {
-    id: 1,
-    name: "Premium Wireless Headphones",
-    category: "Electronics",
-    imageUrl: "/attached_assets/prints/PT2.png",
-    minEarning: "2.50",
-    maxEarning: "4.00",
-    active: true,
-  },
-  {
-    id: 2,
-    name: "Smart Home Security Camera",
-    category: "Home & Garden",
-    imageUrl: "/attached_assets/prints/PT3.png",
-    minEarning: "1.80",
-    maxEarning: "3.20",
-    active: true,
-  },
-  {
-    id: 3,
-    name: "Professional Car Care Kit",
-    category: "Automotive",
-    imageUrl: "/attached_assets/prints/PT10.png",
-    minEarning: "3.00",
-    maxEarning: "5.00",
-    active: true,
-  },
-  {
-    id: 4,
-    name: "Multi-Tool Set",
-    category: "Tools & Hardware",
-    imageUrl: "/attached_assets/prints/PT50.png",
-    minEarning: "1.00",
-    maxEarning: "2.50",
-    active: true,
-  },
-  {
-    id: 5,
-    name: "Gaming Mechanical Keyboard",
-    category: "Electronics",
-    imageUrl: "/attached_assets/prints/PT75.png",
-    minEarning: "2.80",
-    maxEarning: "4.20",
-    active: true,
-  },
-  {
-    id: 6,
-    name: "Fitness Tracker Watch",
-    category: "Sports & Fitness",
-    imageUrl: "/attached_assets/prints/PT100.png",
-    minEarning: "1.50",
-    maxEarning: "3.50",
-    active: true,
-  },
-  {
-    id: 7,
-    name: "Skincare Routine Set",
-    category: "Beauty & Personal Care",
-    imageUrl: "/attached_assets/prints/PT150.png",
-    minEarning: "2.20",
-    maxEarning: "3.80",
-    active: true,
-  },
-  {
-    id: 8,
-    name: "Professional Knife Set",
-    category: "Kitchen & Dining",
-    imageUrl: "/attached_assets/prints/PT200.png",
-    minEarning: "1.90",
-    maxEarning: "3.60",
-    active: true,
-  },
+// Content rotation system - changes every 7 days
+const CONTENT_ROTATION_DAYS = 7;
+
+// All available content pool - ready for frontend-only hosting
+const contentPool: AppContent[] = [
+  // Week 1 - Photos (8)
+  { id: 1, type: "photo", title: "Lifestyle Photo 1", url: "/attached_assets/prints/PT1.png", minEarning: "6.00", maxEarning: "10.00", week: 1 },
+  { id: 2, type: "photo", title: "Lifestyle Photo 2", url: "/attached_assets/prints/PT2.png", minEarning: "6.00", maxEarning: "10.00", week: 1 },
+  { id: 3, type: "photo", title: "Lifestyle Photo 3", url: "/attached_assets/prints/PT3.png", minEarning: "6.00", maxEarning: "10.00", week: 1 },
+  { id: 4, type: "photo", title: "Lifestyle Photo 4", url: "/attached_assets/prints/PT4.png", minEarning: "6.00", maxEarning: "10.00", week: 1 },
+  { id: 5, type: "photo", title: "Lifestyle Photo 5", url: "/attached_assets/prints/PT5.png", minEarning: "6.00", maxEarning: "10.00", week: 1 },
+  { id: 6, type: "photo", title: "Lifestyle Photo 6", url: "/attached_assets/prints/PT6.png", minEarning: "6.00", maxEarning: "10.00", week: 1 },
+  { id: 7, type: "photo", title: "Lifestyle Photo 7", url: "/attached_assets/prints/PT7.png", minEarning: "6.00", maxEarning: "10.00", week: 1 },
+  { id: 8, type: "photo", title: "Lifestyle Photo 8", url: "/attached_assets/prints/PT8.png", minEarning: "6.00", maxEarning: "10.00", week: 1 },
+  
+  // Week 1 - Videos (2)
+  { id: 9, type: "video", title: "Video Content 1", url: "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4", minEarning: "20.00", maxEarning: "40.00", week: 1 },
+  { id: 10, type: "video", title: "Video Content 2", url: "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_2mb.mp4", minEarning: "20.00", maxEarning: "40.00", week: 1 },
+
+  // Week 2 - Photos (8)
+  { id: 11, type: "photo", title: "Lifestyle Photo 9", url: "/attached_assets/prints/PT10.png", minEarning: "6.00", maxEarning: "10.00", week: 2 },
+  { id: 12, type: "photo", title: "Lifestyle Photo 10", url: "/attached_assets/prints/PT11.png", minEarning: "6.00", maxEarning: "10.00", week: 2 },
+  { id: 13, type: "photo", title: "Lifestyle Photo 11", url: "/attached_assets/prints/PT12.png", minEarning: "6.00", maxEarning: "10.00", week: 2 },
+  { id: 14, type: "photo", title: "Lifestyle Photo 12", url: "/attached_assets/prints/PT13.png", minEarning: "6.00", maxEarning: "10.00", week: 2 },
+  { id: 15, type: "photo", title: "Lifestyle Photo 13", url: "/attached_assets/prints/PT14.png", minEarning: "6.00", maxEarning: "10.00", week: 2 },
+  { id: 16, type: "photo", title: "Lifestyle Photo 14", url: "/attached_assets/prints/PT15.png", minEarning: "6.00", maxEarning: "10.00", week: 2 },
+  { id: 17, type: "photo", title: "Lifestyle Photo 15", url: "/attached_assets/prints/PT16.png", minEarning: "6.00", maxEarning: "10.00", week: 2 },
+  { id: 18, type: "photo", title: "Lifestyle Photo 16", url: "/attached_assets/prints/PT17.png", minEarning: "6.00", maxEarning: "10.00", week: 2 },
+  
+  // Week 2 - Videos (2)
+  { id: 19, type: "video", title: "Video Content 3", url: "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_5mb.mp4", minEarning: "20.00", maxEarning: "40.00", week: 2 },
+  { id: 20, type: "video", title: "Video Content 4", url: "https://sample-videos.com/zip/10/mp4/SampleVideo_640x360_1mb.mp4", minEarning: "20.00", maxEarning: "40.00", week: 2 },
 ];
 
-export const getProducts = (): AppProduct[] => {
-  return mockProducts;
+// Calculate current week based on app start date
+const getContentWeek = (): number => {
+  const appStartDate = new Date('2025-01-01'); // Set your app start date
+  const now = new Date();
+  const daysDiff = Math.floor((now.getTime() - appStartDate.getTime()) / (1000 * 60 * 60 * 24));
+  return Math.floor(daysDiff / CONTENT_ROTATION_DAYS) % 2 + 1; // Rotates between week 1 and 2
 };
 
-export const getProduct = (id: number): AppProduct | undefined => {
-  return mockProducts.find(product => product.id === id);
+export const getAvailableContent = (): AppContent[] => {
+  const currentWeek = getContentWeek();
+  return contentPool.filter(content => content.week === currentWeek);
+};
+
+export const getContent = (id: number): AppContent | undefined => {
+  return contentPool.find(content => content.id === id);
+};
+
+export const getTodaysContent = (): AppContent[] => {
+  const available = getAvailableContent();
+  const photos = available.filter(c => c.type === "photo").slice(0, 8);
+  const videos = available.filter(c => c.type === "video").slice(0, 2);
+  return [...photos, ...videos];
 };

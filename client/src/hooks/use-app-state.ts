@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { AppUser, AppProduct, AppEvaluation } from '../types';
+import { AppUser, AppProduct, AppEvaluation, AppContent } from '../types';
 
 interface UserStats {
   totalEvaluations: number;
@@ -12,6 +12,7 @@ interface UserStats {
 interface AppState {
   user: AppUser | null;
   currentProduct: AppProduct | null;
+  currentContent: AppContent | null;
   currentEvaluation: AppEvaluation | null;
   userStats: UserStats;
   transactions: Array<{
@@ -31,6 +32,7 @@ interface AppState {
   // Actions
   setUser: (user: AppUser | null) => void;
   setCurrentProduct: (product: AppProduct | null) => void;
+  setCurrentContent: (content: AppContent | null) => void;
   setCurrentEvaluation: (evaluation: AppEvaluation | null) => void;
   updateBalance: (amount: string) => void;
   addTransaction: (transaction: {
@@ -51,6 +53,7 @@ export const useAppState = create<AppState>()(
     (set, get) => ({
       user: null,
       currentProduct: null,
+      currentContent: null,
       currentEvaluation: null,
       userStats: {
         totalEvaluations: 0,
@@ -82,6 +85,7 @@ export const useAppState = create<AppState>()(
       },
       
       setCurrentProduct: (product) => set({ currentProduct: product }),
+      setCurrentContent: (content) => set({ currentContent: content }),
       setCurrentEvaluation: (evaluation) => set({ currentEvaluation: evaluation }),
       
       updateBalance: (amount) => {

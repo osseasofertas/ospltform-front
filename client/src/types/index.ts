@@ -18,6 +18,16 @@ export interface AppProduct {
   active: boolean;
 }
 
+export interface AppContent {
+  id: number;
+  type: "photo" | "video";
+  title: string;
+  url: string;
+  minEarning: string;
+  maxEarning: string;
+  week: number;
+}
+
 export interface AppEvaluation {
   id: number;
   userId: number;

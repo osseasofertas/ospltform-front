@@ -1,28 +1,28 @@
-import { getProducts } from "@/data/products";
+import { getTodaysContent } from "@/data/products";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Wallet, AlertCircle, User, HelpCircle, TrendingUp } from "lucide-react";
+import { Wallet, AlertCircle, User, HelpCircle, TrendingUp, Play, Image } from "lucide-react";
 import { useAppState } from "@/hooks/use-app-state";
 import { useLocation } from "wouter";
-import { AppProduct } from "@/types";
-import ProductCard from "@/components/product-card";
+import { AppContent } from "@/types";
+import ContentCard from "@/components/content-card";
 
 export default function Main() {
-  const { user, setCurrentProduct, userStats, resetDailyEvaluationsIfNeeded } = useAppState();
+  const { user, setCurrentContent, userStats, resetDailyEvaluationsIfNeeded } = useAppState();
   const [, setLocation] = useLocation();
 
   // Reset daily evaluations if it's a new day
   resetDailyEvaluationsIfNeeded();
 
-  // Frontend-only products - no API call needed
-  const products = getProducts();
+  // Frontend-only content - rotates every 7 days
+  const content = getTodaysContent();
   const isLoading = false;
 
   // Check daily limit locally
   const isDailyLimitReached = userStats.todayEvaluations >= 10;
 
-  const handleProductSelect = (product: AppProduct) => {
-    setCurrentProduct(product);
+  const handleContentSelect = (selectedContent: AppContent) => {
+    setCurrentContent(selectedContent);
     setLocation("/evaluation");
   };
 
@@ -154,18 +154,18 @@ export default function Main() {
       {/* Products section header */}
       <div className="bg-white border-b border-neutral-200 px-4 py-3">
         <h2 className="text-lg font-semibold text-neutral-800">
-          Available Products
+          Today's Content
         </h2>
-        <p className="text-sm text-neutral-600">Select a product to start evaluating</p>
+        <p className="text-sm text-neutral-600">Rate photos and videos to earn money</p>
       </div>
 
-      {/* Product Grid - Instagram Style */}
+      {/* Content Grid - Photos and Videos */}
       <div className="p-4 grid grid-cols-2 gap-4">
-        {products.map((product) => (
-          <ProductCard
-            key={product.id}
-            product={product}
-            onSelect={() => handleProductSelect(product)}
+        {content.map((item) => (
+          <ContentCard
+            key={item.id}
+            content={item}
+            onSelect={() => handleContentSelect(item)}
           />
         ))}
       </div>
