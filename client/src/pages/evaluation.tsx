@@ -16,6 +16,7 @@ export default function Evaluation() {
   const [rating, setRating] = useState<number>(0);
   const [feedback, setFeedback] = useState<string>("");
   const [improvements, setImprovements] = useState<string>("");
+  const [photoAnswers, setPhotoAnswers] = useState<{[key: number]: number}>({});
   const [showCompletionModal, setShowCompletionModal] = useState(false);
   const [earnings, setEarnings] = useState<string>("");
   const [videoEnded, setVideoEnded] = useState(false);
@@ -54,22 +55,35 @@ export default function Evaluation() {
   const handleComplete = () => {
     if (!currentContent || !user) return;
 
-    if (rating === 0) {
-      toast({
-        title: "Rating required",
-        description: "Please provide a rating before submitting",
-        variant: "destructive"
-      });
-      return;
-    }
+    // For photos, check if all questions are answered
+    if (currentContent.type === "photo") {
+      if (Object.keys(photoAnswers).length < 3) {
+        toast({
+          title: "Complete all questions",
+          description: "Please answer all 3 questions before submitting",
+          variant: "destructive"
+        });
+        return;
+      }
+    } else {
+      // For videos, check rating and feedback
+      if (rating === 0) {
+        toast({
+          title: "Rating required",
+          description: "Please provide a rating before submitting",
+          variant: "destructive"
+        });
+        return;
+      }
 
-    if (feedback.trim().length < 10) {
-      toast({
-        title: "Feedback required",
-        description: "Please provide at least 10 characters of feedback",
-        variant: "destructive"
-      });
-      return;
+      if (feedback.trim().length < 10) {
+        toast({
+          title: "Feedback required",
+          description: "Please provide at least 10 characters of feedback",
+          variant: "destructive"
+        });
+        return;
+      }
     }
 
     // Calculate random earning within content range
@@ -99,6 +113,50 @@ export default function Evaluation() {
   }
 
   const canSubmit = currentContent.type === "photo" || (currentContent.type === "video" && videoEnded);
+
+  // Photo evaluation questions
+  const photoQuestions = [
+    {
+      id: 1,
+      question: "How much did this photo provoke your imagination without showing everything?",
+      options: [
+        { value: 5, label: "Very good – Left me wanting more" },
+        { value: 4, label: "Good – Made me curious" },
+        { value: 3, label: "Average – Could be bolder" },
+        { value: 2, label: "Poor – Didn't feel much" },
+        { value: 1, label: "Very poor – Not provocative" }
+      ]
+    },
+    {
+      id: 2,
+      question: "Did the way the body was shown seem tempting or forced?",
+      options: [
+        { value: 5, label: "Very good – Natural, sensual and perfect" },
+        { value: 4, label: "Good – Really caught my attention" },
+        { value: 3, label: "Average – Pretty, but no impact" },
+        { value: 2, label: "Poor – Pose was kind of dull" },
+        { value: 1, label: "Very poor – Not attractive" }
+      ]
+    },
+    {
+      id: 3,
+      question: "Would this photo make you click to see more or scroll past in the feed?",
+      options: [
+        { value: 5, label: "Very good – Would stop immediately to see" },
+        { value: 4, label: "Good – Caught attention" },
+        { value: 3, label: "Average – Maybe, but missing something" },
+        { value: 2, label: "Poor – Didn't hold my gaze" },
+        { value: 1, label: "Very poor – Would scroll right past" }
+      ]
+    }
+  ];
+
+  const handlePhotoAnswer = (questionId: number, value: number) => {
+    setPhotoAnswers(prev => ({
+      ...prev,
+      [questionId]: value
+    }));
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 to-secondary/5">
@@ -182,72 +240,123 @@ export default function Evaluation() {
           </CardContent>
         </Card>
 
-        {/* Rating and Feedback */}
+        {/* Evaluation Forms */}
         {canSubmit && (
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">Evaluation</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              {/* Star Rating */}
-              <div>
-                <label className="block text-sm font-medium text-neutral-700 mb-3">
-                  Overall Rating
-                </label>
-                <div className="flex gap-2">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <button
-                      key={star}
-                      onClick={() => handleStarClick(star)}
-                      className="focus:outline-none transition-all duration-150"
-                    >
-                      <Star
-                        className={`h-8 w-8 ${
-                          star <= rating
-                            ? "text-yellow-400 fill-yellow-400"
-                            : "text-neutral-300"
-                        }`}
-                      />
-                    </button>
+              {currentContent.type === "photo" ? (
+                // Photo evaluation questions
+                <div className="space-y-8">
+                  {photoQuestions.map((question, index) => (
+                    <div key={question.id} className="space-y-4">
+                      <h3 className="font-medium text-neutral-800">
+                        {index + 1}. {question.question}
+                      </h3>
+                      <div className="space-y-3">
+                        {question.options.map((option) => (
+                          <label
+                            key={option.value}
+                            className={`flex items-center p-3 rounded-lg border cursor-pointer transition-all ${
+                              photoAnswers[question.id] === option.value
+                                ? "border-primary bg-primary/5"
+                                : "border-neutral-200 hover:border-neutral-300"
+                            }`}
+                          >
+                            <input
+                              type="radio"
+                              name={`question-${question.id}`}
+                              value={option.value}
+                              checked={photoAnswers[question.id] === option.value}
+                              onChange={() => handlePhotoAnswer(question.id, option.value)}
+                              className="sr-only"
+                            />
+                            <div className={`w-4 h-4 rounded-full border-2 mr-3 ${
+                              photoAnswers[question.id] === option.value
+                                ? "border-primary bg-primary"
+                                : "border-neutral-300"
+                            }`}>
+                              {photoAnswers[question.id] === option.value && (
+                                <div className="w-full h-full rounded-full bg-white scale-50"></div>
+                              )}
+                            </div>
+                            <span className="text-sm text-neutral-700">{option.label}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
                   ))}
                 </div>
-                {rating > 0 && (
-                  <p className="text-sm text-neutral-600 mt-2">
-                    You rated this {rating} out of 5 stars
-                  </p>
-                )}
-              </div>
+              ) : (
+                // Video evaluation (star rating + feedback)
+                <div className="space-y-6">
+                  {/* Star Rating */}
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-3">
+                      Overall Rating
+                    </label>
+                    <div className="flex gap-2">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <button
+                          key={star}
+                          onClick={() => handleStarClick(star)}
+                          className="focus:outline-none transition-all duration-150"
+                        >
+                          <Star
+                            className={`h-8 w-8 ${
+                              star <= rating
+                                ? "text-yellow-400 fill-yellow-400"
+                                : "text-neutral-300"
+                            }`}
+                          />
+                        </button>
+                      ))}
+                    </div>
+                    {rating > 0 && (
+                      <p className="text-sm text-neutral-600 mt-2">
+                        You rated this {rating} out of 5 stars
+                      </p>
+                    )}
+                  </div>
 
-              {/* Feedback */}
-              <div>
-                <label className="block text-sm font-medium text-neutral-700 mb-2">
-                  What did you think about this {currentContent.type}?
-                </label>
-                <Textarea
-                  value={feedback}
-                  onChange={(e) => setFeedback(e.target.value)}
-                  placeholder="Share your thoughts about the content..."
-                  className="min-h-[100px]"
-                />
-              </div>
+                  {/* Feedback */}
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-2">
+                      What did you think about this video?
+                    </label>
+                    <Textarea
+                      value={feedback}
+                      onChange={(e) => setFeedback(e.target.value)}
+                      placeholder="Share your thoughts about the content..."
+                      className="min-h-[100px]"
+                    />
+                  </div>
 
-              {/* Improvements */}
-              <div>
-                <label className="block text-sm font-medium text-neutral-700 mb-2">
-                  What could be improved? (Optional)
-                </label>
-                <Textarea
-                  value={improvements}
-                  onChange={(e) => setImprovements(e.target.value)}
-                  placeholder="Suggestions for improvement..."
-                  className="min-h-[80px]"
-                />
-              </div>
+                  {/* Improvements */}
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-2">
+                      What could be improved? (Optional)
+                    </label>
+                    <Textarea
+                      value={improvements}
+                      onChange={(e) => setImprovements(e.target.value)}
+                      placeholder="Suggestions for improvement..."
+                      className="min-h-[80px]"
+                    />
+                  </div>
+                </div>
+              )}
 
               {/* Submit Button */}
               <Button
                 onClick={handleComplete}
-                disabled={rating === 0 || feedback.trim().length < 10}
+                disabled={
+                  currentContent.type === "photo" 
+                    ? Object.keys(photoAnswers).length < 3
+                    : rating === 0 || feedback.trim().length < 10
+                }
                 className="w-full bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white font-semibold py-3"
               >
                 Submit Evaluation & Earn ${currentContent.minEarning} - ${currentContent.maxEarning}

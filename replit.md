@@ -117,7 +117,8 @@ Preferred communication style: Simple, everyday language.
   - Converted from product evaluation to content evaluation system
   - Added support for 2 videos + 8 photos daily, rotating every 7 days
   - Implemented new reward structure: $6-$10 for photos, $20-$40 for videos
-  - Created single-stage evaluation system with star rating and text feedback
+  - Created specialized evaluation forms: 3 targeted questions for photos, star rating + feedback for videos
+  - Photo questions focus on imagination provocation, body presentation, and feed engagement
   - Added video completion requirement - users must watch entire video before rating
   - Built content rotation system that changes every 7 days automatically
   - Prepared structure for frontend-only hosting without backend dependencies
