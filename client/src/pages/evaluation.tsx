@@ -167,7 +167,7 @@ export default function Evaluation() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 to-secondary/5">
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 to-secondary/5 pb-20">
       {/* Header */}
       <div className="bg-white border-b border-neutral-200 px-4 py-3">
         <div className="flex items-center gap-3">
@@ -395,7 +395,7 @@ export default function Evaluation() {
 
         {/* Video controls overlay when playing */}
         {currentContent.type === "video" && isPlaying && (
-          <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50">
+          <div className="fixed bottom-24 left-1/2 transform -translate-x-1/2 z-50">
             <Button
               onClick={handleVideoPause}
               className="rounded-full bg-black/80 hover:bg-black text-white"
