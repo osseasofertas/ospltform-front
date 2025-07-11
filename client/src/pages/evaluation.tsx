@@ -12,6 +12,7 @@ export default function Evaluation() {
   const [, setLocation] = useLocation();
   const { user, currentContent, completeEvaluation, incrementDailyEvaluations } = useAppState();
   const videoRef = useRef<HTMLVideoElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
   
   const [rating, setRating] = useState<number>(0);
   const [feedback, setFeedback] = useState<string>("");
@@ -28,6 +29,18 @@ export default function Evaluation() {
       setLocation("/");
       return;
     }
+    
+    // Auto-scroll to content after a short delay
+    const timer = setTimeout(() => {
+      if (contentRef.current) {
+        contentRef.current.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'start' 
+        });
+      }
+    }, 500);
+    
+    return () => clearTimeout(timer);
   }, [currentContent, user, setLocation]);
 
   const handleVideoPlay = () => {
@@ -211,7 +224,7 @@ export default function Evaluation() {
         )}
 
         {/* Content Display */}
-        <Card>
+        <Card ref={contentRef}>
           <CardContent className="p-0">
             {currentContent.type === "photo" ? (
               <div className="aspect-square w-full">
