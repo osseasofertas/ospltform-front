@@ -7,15 +7,10 @@ import { useAppState } from "@/hooks/use-app-state";
 
 export default function Profile() {
   const [, setLocation] = useLocation();
-  const { user, logout } = useAppState();
+  const { user } = useAppState();
 
   const handleBack = () => {
     setLocation("/main");
-  };
-
-  const handleLogout = () => {
-    logout();
-    setLocation("/welcome");
   };
 
   const canWithdraw = () => {
@@ -140,16 +135,7 @@ export default function Profile() {
           </CardContent>
         </Card>
 
-        {/* Logout Button */}
-        <div className="mt-6">
-          <Button
-            onClick={handleLogout}
-            variant="outline"
-            className="w-full border-red-200 text-red-600 hover:bg-red-50"
-          >
-            Sign out
-          </Button>
-        </div>
+
       </div>
     </div>
   );
