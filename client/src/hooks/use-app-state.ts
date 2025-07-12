@@ -9,6 +9,18 @@ interface UserStats {
   lastEvaluationDate: string;
 }
 
+interface DailyEvaluationStats {
+  date: string;
+  evaluationsCount: number;
+  earnings: string;
+  contentEvaluated: Array<{
+    contentId: number;
+    type: 'photo' | 'video';
+    earning: string;
+    completedAt: string;
+  }>;
+}
+
 interface AppState {
   user: AppUser | null;
   currentProduct: AppProduct | null;
@@ -23,10 +35,12 @@ interface AppState {
     date: string;
   }>;
   completedEvaluations: Array<{
-    productId: number;
+    contentId: number;
+    type: 'photo' | 'video';
     completedAt: string;
     earning: string;
   }>;
+  dailyStats: DailyEvaluationStats[];
   globalLogoutDate: string | null; // Global logout date for all future logins
   
   // Actions
@@ -40,12 +54,17 @@ interface AppState {
     amount: string;
     description: string;
   }) => void;
-  completeEvaluation: (productId: number, earning: string) => void;
+  completeEvaluation: (contentId: number, contentType: 'photo' | 'video', earning: string) => void;
   incrementDailyEvaluations: () => void;
   resetDailyEvaluationsIfNeeded: () => void;
   logout: () => void;
   isLoginBlocked: () => boolean;
   getDaysUntilLoginAllowed: () => number;
+  
+  // Data access functions
+  getDailyStats: () => DailyEvaluationStats[];
+  getTodaysStats: () => DailyEvaluationStats | undefined;
+  getWeeklyEarnings: () => string;
 }
 
 export const useAppState = create<AppState>()(
@@ -63,6 +82,7 @@ export const useAppState = create<AppState>()(
       },
       transactions: [],
       completedEvaluations: [],
+      dailyStats: [],
       globalLogoutDate: null,
       
       setUser: (user) => {
@@ -116,43 +136,79 @@ export const useAppState = create<AppState>()(
         get().updateBalance(transaction.amount);
       },
       
-      completeEvaluation: (productId, earning) => {
-        const state = get();
-        const today = new Date().toDateString();
+      completeEvaluation: (contentId, contentType, earning) => {
+        const now = new Date();
+        const today = now.toDateString();
         
-        // Add completed evaluation
-        set(state => ({
-          completedEvaluations: [
-            {
-              productId,
-              completedAt: new Date().toISOString(),
-              earning
-            },
-            ...state.completedEvaluations
-          ]
-        }));
-        
-        // Update stats
-        const newTotalEvaluations = state.userStats.totalEvaluations + 1;
-        const newTodayEvaluations = state.userStats.lastEvaluationDate === today 
-          ? state.userStats.todayEvaluations + 1 
-          : 1;
-        const newTotalEarned = (parseFloat(state.userStats.totalEarned) + parseFloat(earning)).toFixed(2);
-        
-        set({
-          userStats: {
-            totalEvaluations: newTotalEvaluations,
-            todayEvaluations: newTodayEvaluations,
-            totalEarned: newTotalEarned,
-            lastEvaluationDate: today
+        set((state) => {
+          const newBalance = (parseFloat(state.user?.balance || "0") + parseFloat(earning)).toFixed(2);
+          const newTotalEarned = (parseFloat(state.userStats.totalEarned) + parseFloat(earning)).toFixed(2);
+          
+          // Update or create today's daily stats
+          const existingDayIndex = state.dailyStats.findIndex(day => day.date === today);
+          let newDailyStats = [...state.dailyStats];
+          
+          if (existingDayIndex >= 0) {
+            // Update existing day
+            newDailyStats[existingDayIndex] = {
+              ...newDailyStats[existingDayIndex],
+              evaluationsCount: newDailyStats[existingDayIndex].evaluationsCount + 1,
+              earnings: (parseFloat(newDailyStats[existingDayIndex].earnings) + parseFloat(earning)).toFixed(2),
+              contentEvaluated: [
+                ...newDailyStats[existingDayIndex].contentEvaluated,
+                {
+                  contentId,
+                  type: contentType,
+                  earning,
+                  completedAt: now.toISOString(),
+                }
+              ]
+            };
+          } else {
+            // Create new day
+            newDailyStats.push({
+              date: today,
+              evaluationsCount: 1,
+              earnings: earning,
+              contentEvaluated: [{
+                contentId,
+                type: contentType,
+                earning,
+                completedAt: now.toISOString(),
+              }]
+            });
           }
+          
+          return {
+            user: state.user ? { ...state.user, balance: newBalance } : null,
+            userStats: {
+              ...state.userStats,
+              totalEvaluations: state.userStats.totalEvaluations + 1,
+              todayEvaluations: state.userStats.lastEvaluationDate === today 
+                ? state.userStats.todayEvaluations + 1 
+                : 1,
+              totalEarned: newTotalEarned,
+              lastEvaluationDate: today,
+            },
+            completedEvaluations: [
+              ...state.completedEvaluations,
+              {
+                contentId,
+                type: contentType,
+                completedAt: now.toISOString(),
+                earning,
+              },
+            ],
+            dailyStats: newDailyStats,
+            currentEvaluation: null,
+          };
         });
-        
-        // Add transaction
+
+        // Add transaction for the earning
         get().addTransaction({
-          type: 'evaluation_completed',
+          type: 'evaluation_earning',
           amount: earning,
-          description: `Product evaluation completed`
+          description: `${contentType === 'photo' ? 'Photo' : 'Video'} evaluation completed`,
         });
       },
       
@@ -235,6 +291,28 @@ export const useAppState = create<AppState>()(
         const daysDiff = Math.floor((now.getTime() - logout.getTime()) / (1000 * 60 * 60 * 24));
         
         return Math.max(0, 7 - daysDiff);
+      },
+      
+      getDailyStats: () => {
+        return get().dailyStats;
+      },
+      
+      getTodaysStats: () => {
+        const state = get();
+        const today = new Date().toDateString();
+        return state.dailyStats.find(day => day.date === today);
+      },
+      
+      getWeeklyEarnings: () => {
+        const state = get();
+        const oneWeekAgo = new Date();
+        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+        
+        const weeklyEarnings = state.dailyStats
+          .filter(day => new Date(day.date) >= oneWeekAgo)
+          .reduce((total, day) => total + parseFloat(day.earnings), 0);
+          
+        return weeklyEarnings.toFixed(2);
       },
     }),
     {

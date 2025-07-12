@@ -1,156 +1,43 @@
-import { useState, useEffect } from 'react';
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { ArrowLeft, TrendingUp, DollarSign, Calendar, Image, Video, Award } from "lucide-react";
 import { useLocation } from "wouter";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { ArrowLeft, Info, CreditCard, CheckCircle, Mail, Building } from "lucide-react";
 import { useAppState } from "@/hooks/use-app-state";
-import { useToast } from "@/hooks/use-toast";
-import { AppTransaction, AppStats } from "@/types";
-import { apiRequest } from "@/lib/queryClient";
 
 export default function Wallet() {
   const [, setLocation] = useLocation();
-  const { user, transactions, userStats } = useAppState();
-  const { toast } = useToast();
-  const [selectedPayoutMethod, setSelectedPayoutMethod] = useState<string>('');
-  const [currentPayoutMethod, setCurrentPayoutMethod] = useState<string>('');
-  const [payoutDetails, setPayoutDetails] = useState({
-    email: '',
-    accountName: '',
-    bankName: '',
-    accountNumber: ''
-  });
-
-  // Load payout method from localStorage on component mount
-  useEffect(() => {
-    const savedPayoutMethod = localStorage.getItem('payoutMethod');
-    const savedPayoutDetails = localStorage.getItem('payoutDetails');
-    if (savedPayoutMethod) {
-      setCurrentPayoutMethod(savedPayoutMethod);
-    }
-    if (savedPayoutDetails) {
-      setPayoutDetails(JSON.parse(savedPayoutDetails));
-    }
-  }, []);
-
-  // Mutation for registering payout method
-  const payoutMethodMutation = useMutation({
-    mutationFn: async (method: string) => {
-      console.log('Registering payout method:', method, 'for user:', user?.id || 1);
-      try {
-        const response = await apiRequest(
-          'POST',
-          '/api/payout-method',
-          { 
-            userId: user?.id || 1, 
-            method,
-            details: method === 'PayPal' ? {
-              email: payoutDetails.email
-            } : {
-              accountName: payoutDetails.accountName,
-              bankName: payoutDetails.bankName,
-              accountNumber: payoutDetails.accountNumber
-            }
-          }
-        );
-        console.log('Payout method registration response:', response);
-        return await response.json();
-      } catch (error) {
-        console.error('Error registering payout method:', error);
-        throw error;
-      }
-    },
-    onSuccess: (data) => {
-      console.log('Payout method registration successful:', data);
-      // Store in localStorage
-      localStorage.setItem('payoutMethod', selectedPayoutMethod);
-      localStorage.setItem('payoutDetails', JSON.stringify(payoutDetails));
-      setCurrentPayoutMethod(selectedPayoutMethod);
-      
-      // Show success toast
-      toast({
-        title: "Method registered!",
-        description: `Your payout method (${selectedPayoutMethod}) has been successfully registered.`,
-        duration: 3000,
-      });
-      
-      // Reset selection
-      setSelectedPayoutMethod('');
-      setPayoutDetails({
-        email: '',
-        accountName: '',
-        bankName: '',
-        accountNumber: ''
-      });
-    },
-    onError: (error) => {
-      console.error('Payout method registration error:', error);
-      toast({
-        title: "Error",
-        description: `Could not register payout method: ${error.message}`,
-        variant: "destructive",
-      });
-    }
-  });
-
-  const handleRegisterPayoutMethod = () => {
-    if (selectedPayoutMethod && isFormValid()) {
-      payoutMethodMutation.mutate(selectedPayoutMethod);
-    }
-  };
-
-  const handleChangePayoutMethod = () => {
-    setCurrentPayoutMethod('');
-    setSelectedPayoutMethod('');
-    setPayoutDetails({
-      email: '',
-      accountName: '',
-      bankName: '',
-      accountNumber: ''
-    });
-    localStorage.removeItem('payoutMethod');
-    localStorage.removeItem('payoutDetails');
-  };
-
-  const isFormValid = () => {
-    if (selectedPayoutMethod === 'PayPal') {
-      return payoutDetails.email.trim() !== '' && payoutDetails.email.includes('@');
-    } else if (selectedPayoutMethod === 'Bank deposit') {
-      return payoutDetails.accountName.trim() !== '' && 
-             payoutDetails.bankName.trim() !== '' && 
-             payoutDetails.accountNumber.trim() !== '';
-    }
-    return false;
-  };
-
-  const getCurrentPayoutInfo = () => {
-    const savedDetails = localStorage.getItem('payoutDetails');
-    if (savedDetails && currentPayoutMethod) {
-      const details = JSON.parse(savedDetails);
-      if (currentPayoutMethod === 'PayPal') {
-        return details.email;
-      } else {
-        return `${details.bankName} - ${details.accountName}`;
-      }
-    }
-    return currentPayoutMethod;
-  };
+  const { user, transactions, userStats, getDailyStats, getTodaysStats, getWeeklyEarnings } = useAppState();
 
   const handleBack = () => {
     setLocation("/main");
   };
 
+  const dailyStats = getDailyStats();
+  const todaysStats = getTodaysStats();
+  const weeklyEarnings = getWeeklyEarnings();
+
+  // Sort transactions by date (newest first)
+  const sortedTransactions = [...transactions].sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+  );
+
+  // Sort daily stats by date (newest first)
+  const sortedDailyStats = [...dailyStats].sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+  );
+
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    // Always show the actual date in MM/DD/YYYY format
-    return date.toLocaleDateString('en-US', {
-      month: '2-digit',
-      day: '2-digit', 
+    return new Date(dateString).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
       year: 'numeric'
+    });
+  };
+
+  const formatTime = (dateString: string) => {
+    return new Date(dateString).toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit'
     });
   };
 
@@ -162,189 +49,160 @@ export default function Wallet() {
           <button onClick={handleBack} className="text-neutral-600 hover:text-neutral-800">
             <ArrowLeft className="h-5 w-5" />
           </button>
-          <h2 className="text-xl font-semibold text-neutral-800">My Wallet</h2>
+          <h2 className="text-xl font-semibold text-neutral-800">Wallet</h2>
           <div className="w-6"></div>
         </div>
       </div>
 
-      {/* Balance Card */}
-      <Card className="bg-gradient-to-r from-primary to-secondary mx-4 mt-4 text-white">
-        <CardContent className="p-6">
-          <div className="text-center">
-            <p className="text-white/80 text-sm mb-2">Available balance</p>
-            <p className="text-4xl font-bold mb-4">${user?.balance || "0.00"}</p>
-            <div className="bg-white/20 rounded-lg p-3 text-sm flex items-center justify-center">
-              <Info className="h-4 w-4 mr-2" />
-              Withdrawal available after 7 days
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Payout Method Card */}
-      <Card className="mx-4 mt-4 border border-neutral-200">
-        <CardContent className="p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <CreditCard className="h-5 w-5 text-primary" />
-            <h3 className="text-lg font-semibold text-neutral-800">Payout Method</h3>
-          </div>
-          
-          {currentPayoutMethod ? (
-            // Show active payout method
-            <div className="space-y-4">
-              <div className="flex items-center gap-2 text-green-600">
-                <CheckCircle className="h-5 w-5" />
-                <div>
-                  <p className="font-medium">Active payout method: {currentPayoutMethod}</p>
-                  <p className="text-sm text-neutral-600">{getCurrentPayoutInfo()}</p>
-                </div>
-              </div>
-              <Button 
-                onClick={handleChangePayoutMethod}
-                variant="outline"
-                className="w-full"
-              >
-                Change method
-              </Button>
-            </div>
-          ) : (
-            // Show payout method selection
-            <div className="space-y-4">
-              <RadioGroup value={selectedPayoutMethod} onValueChange={setSelectedPayoutMethod}>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="PayPal" id="paypal" />
-                  <Label htmlFor="paypal" className="text-sm font-medium flex items-center gap-2">
-                    <Mail className="h-4 w-4" />
-                    PayPal
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="Bank deposit" id="bank" />
-                  <Label htmlFor="bank" className="text-sm font-medium flex items-center gap-2">
-                    <Building className="h-4 w-4" />
-                    Bank deposit
-                  </Label>
-                </div>
-              </RadioGroup>
-
-              {/* PayPal Details */}
-              {selectedPayoutMethod === 'PayPal' && (
-                <div className="space-y-3 p-3 bg-blue-50 rounded-lg border">
-                  <Label htmlFor="email" className="text-sm font-medium text-blue-800">
-                    PayPal Email
-                  </Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="your-email@example.com"
-                    value={payoutDetails.email}
-                    onChange={(e) => setPayoutDetails({
-                      ...payoutDetails,
-                      email: e.target.value
-                    })}
-                    className="border-blue-200 focus:border-blue-400"
-                  />
-                  <p className="text-xs text-blue-600">
-                    Enter the email associated with your PayPal account
-                  </p>
-                </div>
-              )}
-
-              {/* Bank Details */}
-              {selectedPayoutMethod === 'Bank deposit' && (
-                <div className="space-y-3 p-3 bg-green-50 rounded-lg border">
-                  <Label className="text-sm font-medium text-green-800">
-                    Basic bank details
-                  </Label>
-                  <div className="space-y-2">
-                    <Input
-                      placeholder="Account holder name"
-                      value={payoutDetails.accountName}
-                      onChange={(e) => setPayoutDetails({
-                        ...payoutDetails,
-                        accountName: e.target.value
-                      })}
-                      className="border-green-200 focus:border-green-400"
-                    />
-                    <Input
-                      placeholder="Bank name"
-                      value={payoutDetails.bankName}
-                      onChange={(e) => setPayoutDetails({
-                        ...payoutDetails,
-                        bankName: e.target.value
-                      })}
-                      className="border-green-200 focus:border-green-400"
-                    />
-                    <Input
-                      placeholder="Account number"
-                      value={payoutDetails.accountNumber}
-                      onChange={(e) => setPayoutDetails({
-                        ...payoutDetails,
-                        accountNumber: e.target.value
-                      })}
-                      className="border-green-200 focus:border-green-400"
-                    />
-                  </div>
-                  <p className="text-xs text-green-600">
-                    Basic information for payment processing
-                  </p>
-                </div>
-              )}
-              
-              <Button 
-                onClick={handleRegisterPayoutMethod}
-                disabled={!selectedPayoutMethod || !isFormValid() || payoutMethodMutation.isPending}
-                className="w-full"
-              >
-                {payoutMethodMutation.isPending ? 'Registering...' : 'Register method'}
-              </Button>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Quick Stats */}
-      <div className="mx-4 mt-4 grid grid-cols-2 gap-4">
-        <Card className="border border-neutral-200">
-          <CardContent className="p-4">
-            <div className="text-center">
-              <p className="text-2xl font-bold text-primary">{userStats.totalEvaluations}</p>
-              <p className="text-sm text-neutral-600">Evaluations</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="border border-neutral-200">
-          <CardContent className="p-4">
-            <div className="text-center">
-              <p className="text-2xl font-bold text-accent">{userStats.todayEvaluations}</p>
-              <p className="text-sm text-neutral-600">Today</p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Transaction History */}
       <div className="p-4">
-        <h3 className="text-lg font-semibold text-neutral-800 mb-4">Transaction History</h3>
-        
-        <div className="space-y-3">
-          {transactions.map((transaction) => (
-            <Card key={transaction.id} className="border border-neutral-200">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-semibold text-neutral-800">{transaction.description}</p>
-                    <p className="text-sm text-neutral-600">{transaction.type === 'welcome_bonus' ? 'Registration completed' : 'Evaluation completed'}</p>
-                    <p className="text-xs text-neutral-400">{formatDate(transaction.date)}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-semibold text-primary">+${transaction.amount}</p>
-                  </div>
+        {/* Balance Overview */}
+        <Card className="border border-neutral-200 mb-6">
+          <CardContent className="p-6">
+            <div className="text-center">
+              <div className="text-3xl font-bold text-neutral-800 mb-2">
+                ${user?.balance || "0.00"}
+              </div>
+              <p className="text-sm text-neutral-600">Total Balance</p>
+            </div>
+            
+            <div className="grid grid-cols-3 gap-4 mt-6">
+              <div className="text-center">
+                <div className="text-lg font-semibold text-primary">{userStats.totalEvaluations}</div>
+                <p className="text-xs text-neutral-600">Total Evaluations</p>
+              </div>
+              <div className="text-center">
+                <div className="text-lg font-semibold text-primary">{todaysStats?.evaluationsCount || 0}</div>
+                <p className="text-xs text-neutral-600">Today</p>
+              </div>
+              <div className="text-center">
+                <div className="text-lg font-semibold text-primary">${weeklyEarnings}</div>
+                <p className="text-xs text-neutral-600">This Week</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Today's Activity */}
+        {todaysStats && (
+          <Card className="border border-neutral-200 mb-6">
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Calendar className="h-5 w-5 text-primary" />
+                Today's Activity
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-neutral-600">Evaluations Completed</span>
+                  <Badge className="bg-primary/10 text-primary">{todaysStats.evaluationsCount}</Badge>
                 </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-neutral-600">Earnings Today</span>
+                  <span className="font-semibold text-green-600">${todaysStats.earnings}</span>
+                </div>
+                
+                {todaysStats.contentEvaluated.length > 0 && (
+                  <div className="mt-4">
+                    <h4 className="text-sm font-medium text-neutral-700 mb-2">Content Evaluated Today:</h4>
+                    <div className="space-y-2">
+                      {todaysStats.contentEvaluated.map((content, index) => (
+                        <div key={index} className="flex items-center justify-between bg-neutral-50 p-2 rounded">
+                          <div className="flex items-center gap-2">
+                            {content.type === 'photo' ? (
+                              <Image className="h-4 w-4 text-blue-500" />
+                            ) : (
+                              <Video className="h-4 w-4 text-red-500" />
+                            )}
+                            <span className="text-sm capitalize">{content.type} #{content.contentId}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-medium text-green-600">+${content.earning}</span>
+                            <span className="text-xs text-neutral-500">{formatTime(content.completedAt)}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Daily History */}
+        <Card className="border border-neutral-200 mb-6">
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <TrendingUp className="h-5 w-5 text-primary" />
+              Daily History
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {sortedDailyStats.length > 0 ? (
+              <div className="space-y-3">
+                {sortedDailyStats.slice(0, 7).map((day, index) => (
+                  <div key={index} className="flex items-center justify-between p-3 bg-neutral-50 rounded-lg">
+                    <div>
+                      <div className="font-medium text-neutral-800">{formatDate(day.date)}</div>
+                      <div className="text-sm text-neutral-600">
+                        {day.evaluationsCount} evaluation{day.evaluationsCount !== 1 ? 's' : ''}
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-semibold text-green-600">${day.earnings}</div>
+                      <div className="text-xs text-neutral-500">
+                        {day.contentEvaluated.filter(c => c.type === 'photo').length} photos, {' '}
+                        {day.contentEvaluated.filter(c => c.type === 'video').length} videos
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-center text-neutral-500 py-8">No evaluation history yet</p>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Transaction History */}
+        <Card className="border border-neutral-200">
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <DollarSign className="h-5 w-5 text-primary" />
+              Transaction History
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {sortedTransactions.length > 0 ? (
+              <div className="space-y-3">
+                {sortedTransactions.map((transaction) => (
+                  <div key={transaction.id} className="flex items-center justify-between p-3 border-b border-neutral-100 last:border-b-0">
+                    <div className="flex items-center gap-3">
+                      <div className="bg-primary/10 p-2 rounded-full">
+                        {transaction.type === 'welcome_bonus' ? (
+                          <Award className="h-4 w-4 text-primary" />
+                        ) : (
+                          <TrendingUp className="h-4 w-4 text-primary" />
+                        )}
+                      </div>
+                      <div>
+                        <div className="font-medium text-neutral-800">{transaction.description}</div>
+                        <div className="text-sm text-neutral-600">{formatDate(transaction.date)}</div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-semibold text-green-600">+${transaction.amount}</div>
+                      <div className="text-xs text-neutral-500">{formatTime(transaction.date)}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-center text-neutral-500 py-8">No transactions yet</p>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

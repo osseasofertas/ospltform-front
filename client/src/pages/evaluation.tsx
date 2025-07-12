@@ -104,7 +104,7 @@ export default function Evaluation() {
     const earning = (minEarning + (Math.random() * (maxEarning - minEarning))).toFixed(2);
     
     // Complete evaluation
-    completeEvaluation(currentContent.id, earning);
+    completeEvaluation(currentContent.id, currentContent.type, earning);
     incrementDailyEvaluations();
     
     setEarnings(earning);
