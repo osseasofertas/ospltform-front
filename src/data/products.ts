@@ -19,7 +19,7 @@ const contentPool: AppContent[] = [
     id: 2,
     type: "photo",
     title: "Lifestyle Photo 2",
-    url: "/PT2.jpg",
+    url: "/PT2.png",
     minEarning: "6.00",
     maxEarning: "10.00",
     week: 1,
