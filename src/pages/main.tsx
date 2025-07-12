@@ -1,21 +1,35 @@
 import { getTodaysContent } from "@/data/products";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Wallet, AlertCircle, User, HelpCircle, TrendingUp, Play, Image } from "lucide-react";
+import {
+  Wallet,
+  AlertCircle,
+  User,
+  HelpCircle,
+  TrendingUp,
+  Play,
+  Image,
+} from "lucide-react";
 import { useAppState } from "@/hooks/use-app-state";
 import { useLocation } from "wouter";
 import { AppContent } from "@/types";
 import ContentCard from "@/components/content-card";
 
 export default function Main() {
-  const { user, setCurrentContent, userStats, resetDailyEvaluationsIfNeeded } = useAppState();
+  const {
+    user,
+    setCurrentContent,
+    userStats,
+    resetDailyEvaluationsIfNeeded,
+    userLoginDate,
+  } = useAppState();
   const [, setLocation] = useLocation();
 
   // Reset daily evaluations if it's a new day
   resetDailyEvaluationsIfNeeded();
 
-  // Frontend-only content - rotates every 7 days
-  const content = getTodaysContent();
+  // Frontend-only content - rotates every 7 days based on user's login date
+  const content = getTodaysContent(userLoginDate);
   const isLoading = false;
 
   // Check daily limit locally
@@ -58,7 +72,7 @@ export default function Main() {
             </button>
           </div>
         </div>
-        
+
         {/* Limit Message */}
         <div className="p-4">
           <Card className="border border-orange-200 bg-orange-50">
@@ -70,7 +84,8 @@ export default function Main() {
                 Daily limit reached
               </h3>
               <p className="text-neutral-600 mb-4">
-                You've completed 10 evaluations today. Come back tomorrow to continue earning money by evaluating products.
+                You've completed 10 evaluations today. Come back tomorrow to
+                continue earning money by evaluating products.
               </p>
               <p className="text-sm text-neutral-500">
                 The limit resets at 00:00 hours.
@@ -90,8 +105,12 @@ export default function Main() {
           {/* Welcome section */}
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h1 className="text-2xl font-bold">Hello, {user?.name || 'User'}!</h1>
-              <p className="text-white/80 text-sm">Earn money by evaluating products</p>
+              <h1 className="text-2xl font-bold">
+                Hello, {user?.name || "User"}!
+              </h1>
+              <p className="text-white/80 text-sm">
+                Earn money by evaluating products
+              </p>
             </div>
             <div className="text-right">
               <p className="text-2xl font-bold">${user?.balance || "0.00"}</p>
@@ -102,21 +121,21 @@ export default function Main() {
           {/* Quick access menu */}
           <div className="grid grid-cols-3 gap-3 mb-4">
             <button
-              onClick={() => setLocation('/wallet')}
+              onClick={() => setLocation("/wallet")}
               className="bg-white/20 backdrop-blur-sm rounded-lg p-3 text-center hover:bg-white/30 transition-colors"
             >
               <Wallet className="h-5 w-5 mx-auto mb-1" />
               <span className="text-xs font-medium">My Wallet</span>
             </button>
             <button
-              onClick={() => setLocation('/profile')}
+              onClick={() => setLocation("/profile")}
               className="bg-white/20 backdrop-blur-sm rounded-lg p-3 text-center hover:bg-white/30 transition-colors"
             >
               <User className="h-5 w-5 mx-auto mb-1" />
               <span className="text-xs font-medium">Profile</span>
             </button>
             <button
-              onClick={() => setLocation('/support')}
+              onClick={() => setLocation("/support")}
               className="bg-white/20 backdrop-blur-sm rounded-lg p-3 text-center hover:bg-white/30 transition-colors"
             >
               <HelpCircle className="h-5 w-5 mx-auto mb-1" />
@@ -128,12 +147,19 @@ export default function Main() {
           <div className="bg-white/20 backdrop-blur-sm rounded-lg p-4">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-medium">Daily progress</span>
-              <span className="text-sm">{userStats.todayEvaluations}/10 evaluations</span>
+              <span className="text-sm">
+                {userStats.todayEvaluations}/10 evaluations
+              </span>
             </div>
             <div className="w-full bg-white/20 rounded-full h-2 mb-2">
-              <div 
+              <div
                 className="bg-white rounded-full h-2 transition-all duration-300"
-                style={{ width: `${Math.min((userStats.todayEvaluations / 10) * 100, 100)}%` }}
+                style={{
+                  width: `${Math.min(
+                    (userStats.todayEvaluations / 10) * 100,
+                    100
+                  )}%`,
+                }}
               ></div>
             </div>
             <div className="flex justify-between text-xs text-white/80">
@@ -156,7 +182,9 @@ export default function Main() {
         <h2 className="text-lg font-semibold text-neutral-800">
           Today's Content
         </h2>
-        <p className="text-sm text-neutral-600">Rate photos and videos to earn money</p>
+        <p className="text-sm text-neutral-600">
+          Rate photos and videos to earn money
+        </p>
       </div>
 
       {/* Content Grid - Photos and Videos */}
