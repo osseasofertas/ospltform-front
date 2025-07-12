@@ -25,11 +25,18 @@ export default function Main() {
   } = useAppState();
   const [, setLocation] = useLocation();
 
+  // Get evaluated content IDs
+  const evaluatedIds = new Set(
+    useAppState.getState().completedEvaluations.map((e) => e.contentId)
+  );
+
   // Reset daily evaluations if it's a new day
   resetDailyEvaluationsIfNeeded();
 
   // Frontend-only content - rotates every 7 days based on user's login date
-  const content = getTodaysContent(userLoginDate);
+  const content = getTodaysContent(userLoginDate).filter(
+    (item) => !evaluatedIds.has(item.id)
+  );
   const isLoading = false;
 
   // Check daily limit locally
