@@ -364,7 +364,7 @@ export const useAppState = create<AppState>()(
       },
     }),
     {
-      name: "safemoney-app-state",
+      name: "onlycash-app-state",
     }
   )
 );
