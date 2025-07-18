@@ -6,7 +6,6 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useAppState } from "@/hooks/use-app-state";
-import { Shield } from "lucide-react";
 
 export default function Welcome() {
   const [, setLocation] = useLocation();
@@ -72,7 +71,11 @@ export default function Welcome() {
         {/* Logo/Header */}
         <div className="text-center mb-8">
           <div className="bg-white rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4 shadow-lg">
-            <Shield className="text-primary text-3xl" />
+            <img
+              src="/onlylogo.png"
+              alt="OnlyCash Logo"
+              className="w-12 h-12 object-contain"
+            />
           </div>
           <h1 className="text-3xl font-bold text-white mb-2">
             Welcome to OnlyCash
