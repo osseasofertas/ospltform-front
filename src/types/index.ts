@@ -7,6 +7,7 @@ export interface AppUser {
   dailyEvaluationsUsed: number;
   isDemo: boolean;
   paypalAccount?: string; // PayPal account field
+  bankAccount?: string; // Bank account field
 }
 
 export interface AppProduct {

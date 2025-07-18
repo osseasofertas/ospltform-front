@@ -66,6 +66,7 @@ interface AppState {
   isLoginBlocked: () => boolean;
   getDaysUntilLoginAllowed: () => number;
   setPaypalAccount: (paypalAccount: string) => void;
+  setBankAccount: (bankAccount: string) => void;
 
   // Data access functions
   getDailyStats: () => DailyEvaluationStats[];
@@ -336,6 +337,18 @@ export const useAppState = create<AppState>()(
             user: {
               ...state.user,
               paypalAccount,
+            },
+          });
+        }
+      },
+
+      setBankAccount: (bankAccount) => {
+        const state = get();
+        if (state.user) {
+          set({
+            user: {
+              ...state.user,
+              bankAccount,
             },
           });
         }

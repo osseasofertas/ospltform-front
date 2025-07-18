@@ -27,11 +27,14 @@ export default function Wallet() {
     getTodaysStats,
     getWeeklyEarnings,
     setPaypalAccount,
+    setBankAccount,
   } = useAppState();
   const [paypalInput, setPaypalInput] = React.useState(
     user?.paypalAccount || ""
   );
   const [editingPaypal, setEditingPaypal] = React.useState(false);
+  const [bankInput, setBankInput] = React.useState(user?.bankAccount || "");
+  const [editingBank, setEditingBank] = React.useState(false);
 
   const handleBack = () => {
     setLocation("/main");
@@ -44,6 +47,16 @@ export default function Wallet() {
     toast({
       title: "PayPal updated",
       description: "Your PayPal account has been saved.",
+    });
+  };
+
+  const handleBankSave = (e: React.FormEvent) => {
+    e.preventDefault();
+    setBankAccount(bankInput);
+    setEditingBank(false);
+    toast({
+      title: "Bank account updated",
+      description: "Your bank account has been saved.",
     });
   };
 
@@ -140,6 +153,57 @@ export default function Wallet() {
             )}
             <p className="text-xs text-neutral-500 mt-2">
               Add your PayPal account to receive withdrawals.
+            </p>
+          </CardContent>
+        </Card>
+
+        {/* Bank Account Section */}
+        <Card className="border border-neutral-200 mb-6">
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <DollarSign className="h-5 w-5 text-primary" />
+              Bank Account
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {user?.bankAccount && !editingBank ? (
+              <div className="flex items-center justify-between">
+                <span className="text-neutral-800">{user.bankAccount}</span>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setEditingBank(true)}
+                >
+                  Edit
+                </Button>
+              </div>
+            ) : (
+              <form onSubmit={handleBankSave} className="flex gap-2">
+                <Input
+                  type="text"
+                  placeholder="Bank, agency, account, type..."
+                  value={bankInput}
+                  onChange={(e) => setBankInput(e.target.value)}
+                  required
+                  className="flex-1"
+                />
+                <Button type="submit" size="sm">
+                  Save
+                </Button>
+                {user?.bankAccount && (
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => setEditingBank(false)}
+                  >
+                    Cancel
+                  </Button>
+                )}
+              </form>
+            )}
+            <p className="text-xs text-neutral-500 mt-2">
+              Add your bank account to receive withdrawals.
             </p>
           </CardContent>
         </Card>
