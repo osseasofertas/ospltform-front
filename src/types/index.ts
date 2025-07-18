@@ -6,6 +6,7 @@ export interface AppUser {
   registrationDate: string;
   dailyEvaluationsUsed: number;
   isDemo: boolean;
+  paypalAccount?: string; // PayPal account field
 }
 
 export interface AppProduct {
@@ -55,7 +56,7 @@ export interface AppQuestion {
   productId: number;
   stage: number;
   questionNumber: number;
-  type: 'multiple_choice' | 'star_rating' | 'free_text';
+  type: "multiple_choice" | "star_rating" | "free_text";
   question: string;
   options?: string[];
   metadata?: Record<string, any>;
