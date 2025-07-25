@@ -56,3 +56,4 @@ All user data is stored in browser localStorage:
 - Content evaluation progress
 
 Data persists between browser sessions and resets only on manual logout (after 7-day lockout period).# ospltform-front
+# ospltform-front
