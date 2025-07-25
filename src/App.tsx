@@ -11,6 +11,8 @@ import Support from "@/pages/support";
 import BottomNavigation from "@/components/bottom-navigation";
 import { useAppState } from "@/hooks/use-app-state";
 import NotFound from "@/pages/not-found";
+import Login from "@/pages/login";
+import Register from "@/pages/register";
 
 function Router() {
   const { user } = useAppState();
@@ -18,14 +20,16 @@ function Router() {
   return (
     <div className="min-h-screen bg-neutral-50">
       <Switch>
-        <Route path="/" component={user ? Main : Welcome} />
+        <Route path="/" component={Welcome} />
         <Route path="/welcome" component={Welcome} />
-        <Route path="/main" component={Main} />
-        <Route path="/evaluation" component={Evaluation} />
-        <Route path="/results" component={Results} />
-        <Route path="/wallet" component={Wallet} />
-        <Route path="/profile" component={Profile} />
-        <Route path="/support" component={Support} />
+        <Route path="/login" component={Login} />
+        <Route path="/register" component={Register} />
+        <Route path="/main" component={user ? Main : Login} />
+        <Route path="/evaluation" component={user ? Evaluation : Login} />
+        <Route path="/results" component={user ? Results : Login} />
+        <Route path="/wallet" component={user ? Wallet : Login} />
+        <Route path="/profile" component={user ? Profile : Login} />
+        <Route path="/support" component={user ? Support : Login} />
         <Route component={NotFound} />
       </Switch>
       {user && <BottomNavigation />}

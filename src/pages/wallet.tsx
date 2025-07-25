@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { useLocation } from "wouter";
 import { useAppState } from "@/hooks/use-app-state";
-import React from "react";
+import React, { useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -22,27 +22,29 @@ export default function Wallet() {
   const {
     user,
     transactions,
-    userStats,
-    getDailyStats,
-    getTodaysStats,
-    getWeeklyEarnings,
-    setPaypalAccount,
-    setBankAccount,
+    stats,
+    fetchStats,
+    fetchTransactions,
+    updatePaypal,
+    updateBank,
   } = useAppState();
-  const [paypalInput, setPaypalInput] = React.useState(
-    user?.paypalAccount || ""
-  );
+  const [paypalInput, setPaypalInput] = React.useState(user?.paypalAccount || "");
   const [editingPaypal, setEditingPaypal] = React.useState(false);
   const [bankInput, setBankInput] = React.useState(user?.bankAccount || "");
   const [editingBank, setEditingBank] = React.useState(false);
+
+  useEffect(() => {
+    fetchStats();
+    fetchTransactions();
+  }, [fetchStats, fetchTransactions]);
 
   const handleBack = () => {
     setLocation("/main");
   };
 
-  const handlePaypalSave = (e: React.FormEvent) => {
+  const handlePaypalSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    setPaypalAccount(paypalInput);
+    await updatePaypal(paypalInput);
     setEditingPaypal(false);
     toast({
       title: "PayPal updated",
@@ -50,29 +52,15 @@ export default function Wallet() {
     });
   };
 
-  const handleBankSave = (e: React.FormEvent) => {
+  const handleBankSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    setBankAccount(bankInput);
+    await updateBank(bankInput);
     setEditingBank(false);
     toast({
       title: "Bank account updated",
       description: "Your bank account has been saved.",
     });
   };
-
-  const dailyStats = getDailyStats();
-  const todaysStats = getTodaysStats();
-  const weeklyEarnings = getWeeklyEarnings();
-
-  // Sort transactions by date (newest first)
-  const sortedTransactions = [...transactions].sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-  );
-
-  // Sort daily stats by date (newest first)
-  const sortedDailyStats = [...dailyStats].sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-  );
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -88,6 +76,19 @@ export default function Wallet() {
       minute: "2-digit",
     });
   };
+
+  // Fallbacks para garantir que a página nunca quebre
+  const totalEvaluations = stats?.totalEvaluations ?? 0;
+  const todayEvaluations = stats?.todayEvaluations ?? 0;
+  const totalEarned = stats?.totalEarned ?? "0.00";
+
+  // Ordenar transações por data
+  const sortedTransactions = [...(transactions ?? [])].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
+
+  // Calcular saldo a partir das transações
+  const balance = transactions.reduce((sum, t) => sum + Number(t.amount), 0);
 
   return (
     <div className="min-h-screen bg-neutral-50 pb-20">
@@ -212,7 +213,7 @@ export default function Wallet() {
           <CardContent className="p-6">
             <div className="text-center">
               <div className="text-3xl font-bold text-neutral-800 mb-2">
-                ${user?.balance || "0.00"}
+                ${balance.toFixed(2)}
               </div>
               <p className="text-sm text-neutral-600">Total Balance</p>
             </div>
@@ -220,141 +221,23 @@ export default function Wallet() {
             <div className="grid grid-cols-3 gap-4 mt-6">
               <div className="text-center">
                 <div className="text-lg font-semibold text-primary">
-                  {userStats.totalEvaluations}
+                  {totalEvaluations}
                 </div>
                 <p className="text-xs text-neutral-600">Total Evaluations</p>
               </div>
               <div className="text-center">
                 <div className="text-lg font-semibold text-primary">
-                  {todaysStats?.evaluationsCount || 0}
+                  {todayEvaluations}
                 </div>
                 <p className="text-xs text-neutral-600">Today</p>
               </div>
               <div className="text-center">
                 <div className="text-lg font-semibold text-primary">
-                  ${weeklyEarnings}
+                  ${totalEarned}
                 </div>
-                <p className="text-xs text-neutral-600">This Week</p>
+                <p className="text-xs text-neutral-600">Total Earned</p>
               </div>
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Today's Activity */}
-        {todaysStats && (
-          <Card className="border border-neutral-200 mb-6">
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Calendar className="h-5 w-5 text-primary" />
-                Today's Activity
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-neutral-600">
-                    Evaluations Completed
-                  </span>
-                  <Badge className="bg-primary/10 text-primary">
-                    {todaysStats.evaluationsCount}
-                  </Badge>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-neutral-600">Earnings Today</span>
-                  <span className="font-semibold text-green-600">
-                    ${todaysStats.earnings}
-                  </span>
-                </div>
-
-                {todaysStats.contentEvaluated.length > 0 && (
-                  <div className="mt-4">
-                    <h4 className="text-sm font-medium text-neutral-700 mb-2">
-                      Content Evaluated Today:
-                    </h4>
-                    <div className="space-y-2">
-                      {todaysStats.contentEvaluated.map((content, index) => (
-                        <div
-                          key={index}
-                          className="flex items-center justify-between bg-neutral-50 p-2 rounded"
-                        >
-                          <div className="flex items-center gap-2">
-                            {content.type === "photo" ? (
-                              <Image className="h-4 w-4 text-blue-500" />
-                            ) : (
-                              <Video className="h-4 w-4 text-red-500" />
-                            )}
-                            <span className="text-sm capitalize">
-                              {content.type} #{content.contentId}
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-medium text-green-600">
-                              +${content.earning}
-                            </span>
-                            <span className="text-xs text-neutral-500">
-                              {formatTime(content.completedAt)}
-                            </span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Daily History */}
-        <Card className="border border-neutral-200 mb-6">
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <TrendingUp className="h-5 w-5 text-primary" />
-              Daily History
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {sortedDailyStats.length > 0 ? (
-              <div className="space-y-3">
-                {sortedDailyStats.slice(0, 7).map((day, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between p-3 bg-neutral-50 rounded-lg"
-                  >
-                    <div>
-                      <div className="font-medium text-neutral-800">
-                        {formatDate(day.date)}
-                      </div>
-                      <div className="text-sm text-neutral-600">
-                        {day.evaluationsCount} evaluation
-                        {day.evaluationsCount !== 1 ? "s" : ""}
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="font-semibold text-green-600">
-                        ${day.earnings}
-                      </div>
-                      <div className="text-xs text-neutral-500">
-                        {
-                          day.contentEvaluated.filter((c) => c.type === "photo")
-                            .length
-                        }{" "}
-                        photos,{" "}
-                        {
-                          day.contentEvaluated.filter((c) => c.type === "video")
-                            .length
-                        }{" "}
-                        videos
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-center text-neutral-500 py-8">
-                No evaluation history yet
-              </p>
-            )}
           </CardContent>
         </Card>
 
@@ -387,7 +270,7 @@ export default function Wallet() {
                           {transaction.description}
                         </div>
                         <div className="text-sm text-neutral-600">
-                          {formatDate(transaction.date)}
+                          {formatDate(transaction.createdAt)}
                         </div>
                       </div>
                     </div>
@@ -396,7 +279,7 @@ export default function Wallet() {
                         +${transaction.amount}
                       </div>
                       <div className="text-xs text-neutral-500">
-                        {formatTime(transaction.date)}
+                        {formatTime(transaction.createdAt)}
                       </div>
                     </div>
                   </div>

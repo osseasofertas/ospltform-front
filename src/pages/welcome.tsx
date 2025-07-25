@@ -1,69 +1,9 @@
-import { useState } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
-import { useToast } from "@/hooks/use-toast";
-import { useAppState } from "@/hooks/use-app-state";
 
 export default function Welcome() {
   const [, setLocation] = useLocation();
-  const { toast } = useToast();
-  const { setUser } = useAppState();
-  const [isLoading, setIsLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    email: "",
-  });
-
-  // Popular email domains for English-speaking countries
-  const emailMasks = [
-    "@gmail.com",
-    "@yahoo.com",
-    "@outlook.com",
-    "@hotmail.com",
-    "@icloud.com",
-    "@aol.com",
-    "@protonmail.com",
-  ];
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-
-    // Check if login is blocked due to recent logout (global block for ANY email)
-    const { isLoginBlocked, getDaysUntilLoginAllowed } = useAppState.getState();
-
-    if (isLoginBlocked()) {
-      const daysRemaining = getDaysUntilLoginAllowed();
-      toast({
-        title: "Login Blocked",
-        description: `For security reasons, login is blocked for ${daysRemaining} more days after logout.`,
-        variant: "destructive",
-      });
-      setIsLoading(false);
-      return;
-    }
-
-    // Frontend-only login - create user profile from email
-    const newUser = {
-      id: Date.now(), // Generate unique ID
-      name: formData.email.split("@")[0], // Use email username as name
-      email: formData.email,
-      balance: "50.00", // Default starting balance
-      registrationDate: new Date().toISOString(),
-      isDemo: false,
-      dailyEvaluationsUsed: 0,
-    };
-
-    setUser(newUser);
-    toast({
-      title: "Welcome!",
-      description: "You've successfully logged in",
-    });
-    setLocation("/main");
-    setIsLoading(false);
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary to-secondary p-6 flex flex-col justify-center">
@@ -78,61 +18,25 @@ export default function Welcome() {
             />
           </div>
           <h1 className="text-3xl font-bold text-white mb-2">
-            Welcome to OnlyCash
+            Bem-vindo ao OnlyCash
           </h1>
-          <p className="text-white/90 text-lg">Log in to your account</p>
+          <p className="text-white/90 text-lg">Acesse ou crie sua conta</p>
         </div>
-
-        {/* Form */}
         <Card className="bg-white rounded-2xl shadow-xl">
-          <CardContent className="p-6">
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <Label
-                  htmlFor="email"
-                  className="block text-sm font-medium text-neutral-700 mb-2"
-                >
-                  Email
-                </Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) =>
-                    setFormData({ ...formData, email: e.target.value })
-                  }
-                  placeholder="your@email.com"
-                  className="w-full px-4 py-3 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                  required
-                />
-                <p className="text-xs text-neutral-500 mt-1">
-                  Fill in with your payment email
-                </p>
-                <div className="flex flex-wrap gap-1 mt-2">
-                  {emailMasks.map((mask) => (
-                    <button
-                      key={mask}
-                      type="button"
-                      onClick={() => {
-                        const username = formData.email.split("@")[0];
-                        setFormData({ ...formData, email: username + mask });
-                      }}
-                      className="px-2 py-1 text-xs bg-neutral-100 text-neutral-600 rounded hover:bg-neutral-200 transition-colors"
-                    >
-                      {mask}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
+          <CardContent className="p-6 flex flex-col gap-4">
+            <Button
+              className="w-full bg-primary text-white py-3 px-6 rounded-lg font-semibold text-lg hover:bg-primary/90 shadow-lg"
+              onClick={() => setLocation("/login")}
+            >
+              Entrar
+            </Button>
               <Button
-                type="submit"
-                disabled={isLoading}
-                className="w-full bg-primary text-white py-3 px-6 rounded-lg font-semibold text-lg hover:bg-primary/90 shadow-lg"
+              variant="outline"
+              className="w-full py-3 px-6 rounded-lg font-semibold text-lg"
+              onClick={() => setLocation("/register")}
               >
-                {isLoading ? "Loading..." : "Log in"}
+              Cadastrar
               </Button>
-            </form>
           </CardContent>
         </Card>
       </div>

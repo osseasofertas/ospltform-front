@@ -14,51 +14,53 @@ import { useAppState } from "@/hooks/use-app-state";
 import { useLocation } from "wouter";
 import { AppContent } from "@/types";
 import ContentCard from "@/components/content-card";
+import { useEffect, useState } from "react";
 
 export default function Main() {
   const {
     user,
-    setCurrentContent,
-    userStats,
-    resetDailyEvaluationsIfNeeded,
-    userLoginDate,
+    evaluations,
+    fetchEvaluations,
+    stats,
+    fetchStats,
   } = useAppState();
   const [, setLocation] = useLocation();
+  const [currentContent, setCurrentContent] = useState<AppContent | null>(null);
 
-  // Get evaluated content IDs
-  const evaluatedIds = new Set(
-    useAppState.getState().completedEvaluations.map((e) => e.contentId)
-  );
+  useEffect(() => {
+    fetchEvaluations();
+    fetchStats();
+  }, [fetchEvaluations, fetchStats]);
 
-  // Reset daily evaluations if it's a new day
-  resetDailyEvaluationsIfNeeded();
-
-  // Frontend-only content - rotates every 7 days based on user's login date
-  const content = getTodaysContent(userLoginDate).filter(
-    (item) => !evaluatedIds.has(item.id)
-  );
-  const isLoading = false;
-
-  // Check daily limit locally
-  const isDailyLimitReached = userStats.todayEvaluations >= 10;
+  // Fallbacks para garantir que a página nunca quebre
+  const todayEvaluations = stats?.todayEvaluations ?? 0;
+  const isDailyLimitReached = todayEvaluations >= 10;
+  const evaluatedIds = new Set((evaluations ?? []).map((e) => e.productId));
+  const content = user
+    ? getTodaysContent(user.registrationDate).filter(
+        (item) => !evaluatedIds.has(item.id)
+      )
+    : [];
 
   const handleContentSelect = (selectedContent: AppContent) => {
     setCurrentContent(selectedContent);
     setLocation("/evaluation");
   };
 
-  if (isLoading) {
+  if (!user) return null;
+
+  // Loading visual só se stats estiver carregando pela primeira vez
+  if (!stats && todayEvaluations === 0 && !isDailyLimitReached) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-neutral-600">Loading products...</p>
+          <p className="text-neutral-600">Loading...</p>
         </div>
       </div>
     );
   }
 
-  // Handle daily limit reached
   if (isDailyLimitReached) {
     return (
       <div className="min-h-screen bg-neutral-50">
@@ -155,7 +157,7 @@ export default function Main() {
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-medium">Daily progress</span>
               <span className="text-sm">
-                {userStats.todayEvaluations}/10 evaluations
+                {todayEvaluations}/10 evaluations
               </span>
             </div>
             <div className="w-full bg-white/20 rounded-full h-2 mb-2">
@@ -163,17 +165,17 @@ export default function Main() {
                 className="bg-white rounded-full h-2 transition-all duration-300"
                 style={{
                   width: `${Math.min(
-                    (userStats.todayEvaluations / 10) * 100,
+                    (todayEvaluations / 10) * 100,
                     100
                   )}%`,
                 }}
               ></div>
             </div>
             <div className="flex justify-between text-xs text-white/80">
-              <span>Completed: {userStats.todayEvaluations}</span>
-              <span>Remaining: {10 - userStats.todayEvaluations}</span>
+              <span>Completed: {todayEvaluations}</span>
+              <span>Remaining: {10 - todayEvaluations}</span>
             </div>
-            {userStats.todayEvaluations >= 10 && (
+            {todayEvaluations >= 10 && (
               <div className="mt-2 text-center">
                 <span className="text-xs bg-white/30 px-2 py-1 rounded-full">
                   🎉 Daily limit reached!
