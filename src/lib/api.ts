@@ -1,10 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  // Use Vercel proxy in production, direct URL in development
-  baseURL: import.meta.env.PROD 
-    ? '/api' 
-    : 'https://platform-production-f017.up.railway.app',
+  baseURL: 'https://platform-production-f017.up.railway.app',
 });
 
 api.interceptors.request.use((config) => {
