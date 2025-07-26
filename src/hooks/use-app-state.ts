@@ -106,16 +106,15 @@ export const useAppState = create<AppState>()(
         set({ currentContent: content });
       },
 
-      completeEvaluation: async (contentId, contentType, earning) => {
+      completeEvaluation: async (contentId: number, contentType: string, earning: string) => {
         console.log("completeEvaluation called with:", { contentId, contentType, earning });
         
         try {
-          // Send evaluation data to backend matching the schema
+          // Save evaluation to backend
           const evaluationData = {
             contentId: contentId,
             type: contentType,
             earning: parseFloat(earning),
-            completedAt: new Date().toISOString(),
           };
           
           console.log("Sending evaluation data to backend:", evaluationData);
@@ -131,13 +130,13 @@ export const useAppState = create<AppState>()(
               productId: contentId,
               currentStage: contentType === "photo" ? 3 : 1,
               completed: true,
-              totalEarned: earning,
+              totalEarned: earning, // This should be the exact earning value
               startedAt: new Date().toISOString(),
               completedAt: new Date().toISOString(),
               answers: {},
             };
 
-            console.log("Creating new evaluation:", newEvaluation);
+            console.log("Creating new evaluation with totalEarned:", newEvaluation.totalEarned);
             console.log("Current evaluations count:", state.evaluations.length);
 
             const updatedState = {
@@ -153,7 +152,7 @@ export const useAppState = create<AppState>()(
               } : null,
             };
 
-            console.log("Updated state:", updatedState);
+            console.log("Updated state with new evaluation:", updatedState);
             return updatedState;
           });
           
@@ -175,11 +174,13 @@ export const useAppState = create<AppState>()(
               productId: contentId,
               currentStage: contentType === "photo" ? 3 : 1,
               completed: true,
-              totalEarned: earning,
+              totalEarned: earning, // This should be the exact earning value
               startedAt: new Date().toISOString(),
               completedAt: new Date().toISOString(),
               answers: {},
             };
+
+            console.log("Creating local evaluation with totalEarned:", newEvaluation.totalEarned);
 
             return {
               evaluations: [...state.evaluations, newEvaluation],

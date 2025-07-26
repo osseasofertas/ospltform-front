@@ -6,12 +6,31 @@ import { useAppState } from "@/hooks/use-app-state";
 
 export default function Results() {
   const [, setLocation] = useLocation();
-  const { user, currentContent } = useAppState();
+  const { user, currentContent, evaluations } = useAppState();
 
-  // Get the actual earning from the completed evaluation
-  const actualEarning = currentContent ? 
-    (parseFloat(currentContent.minEarning) + Math.random() * (parseFloat(currentContent.maxEarning) - parseFloat(currentContent.minEarning))).toFixed(2) : 
-    "3.25";
+  // Get the actual earning from the most recent completed evaluation
+  const getActualEarning = () => {
+    if (!evaluations || evaluations.length === 0) {
+      return "0.00";
+    }
+    
+    // Get the most recent completed evaluation
+    const recentEvaluation = evaluations
+      .filter(evaluation => evaluation.completed)
+      .sort((a, b) => new Date(b.completedAt || new Date()).getTime() - new Date(a.completedAt || new Date()).getTime())[0];
+    
+    if (recentEvaluation) {
+      console.log("Most recent evaluation:", recentEvaluation);
+      return recentEvaluation.totalEarned || "0.00";
+    }
+    
+    // Fallback to currentContent calculation if no evaluation found
+    return currentContent ? 
+      (parseFloat(currentContent.minEarning) + Math.random() * (parseFloat(currentContent.maxEarning) - parseFloat(currentContent.minEarning))).toFixed(2) : 
+      "0.00";
+  };
+
+  const actualEarning = getActualEarning();
 
   // Calculate stage earnings for photos (ensure sum equals total)
   const totalEarning = parseFloat(actualEarning);
