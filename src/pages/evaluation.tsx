@@ -26,7 +26,7 @@ export default function Evaluation() {
 
   useEffect(() => {
     if (!currentContent || !user) {
-      setLocation("/");
+      setLocation("/main");
       return;
     }
     
@@ -201,7 +201,7 @@ export default function Evaluation() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => setLocation("/")}
+            onClick={() => setLocation("/main")}
             className="p-1"
           >
             <ArrowLeft className="h-5 w-5" />
