@@ -71,10 +71,10 @@ export default function Wallet() {
         return "Invalid Date";
       }
       return date.toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      });
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
     } catch (error) {
       return "Invalid Date";
     }
@@ -87,9 +87,9 @@ export default function Wallet() {
         return "Invalid Time";
       }
       return date.toLocaleTimeString("en-US", {
-        hour: "2-digit",
-        minute: "2-digit",
-      });
+      hour: "2-digit",
+      minute: "2-digit",
+    });
     } catch (error) {
       return "Invalid Time";
     }

@@ -22,7 +22,9 @@ export default function Main() {
     user,
     transactions,
     evaluations,
+    fetchUser,
     fetchEvaluations,
+    fetchTransactions,
     stats,
     fetchStats,
     setCurrentContent,
@@ -31,9 +33,19 @@ export default function Main() {
   const [, setLocation] = useLocation();
 
   useEffect(() => {
-    fetchEvaluations();
-    fetchStats();
-  }, [fetchEvaluations, fetchStats]);
+    console.log("=== Main page - Loading data ===");
+    console.log("Main page - User logged in:", !!user);
+    
+    if (user) {
+      fetchEvaluations();
+      fetchStats();
+      fetchTransactions();
+      console.log("=== Main page - Data loading initiated ===");
+    } else {
+      console.log("=== Main page - User not logged in, fetching user first ===");
+      fetchUser();
+    }
+  }, [fetchUser, fetchEvaluations, fetchStats, fetchTransactions, user]);
 
   // Fallbacks to ensure the page never breaks
   const todayEvaluations = stats?.todayEvaluations ?? 0;
@@ -54,6 +66,7 @@ export default function Main() {
     console.log("Main page - User balance (backend):", user?.balance);
     console.log("Main page - Calculated balance (transactions):", calculatedBalance);
     console.log("Main page - Transactions count:", transactions?.length);
+    console.log("Main page - Transactions loaded:", !!transactions);
     console.log("Main page - User registration date:", user?.registrationDate);
     console.log("Main page - User evaluation limit:", user?.evaluationLimit);
     console.log("Main page - Current evaluations:", evaluations);

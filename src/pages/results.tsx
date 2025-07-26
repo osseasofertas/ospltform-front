@@ -79,16 +79,16 @@ export default function Results() {
             <div className="space-y-2 text-white/90">
               {currentContent?.type === "photo" ? (
                 <>
-                  <div className="flex justify-between items-center">
-                    <span>Stage 1 completed</span>
+              <div className="flex justify-between items-center">
+                <span>Stage 1 completed</span>
                     <span>${stage1Earning}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span>Stage 2 completed</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span>Stage 2 completed</span>
                     <span>${stage2Earning}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span>Stage 3 completed</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span>Stage 3 completed</span>
                     <span>${stage3Earning}</span>
                   </div>
                 </>
@@ -96,7 +96,7 @@ export default function Results() {
                 <div className="flex justify-between items-center">
                   <span>Video evaluation completed</span>
                   <span>${actualEarning}</span>
-                </div>
+              </div>
               )}
               <div className="border-t border-white/20 pt-2 mt-2">
                 <div className="flex justify-between items-center text-white font-semibold">

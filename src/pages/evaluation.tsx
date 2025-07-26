@@ -111,14 +111,14 @@ export default function Evaluation() {
       // Complete evaluation (now async)
       await completeEvaluation(currentContent.id, currentContent.type, earning);
       await incrementDailyEvaluations();
-      
-      setEarnings(earning);
-      setShowCompletionModal(true);
-      
-      toast({
-        title: "Evaluation completed!",
-        description: `You earned $${earning} for this evaluation`,
-      });
+    
+    setEarnings(earning);
+    setShowCompletionModal(true);
+    
+    toast({
+      title: "Evaluation completed!",
+      description: `You earned $${earning} for this evaluation`,
+    });
     } catch (error) {
       console.error("Error completing evaluation:", error);
       toast({
