@@ -31,7 +31,14 @@ export default function Login() {
         localStorage.setItem("access_token", response.data.access_token);
         // Fetch the authenticated user data and update the global state
         await fetchUser();
-        setLocation("/main");
+        
+        // Check if user is verified
+        const userData = await api.get("/user/me");
+        if (userData.data && !userData.data.isVerified) {
+          setLocation("/verification");
+        } else {
+          setLocation("/main");
+        }
       } else {
         console.log("Login response:", response.data);
         setError("Login completed but no token received. Please try again.");

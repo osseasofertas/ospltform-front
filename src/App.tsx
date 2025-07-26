@@ -11,7 +11,9 @@ import Support from "@/pages/support";
 import LimitUpgrade from "@/pages/limit-upgrade";
 import Payment from "@/pages/payment";
 import PaymentSuccess from "@/pages/payment-success";
+import Verification from "@/pages/verification";
 import BottomNavigation from "@/components/bottom-navigation";
+import ProtectedRoute from "@/components/protected-route";
 import { useAppState } from "@/hooks/use-app-state";
 import NotFound from "@/pages/not-found";
 import Login from "@/pages/login";
@@ -36,6 +38,7 @@ function Router() {
         <Route path="/limit-upgrade" component={user ? LimitUpgrade : Login} />
         <Route path="/payment" component={user ? Payment : Login} />
         <Route path="/payment-success" component={PaymentSuccess} />
+        <Route path="/verification" component={user ? Verification : Login} />
         <Route component={NotFound} />
       </Switch>
       {user && <BottomNavigation />}

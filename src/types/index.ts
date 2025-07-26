@@ -4,6 +4,7 @@ export interface AppUser {
   email: string;
   balance: string;
   evaluationLimit: number; // Add evaluation limit from database
+  isVerified: boolean;
   registrationDate: string;
   dailyEvaluationsUsed: number;
   isDemo: boolean;

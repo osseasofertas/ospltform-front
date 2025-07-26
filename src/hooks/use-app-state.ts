@@ -30,6 +30,7 @@ interface AppState {
   updateUserBalance: (earning: string) => Promise<void>;
   createTransaction: (type: string, amount: string, description: string) => Promise<void>;
   updateEvaluationLimit: (newLimit: number) => Promise<void>;
+  updateVerification: (file: File) => Promise<void>;
   ensureEvaluationLimit: (user: any) => any;
   checkLocalStorage: () => void;
   logout: () => void;
@@ -474,6 +475,40 @@ export const useAppState = create<AppState>()(
           
           console.log("=== updateEvaluationLimit FALLBACK SUCCESS ===");
         }
+  },
+
+  updateVerification: async (file: File) => {
+    try {
+      console.log("=== updateVerification START ===");
+      console.log("Uploading verification document:", file.name);
+      
+      const formData = new FormData();
+      formData.append('document', file);
+      
+      const response = await api.post("/user/verification", formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      
+      console.log("Backend verification upload response:", response.data);
+      
+      // Update local user state to mark as pending verification
+      set((state) => {
+        const updatedUser = state.user ? {
+          ...state.user,
+          isVerified: false, // Still false until admin approves
+        } : null;
+        
+        return { user: updatedUser };
+      });
+      
+      console.log("=== updateVerification SUCCESS ===");
+    } catch (error) {
+      console.error("=== updateVerification ERROR ===");
+      console.error("Error uploading verification document:", error);
+      throw error; // Re-throw to let the component handle the error
+    }
   },
 
   logout: () => {
