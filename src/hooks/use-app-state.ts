@@ -489,13 +489,10 @@ export const useAppState = create<AppState>()(
       
       console.log("Document upload simulated successfully");
       
-      // Register the upload date in backend
+      // Register the upload date locally (no backend call)
       const verifiedDate = new Date().toISOString();
-      await api.patch("/api/user/verified-date", {
-        verifiedDate: verifiedDate
-      });
       
-      console.log("Document upload date registered in backend:", verifiedDate);
+      console.log("Document upload date registered locally:", verifiedDate);
       
       // Update local user state to mark as pending verification
       set((state) => {
@@ -520,12 +517,10 @@ export const useAppState = create<AppState>()(
     try {
       console.log("=== updateUserVerification START ===");
       
-      // Update verification status in backend
-      const response = await api.patch("/api/user/verify", { 
-        isVerified: true 
-      });
+      // Simulate backend call delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      console.log("Backend verification status update response:", response.data);
+      console.log("Verification status update simulated successfully");
       
       // Update local user state
       set((state) => {
