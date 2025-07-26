@@ -23,16 +23,47 @@ export default function Login() {
     setError("");
     try {
       // Call the backend login API
-      const { data } = await api.post("/auth/login", formData);
-      // Save the access_token in localStorage
-      localStorage.setItem("access_token", data.access_token);
-      // Fetch the authenticated user data and update the global state
-      await fetchUser();
-      setLocation("/main");
-    } catch (err) {
-      setError("Incorrect email or password.");
+      const response = await api.post("/auth/login", formData);
+      
+      // Check if the response has the expected data structure
+      if (response.data && response.data.access_token) {
+        // Save the access_token in localStorage
+        localStorage.setItem("access_token", response.data.access_token);
+        // Fetch the authenticated user data and update the global state
+        await fetchUser();
+        setLocation("/main");
+      } else {
+        console.log("Login response:", response.data);
+        setError("Login completed but no token received. Please try again.");
+      }
+    } catch (err: any) {
+      console.error("Login error:", err);
+      
+      // Handle different types of errors
+      if (err.response) {
+        // Server responded with error status
+        const status = err.response.status;
+        const data = err.response.data;
+        
+        if (status === 401) {
+          setError("Incorrect email or password.");
+        } else if (status === 400) {
+          setError(data?.message || "Invalid login data. Please check your information.");
+        } else if (status === 422) {
+          setError("Please fill in all required fields correctly.");
+        } else {
+          setError(`Login failed (${status}). Please try again.`);
+        }
+      } else if (err.request) {
+        // Network error
+        setError("Network error. Please check your connection and try again.");
+      } else {
+        // Other error
+        setError("An unexpected error occurred. Please try again.");
+      }
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   return (

@@ -22,15 +22,48 @@ export default function Register() {
     e.preventDefault();
     setIsLoading(true);
     setError("");
+    
     try {
-      const { data } = await api.post("/auth/register", formData);
-      localStorage.setItem("access_token", data.access_token);
-      await fetchUser();
-      setLocation("/main");
-    } catch (err) {
-      setError("Error registering. Try another email.");
+      const response = await api.post("/auth/register", formData);
+      
+      // Check if the response has the expected data structure
+      if (response.data && response.data.access_token) {
+        localStorage.setItem("access_token", response.data.access_token);
+        await fetchUser();
+        setLocation("/main");
+      } else {
+        // If no access_token but request was successful, user might already be logged in
+        console.log("Registration response:", response.data);
+        setError("Registration completed but no token received. Please try logging in.");
+      }
+    } catch (err: any) {
+      console.error("Registration error:", err);
+      
+      // Handle different types of errors
+      if (err.response) {
+        // Server responded with error status
+        const status = err.response.status;
+        const data = err.response.data;
+        
+        if (status === 409) {
+          setError("Email already exists. Please use a different email or try logging in.");
+        } else if (status === 400) {
+          setError(data?.message || "Invalid registration data. Please check your information.");
+        } else if (status === 422) {
+          setError("Please fill in all required fields correctly.");
+        } else {
+          setError(`Registration failed (${status}). Please try again.`);
+        }
+      } else if (err.request) {
+        // Network error
+        setError("Network error. Please check your connection and try again.");
+      } else {
+        // Other error
+        setError("An unexpected error occurred. Please try again.");
+      }
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   return (
