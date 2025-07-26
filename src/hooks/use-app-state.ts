@@ -491,7 +491,7 @@ export const useAppState = create<AppState>()(
       
       // Register the upload date in backend
       const verifiedDate = new Date().toISOString();
-      await api.patch("/user/verified-date", {
+      await api.patch("/api/user/verified-date", {
         verifiedDate: verifiedDate
       });
       
@@ -521,7 +521,7 @@ export const useAppState = create<AppState>()(
       console.log("=== updateUserVerification START ===");
       
       // Update verification status in backend
-      const response = await api.patch("/user/verify", { 
+      const response = await api.patch("/api/user/verify", { 
         isVerified: true 
       });
       
