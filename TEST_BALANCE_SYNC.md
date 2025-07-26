@@ -10,7 +10,9 @@ Abra o DevTools (F12) e verifique os logs:
 
 ```javascript
 // Logs esperados:
-"Main page - User balance: 50.00";
+"Main page - User balance (backend): 50.00";
+"Main page - Calculated balance (transactions): 50";
+"Main page - Transactions count: 1";
 "Main page - User info: {id: 1, name: '...', balance: '50.00', ...}";
 ```
 
@@ -18,8 +20,9 @@ Abra o DevTools (F12) e verifique os logs:
 
 ```javascript
 // Logs esperados:
-"Wallet page - User balance: 50.00";
-"Wallet page - Calculated balance: 50";
+"Wallet page - User balance (backend): 50.00";
+"Wallet page - Calculated balance (transactions): 50";
+"Wallet page - Transactions count: 1";
 ```
 
 ### 2. **Teste Manual**
@@ -99,9 +102,9 @@ curl -X GET https://platform-production-f017.up.railway.app/user/me \
 
 #### **Verificação**:
 
-- Página principal: `user?.balance`
-- Wallet: `parseFloat(user?.balance || "0")`
-- Ambos devem mostrar o mesmo valor
+- Página principal: `transactions.reduce((sum, t) => sum + Number(t.amount), 0)`
+- Wallet: `transactions.reduce((sum, t) => sum + Number(t.amount), 0)`
+- Ambos devem mostrar o mesmo valor (calculado a partir das transações)
 
 ### 8. **Comando SQL para Verificar**
 

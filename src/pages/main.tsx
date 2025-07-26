@@ -20,6 +20,7 @@ import { useEffect, useState } from "react";
 export default function Main() {
   const {
     user,
+    transactions,
     evaluations,
     fetchEvaluations,
     stats,
@@ -47,8 +48,12 @@ export default function Main() {
 
   // Debug logs
   useEffect(() => {
+    const calculatedBalance = (transactions || []).reduce((sum: number, t: any) => sum + Number(t.amount), 0);
+    
     console.log("=== Main page DEBUG ===");
-    console.log("Main page - User balance:", user?.balance);
+    console.log("Main page - User balance (backend):", user?.balance);
+    console.log("Main page - Calculated balance (transactions):", calculatedBalance);
+    console.log("Main page - Transactions count:", transactions?.length);
     console.log("Main page - User registration date:", user?.registrationDate);
     console.log("Main page - User evaluation limit:", user?.evaluationLimit);
     console.log("Main page - Current evaluations:", evaluations);
@@ -74,7 +79,7 @@ export default function Main() {
     // Debug user info
     console.log("Main page - User info:", user);
     console.log("=== Main page DEBUG END ===");
-  }, [evaluations, evaluatedIds, content, user?.registrationDate, user, todayEvaluations, isDailyLimitReached]);
+  }, [evaluations, evaluatedIds, content, user?.registrationDate, user, todayEvaluations, isDailyLimitReached, transactions]);
 
   const handleContentSelect = (selectedContent: AppContent) => {
     setCurrentContent(selectedContent);
@@ -182,7 +187,7 @@ export default function Main() {
               </p>
             </div>
             <div className="text-right">
-              <p className="text-2xl font-bold">${user?.balance || "0.00"}</p>
+              <p className="text-2xl font-bold">${(transactions || []).reduce((sum: number, t: any) => sum + Number(t.amount), 0).toFixed(2)}</p>
               <p className="text-white/80 text-xs">Available balance</p>
             </div>
           </div>
