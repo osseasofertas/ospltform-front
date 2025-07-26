@@ -41,6 +41,13 @@ export default function Wallet() {
     fetchEvaluations();
   }, [fetchStats, fetchTransactions, fetchEvaluations]);
 
+  // Debug logs
+  useEffect(() => {
+    console.log("Wallet page - Current evaluations:", evaluations);
+    console.log("Wallet page - Current stats:", stats);
+    console.log("Wallet page - Current transactions:", transactions);
+  }, [evaluations, stats, transactions]);
+
   const handleBack = () => {
     setLocation("/main");
   };

@@ -95,6 +95,8 @@ export const useAppState = create<AppState>()(
       },
 
       completeEvaluation: (contentId, contentType, earning) => {
+        console.log("completeEvaluation called with:", { contentId, contentType, earning });
+        
         set((state) => {
           const newEvaluation = {
             id: Date.now(), // Generate a unique ID
@@ -108,7 +110,10 @@ export const useAppState = create<AppState>()(
             answers: {},
           };
 
-          return {
+          console.log("Creating new evaluation:", newEvaluation);
+          console.log("Current evaluations count:", state.evaluations.length);
+
+          const updatedState = {
             evaluations: [...state.evaluations, newEvaluation],
             stats: state.stats ? {
               ...state.stats,
@@ -116,6 +121,9 @@ export const useAppState = create<AppState>()(
               totalEarned: (parseFloat(state.stats.totalEarned || "0") + parseFloat(earning)).toFixed(2),
             } : null,
           };
+
+          console.log("Updated state:", updatedState);
+          return updatedState;
         });
       },
 

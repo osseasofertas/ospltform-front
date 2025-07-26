@@ -75,6 +75,7 @@ export default function Evaluation() {
   };
 
   const handleComplete = () => {
+    console.log("handleComplete called with currentContent:", currentContent);
     if (!currentContent || !user) return;
 
     // For videos, check rating and feedback
@@ -102,6 +103,9 @@ export default function Evaluation() {
     const minEarning = parseFloat(currentContent.minEarning);
     const maxEarning = parseFloat(currentContent.maxEarning);
     const earning = (minEarning + (Math.random() * (maxEarning - minEarning))).toFixed(2);
+    
+    console.log("Calculated earning:", earning);
+    console.log("Calling completeEvaluation with:", { contentId: currentContent.id, contentType: currentContent.type, earning });
     
     // Complete evaluation
     completeEvaluation(currentContent.id, currentContent.type, earning);
