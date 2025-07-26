@@ -22,15 +22,15 @@ export default function Login() {
     setIsLoading(true);
     setError("");
     try {
-      // Chama a API de login do back-end
+      // Call the backend login API
       const { data } = await api.post("/auth/login", formData);
-      // Salva o access_token no localStorage
+      // Save the access_token in localStorage
       localStorage.setItem("access_token", data.access_token);
-      // Busca os dados do usuário autenticado e atualiza o estado global
+      // Fetch the authenticated user data and update the global state
       await fetchUser();
       setLocation("/main");
     } catch (err) {
-      setError("Email ou senha incorretos.");
+      setError("Incorrect email or password.");
     }
     setIsLoading(false);
   };
@@ -42,27 +42,27 @@ export default function Login() {
           <div className="bg-white rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4 shadow-lg">
             <img src="/onlylogo.png" alt="OnlyCash Logo" className="w-12 h-12 object-contain" />
           </div>
-          <h1 className="text-3xl font-bold text-white mb-2">Entrar</h1>
-          <p className="text-white/90 text-lg">Acesse sua conta</p>
+          <h1 className="text-3xl font-bold text-white mb-2">Login</h1>
+          <p className="text-white/90 text-lg">Access your account</p>
         </div>
         <Card className="bg-white rounded-2xl shadow-xl">
           <CardContent className="p-6">
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <Label htmlFor="email" className="block text-sm font-medium text-neutral-700 mb-2">Email</Label>
-                <Input id="email" type="email" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} placeholder="seu@email.com" required />
+                <Input id="email" type="email" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} placeholder="your@email.com" required />
               </div>
               <div>
-                <Label htmlFor="password" className="block text-sm font-medium text-neutral-700 mb-2">Senha</Label>
-                <Input id="password" type="password" value={formData.password} onChange={e => setFormData({ ...formData, password: e.target.value })} placeholder="Sua senha" required />
+                <Label htmlFor="password" className="block text-sm font-medium text-neutral-700 mb-2">Password</Label>
+                <Input id="password" type="password" value={formData.password} onChange={e => setFormData({ ...formData, password: e.target.value })} placeholder="Your password" required />
               </div>
               {error && <p className="text-red-500 text-sm">{error}</p>}
               <Button type="submit" disabled={isLoading} className="w-full bg-primary text-white py-3 px-6 rounded-lg font-semibold text-lg hover:bg-primary/90 shadow-lg">
-                {isLoading ? "Entrando..." : "Entrar"}
+                {isLoading ? "Logging in..." : "Login"}
               </Button>
               <p className="text-sm text-neutral-500 text-center mt-2">
-                Não tem uma conta?{' '}
-                <span className="text-primary cursor-pointer underline" onClick={() => setLocation('/register')}>Cadastre-se</span>
+                Don't have an account?{' '}
+                <span className="text-primary cursor-pointer underline" onClick={() => setLocation('/register')}>Register</span>
               </p>
             </form>
           </CardContent>

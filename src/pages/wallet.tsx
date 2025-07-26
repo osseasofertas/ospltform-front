@@ -77,17 +77,17 @@ export default function Wallet() {
     });
   };
 
-  // Fallbacks para garantir que a página nunca quebre
+  // Fallbacks to ensure the page never breaks
   const totalEvaluations = stats?.totalEvaluations ?? 0;
   const todayEvaluations = stats?.todayEvaluations ?? 0;
   const totalEarned = stats?.totalEarned ?? "0.00";
 
-  // Ordenar transações por data
+  // Sort transactions by date
   const sortedTransactions = [...(transactions ?? [])].sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
 
-  // Calcular saldo a partir das transações
+  // Calculate balance from transactions
   const balance = transactions.reduce((sum, t) => sum + Number(t.amount), 0);
 
   return (

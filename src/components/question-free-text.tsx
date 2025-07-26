@@ -29,7 +29,7 @@ export default function QuestionFreeText({ question, value, onChange }: Question
       onCut={handleCut}
       rows={4}
       className="w-full p-3 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
-      placeholder="Escribe tu respuesta..."
+      placeholder="Write your answer..."
     />
   );
 }

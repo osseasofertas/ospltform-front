@@ -32,7 +32,7 @@ export default function Main() {
     fetchStats();
   }, [fetchEvaluations, fetchStats]);
 
-  // Fallbacks para garantir que a página nunca quebre
+  // Fallbacks to ensure the page never breaks
   const todayEvaluations = stats?.todayEvaluations ?? 0;
   const isDailyLimitReached = todayEvaluations >= 10;
   const evaluatedIds = new Set((evaluations ?? []).map((e) => e.productId));
@@ -49,7 +49,7 @@ export default function Main() {
 
   if (!user) return null;
 
-  // Loading visual só se stats estiver carregando pela primeira vez
+  // Loading visual only if stats are loading for the first time
   if (!stats && todayEvaluations === 0 && !isDailyLimitReached) {
     return (
       <div className="min-h-screen flex items-center justify-center">

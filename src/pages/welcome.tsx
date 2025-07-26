@@ -18,9 +18,9 @@ export default function Welcome() {
             />
           </div>
           <h1 className="text-3xl font-bold text-white mb-2">
-            Bem-vindo ao OnlyCash
+            Welcome to OnlyCash
           </h1>
-          <p className="text-white/90 text-lg">Acesse ou crie sua conta</p>
+          <p className="text-white/90 text-lg">Access or create your account</p>
         </div>
         <Card className="bg-white rounded-2xl shadow-xl">
           <CardContent className="p-6 flex flex-col gap-4">
@@ -28,14 +28,14 @@ export default function Welcome() {
               className="w-full bg-primary text-white py-3 px-6 rounded-lg font-semibold text-lg hover:bg-primary/90 shadow-lg"
               onClick={() => setLocation("/login")}
             >
-              Entrar
+              Login
             </Button>
               <Button
               variant="outline"
               className="w-full py-3 px-6 rounded-lg font-semibold text-lg"
               onClick={() => setLocation("/register")}
               >
-              Cadastrar
+              Register
               </Button>
           </CardContent>
         </Card>

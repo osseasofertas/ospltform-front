@@ -84,7 +84,7 @@ export default function Support() {
 
           {/* Product Evaluation */}
           <AccordionItem
-            value="evaluacion"
+            value="evaluation"
             className="border border-neutral-200 rounded-lg"
           >
             <AccordionTrigger className="px-4 py-3 hover:no-underline">
@@ -137,7 +137,7 @@ export default function Support() {
 
           {/* My Wallet and Earnings */}
           <AccordionItem
-            value="billetera"
+            value="wallet"
             className="border border-neutral-200 rounded-lg"
           >
             <AccordionTrigger className="px-4 py-3 hover:no-underline">
@@ -207,7 +207,7 @@ export default function Support() {
 
           {/* Profile Management */}
           <AccordionItem
-            value="perfil"
+            value="profile"
             className="border border-neutral-200 rounded-lg"
           >
             <AccordionTrigger className="px-4 py-3 hover:no-underline">
