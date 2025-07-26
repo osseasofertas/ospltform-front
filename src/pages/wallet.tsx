@@ -41,13 +41,6 @@ export default function Wallet() {
     fetchEvaluations();
   }, [fetchStats, fetchTransactions, fetchEvaluations]);
 
-  // Debug logs
-  useEffect(() => {
-    console.log("Wallet page - Current evaluations:", evaluations);
-    console.log("Wallet page - Current stats:", stats);
-    console.log("Wallet page - Current transactions:", transactions);
-  }, [evaluations, stats, transactions]);
-
   const handleBack = () => {
     setLocation("/main");
   };
@@ -99,6 +92,15 @@ export default function Wallet() {
 
   // Calculate balance from transactions
   const balance = transactions.reduce((sum, t) => sum + Number(t.amount), 0);
+
+  // Debug logs
+  useEffect(() => {
+    console.log("Wallet page - Current evaluations:", evaluations);
+    console.log("Wallet page - Current stats:", stats);
+    console.log("Wallet page - Current transactions:", transactions);
+    console.log("Wallet page - Filtered evaluations:", evaluations?.filter(evaluation => evaluation.completed));
+    console.log("Wallet page - Sorted transactions:", sortedTransactions);
+  }, [evaluations, stats, transactions, sortedTransactions]);
 
   return (
     <div className="min-h-screen bg-neutral-50 pb-20">

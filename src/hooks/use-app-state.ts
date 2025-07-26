@@ -28,6 +28,7 @@ interface AppState {
   completeEvaluation: (contentId: number, contentType: string, earning: string) => Promise<void>;
   incrementDailyEvaluations: () => Promise<void>;
   updateUserBalance: (earning: string) => Promise<void>;
+  createTransaction: (type: string, amount: string, description: string) => Promise<void>;
   logout: () => void;
 }
 
@@ -149,6 +150,10 @@ export const useAppState = create<AppState>()(
           // Also update user balance in backend
           await get().updateUserBalance(earning);
           
+          // Create transaction for the evaluation
+          const transactionDescription = `${contentType === "photo" ? "Photo" : "Video"} evaluation completed`;
+          await get().createTransaction("evaluation", earning, transactionDescription);
+          
         } catch (error) {
           console.error("Error saving evaluation to backend:", error);
           
@@ -241,6 +246,44 @@ export const useAppState = create<AppState>()(
               ...state.user,
               balance: (parseFloat(state.user.balance || "0") + parseFloat(earning)).toFixed(2),
             } : null,
+          }));
+        }
+      },
+
+      createTransaction: async (type: string, amount: string, description: string) => {
+        try {
+          // Create transaction in backend
+          const transactionData = {
+            type: type,
+            amount: parseFloat(amount),
+            description: description,
+            date: new Date().toISOString(),
+          };
+          
+          console.log("Creating transaction:", transactionData);
+          
+          const response = await api.post("/transactions", transactionData);
+          console.log("Backend transaction response:", response.data);
+          
+          // Update local state
+          set((state) => ({
+            transactions: [...state.transactions, response.data],
+          }));
+        } catch (error) {
+          console.error("Error creating transaction in backend:", error);
+          
+          // Fallback: create only in local state
+          const newTransaction = {
+            id: Date.now(),
+            userId: get().user?.id || 0,
+            type: type,
+            amount: amount,
+            description: description,
+            createdAt: new Date().toISOString(),
+          };
+          
+          set((state) => ({
+            transactions: [...state.transactions, newTransaction],
           }));
         }
       },
