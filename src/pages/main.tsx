@@ -140,7 +140,7 @@ export default function Main() {
                 continue earning money by evaluating products.
               </p>
               <p className="text-sm text-neutral-500">
-                The limit resets at 00:00 hours.
+                The limit resets at midnight (00:00).
               </p>
             </CardContent>
           </Card>

@@ -110,8 +110,31 @@ export const useAppState = create<AppState>()(
         set({ loading: true });
         try {
           const { data } = await api.get("/stats/summary");
-          set({ stats: data, loading: false });
+          console.log("Fetched stats from backend:", data);
+          
+          // Check if it's a new day (midnight reset)
+          const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+          const lastEvaluationDate = data?.lastEvaluationDate; // This should be set by backend
+          
+          console.log("Today's date:", today);
+          console.log("Last evaluation date from backend:", lastEvaluationDate);
+          
+          // Reset daily count if it's a new day
+          let todayEvaluations = data?.todayEvaluations || 0;
+          if (lastEvaluationDate && lastEvaluationDate !== today) {
+            console.log("New day detected, resetting daily count");
+            todayEvaluations = 0;
+          }
+          
+          const updatedStats = {
+            ...data,
+            todayEvaluations,
+          };
+          
+          console.log("Updated stats with daily limit:", updatedStats);
+          set({ stats: updatedStats, loading: false });
         } catch (error) {
+          console.error("Error fetching stats:", error);
           set({ loading: false });
         }
       },
@@ -249,8 +272,12 @@ export const useAppState = create<AppState>()(
 
       incrementDailyEvaluations: async () => {
         try {
-          // Update daily stats in backend matching the schema
+          // Use current date for midnight reset
           const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+          
+          console.log("Current date for daily stats:", today);
+          
+          // Update daily stats in backend matching the schema
           const dailyStatsData = {
             date: today,
             evaluations: 1, // Increment by 1
