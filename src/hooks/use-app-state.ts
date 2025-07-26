@@ -73,11 +73,18 @@ export const useAppState = create<AppState>()(
       },
 
       fetchEvaluations: async () => {
+        console.log("fetchEvaluations called");
         set({ loading: true });
         try {
           const { data } = await api.get("/evaluations");
           console.log("Fetched evaluations from backend:", data);
-          set({ evaluations: data ?? [], loading: false });
+          console.log("Evaluations data type:", typeof data);
+          console.log("Evaluations is array:", Array.isArray(data));
+          console.log("Evaluations length:", data?.length);
+          
+          const evaluations = data ?? [];
+          console.log("Setting evaluations to:", evaluations);
+          set({ evaluations, loading: false });
         } catch (error) {
           console.error("Error fetching evaluations:", error);
           set({ loading: false });
@@ -129,7 +136,7 @@ export const useAppState = create<AppState>()(
             const newEvaluation = {
               id: response.data.id || Date.now(), // Use backend ID if available
               userId: state.user?.id || 0,
-              productId: contentId,
+              productId: contentId, // This should match the content ID
               currentStage: contentType === "photo" ? 3 : 1,
               completed: true,
               totalEarned: earning, // This should be the exact earning value
@@ -138,11 +145,16 @@ export const useAppState = create<AppState>()(
               answers: {},
             };
 
+            console.log("Creating new evaluation with productId:", newEvaluation.productId);
             console.log("Creating new evaluation with totalEarned:", newEvaluation.totalEarned);
             console.log("Current evaluations count:", state.evaluations.length);
+            console.log("Current evaluations:", state.evaluations);
+
+            const updatedEvaluations = [...state.evaluations, newEvaluation];
+            console.log("Updated evaluations array:", updatedEvaluations);
 
             const updatedState = {
-              evaluations: [...state.evaluations, newEvaluation],
+              evaluations: updatedEvaluations,
               stats: state.stats ? {
                 ...state.stats,
                 totalEvaluations: (state.stats.totalEvaluations || 0) + 1,
@@ -173,7 +185,7 @@ export const useAppState = create<AppState>()(
             const newEvaluation = {
               id: Date.now(),
               userId: state.user?.id || 0,
-              productId: contentId,
+              productId: contentId, // This should match the content ID
               currentStage: contentType === "photo" ? 3 : 1,
               completed: true,
               totalEarned: earning, // This should be the exact earning value
@@ -182,6 +194,7 @@ export const useAppState = create<AppState>()(
               answers: {},
             };
 
+            console.log("Creating local evaluation with productId:", newEvaluation.productId);
             console.log("Creating local evaluation with totalEarned:", newEvaluation.totalEarned);
 
             return {

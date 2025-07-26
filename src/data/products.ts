@@ -1,7 +1,7 @@
 import { AppContent } from "@/types";
 
-// Content rotation system - changes every 7 days
-const CONTENT_ROTATION_DAYS = 7;
+// Content rotation system - changes every day
+const CONTENT_ROTATION_DAYS = 1;
 
 // All available content pool - ready for frontend-only hosting
 const contentPool: AppContent[] = [
@@ -203,7 +203,7 @@ const getContentDay = (userLoginDate: string | null): number => {
   const daysDiff = Math.floor(
     (now.getTime() - loginDate.getTime()) / (1000 * 60 * 60 * 24)
   );
-  return (Math.floor(daysDiff / CONTENT_ROTATION_DAYS) % 2) + 1; // Rotates between day 1 and 2
+  return (daysDiff % 2) + 1; // Rotates between day 1 and 2 daily
 };
 
 export const getAvailableContent = (

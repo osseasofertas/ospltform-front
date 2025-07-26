@@ -56,11 +56,25 @@ export default function Main() {
 
   // Debug logs
   useEffect(() => {
+    console.log("Main page - User registration date:", user?.registrationDate);
     console.log("Main page - Current evaluations:", evaluations);
     console.log("Main page - Evaluated IDs:", Array.from(evaluatedIds));
     console.log("Main page - Available content:", content);
     console.log("Main page - Total content before filter:", getTodaysContent(user?.registrationDate || "").length);
-  }, [evaluations, evaluatedIds, content, user?.registrationDate]);
+    
+    // Debug each content item
+    const allContent = getTodaysContent(user?.registrationDate || "");
+    console.log("Main page - All content items:", allContent.map(item => ({ id: item.id, title: item.title })));
+    
+    // Debug filtering process
+    allContent.forEach(item => {
+      const isEvaluated = evaluatedIds.has(item.id);
+      console.log(`Content ${item.id} (${item.title}): evaluated = ${isEvaluated}`);
+    });
+    
+    // Debug user info
+    console.log("Main page - User info:", user);
+  }, [evaluations, evaluatedIds, content, user?.registrationDate, user]);
 
   const handleContentSelect = (selectedContent: AppContent) => {
     setCurrentContent(selectedContent);
