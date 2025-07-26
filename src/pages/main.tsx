@@ -96,17 +96,8 @@ export default function Main() {
     alert("More evaluations unlocked! You can now continue evaluating.");
   };
 
-  const handleIncreaseLimit = async () => {
-    if (!user) return;
-    
-    const newLimit = user.evaluationLimit + 5; // Increase by 5
-    try {
-      await updateEvaluationLimit(newLimit);
-      alert(`Evaluation limit increased to ${newLimit} per day!`);
-    } catch (error) {
-      console.error("Error increasing evaluation limit:", error);
-      alert("Failed to increase evaluation limit. Please try again.");
-    }
+  const handleIncreaseLimit = () => {
+    setLocation("/limit-upgrade");
   };
 
   if (!user) return null;
@@ -165,7 +156,7 @@ export default function Main() {
                 onClick={handleIncreaseLimit}
                 className="w-full bg-primary text-white py-2 px-4 rounded-lg font-semibold hover:bg-primary/90"
               >
-                Increase Daily Limit (+5)
+                Upgrade Daily Limit
               </Button>
             </CardContent>
           </Card>

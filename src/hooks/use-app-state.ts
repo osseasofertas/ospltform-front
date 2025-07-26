@@ -387,16 +387,30 @@ export const useAppState = create<AppState>()(
 
       updateEvaluationLimit: async (newLimit: number) => {
         try {
-          const response = await api.patch("/user/evaluation-limit", { evaluationLimit: newLimit });
+          console.log("Updating evaluation limit to:", newLimit);
+          const response = await api.patch("/user/evaluation-limit", { 
+            evaluationLimit: parseInt(newLimit.toString()) 
+          });
           console.log("Backend evaluation limit update response:", response.data);
+          
+          // Update local user state
           set((state) => ({
             user: state.user ? {
               ...state.user,
-              evaluationLimit: newLimit,
+              evaluationLimit: parseInt(newLimit.toString()),
             } : null,
           }));
+          
+          console.log("Local user state updated with new limit:", parseInt(newLimit.toString()));
         } catch (error) {
           console.error("Error updating evaluation limit in backend:", error);
+          // Fallback: update only local state
+          set((state) => ({
+            user: state.user ? {
+              ...state.user,
+              evaluationLimit: parseInt(newLimit.toString()),
+            } : null,
+          }));
         }
       },
 

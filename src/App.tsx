@@ -8,6 +8,9 @@ import Results from "@/pages/results";
 import Wallet from "@/pages/wallet";
 import Profile from "@/pages/profile";
 import Support from "@/pages/support";
+import LimitUpgrade from "@/pages/limit-upgrade";
+import Payment from "@/pages/payment";
+import PaymentSuccess from "@/pages/payment-success";
 import BottomNavigation from "@/components/bottom-navigation";
 import { useAppState } from "@/hooks/use-app-state";
 import NotFound from "@/pages/not-found";
@@ -30,6 +33,9 @@ function Router() {
         <Route path="/wallet" component={user ? Wallet : Login} />
         <Route path="/profile" component={user ? Profile : Login} />
         <Route path="/support" component={user ? Support : Login} />
+        <Route path="/limit-upgrade" component={user ? LimitUpgrade : Login} />
+        <Route path="/payment" component={user ? Payment : Login} />
+        <Route path="/payment-success" component={PaymentSuccess} />
         <Route component={NotFound} />
       </Switch>
       {user && <BottomNavigation />}
