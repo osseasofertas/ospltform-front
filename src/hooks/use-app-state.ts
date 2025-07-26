@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 import api from "@/lib/api";
 import type {
   AppUser,
@@ -29,81 +30,123 @@ interface AppState {
   logout: () => void;
 }
 
-export const useAppState = create<AppState>((set) => ({
-  user: null,
-  transactions: [],
-  evaluations: [],
-  stats: null,
-  currentContent: null,
-  loading: false,
-
-  fetchUser: async () => {
-    set({ loading: true });
-    const { data } = await api.get("/user/me");
-    set({ user: data, loading: false });
-  },
-
-  fetchTransactions: async () => {
-    set({ loading: true });
-    const { data } = await api.get("/transactions");
-    set({ transactions: data, loading: false });
-  },
-
-  fetchEvaluations: async () => {
-    set({ loading: true });
-    const { data } = await api.get("/evaluations");
-    set({ evaluations: data ?? [], loading: false });
-  },
-
-  fetchStats: async () => {
-    set({ loading: true });
-    const { data } = await api.get("/stats/summary");
-    set({ stats: data, loading: false });
-    // Para dailyStats:
-    // const { data: daily } = await api.get("/stats/daily");
-    // set({ dailyStats: daily });
-  },
-
-  updatePaypal: async (paypalAccount) => {
-    await api.patch("/user", { paypalAccount });
-    await useAppState.getState().fetchUser();
-  },
-
-  updateBank: async (bankAccount) => {
-    await api.patch("/user", { bankAccount });
-    await useAppState.getState().fetchUser();
-  },
-
-  setCurrentContent: (content) => {
-    set({ currentContent: content });
-  },
-
-  completeEvaluation: (contentId, contentType, earning) => {
-    set((state) => ({
-      evaluations: state.evaluations.map((evaluation) =>
-        evaluation.id === contentId ? { ...evaluation, completed: true, totalEarned: earning } : evaluation
-      ),
-    }));
-  },
-
-  incrementDailyEvaluations: () => {
-    set((state) => ({
-      stats: state.stats ? {
-        ...state.stats,
-        todayEvaluations: (state.stats.todayEvaluations || 0) + 1,
-      } : null,
-    }));
-  },
-
-  logout: () => {
-    localStorage.removeItem("access_token");
-    set({
+export const useAppState = create<AppState>()(
+  persist(
+    (set, get) => ({
       user: null,
       transactions: [],
       evaluations: [],
       stats: null,
       currentContent: null,
       loading: false,
-    });
-  },
-}));
+
+      fetchUser: async () => {
+        set({ loading: true });
+        try {
+          const { data } = await api.get("/user/me");
+          set({ user: data, loading: false });
+        } catch (error) {
+          set({ loading: false });
+        }
+      },
+
+      fetchTransactions: async () => {
+        set({ loading: true });
+        try {
+          const { data } = await api.get("/transactions");
+          set({ transactions: data, loading: false });
+        } catch (error) {
+          set({ loading: false });
+        }
+      },
+
+      fetchEvaluations: async () => {
+        set({ loading: true });
+        try {
+          const { data } = await api.get("/evaluations");
+          set({ evaluations: data ?? [], loading: false });
+        } catch (error) {
+          set({ loading: false });
+        }
+      },
+
+      fetchStats: async () => {
+        set({ loading: true });
+        try {
+          const { data } = await api.get("/stats/summary");
+          set({ stats: data, loading: false });
+        } catch (error) {
+          set({ loading: false });
+        }
+      },
+
+      updatePaypal: async (paypalAccount) => {
+        await api.patch("/user", { paypalAccount });
+        await get().fetchUser();
+      },
+
+      updateBank: async (bankAccount) => {
+        await api.patch("/user", { bankAccount });
+        await get().fetchUser();
+      },
+
+      setCurrentContent: (content) => {
+        set({ currentContent: content });
+      },
+
+      completeEvaluation: (contentId, contentType, earning) => {
+        set((state) => {
+          const newEvaluation = {
+            id: Date.now(), // Generate a unique ID
+            userId: state.user?.id || 0,
+            productId: contentId,
+            currentStage: contentType === "photo" ? 3 : 1,
+            completed: true,
+            totalEarned: earning,
+            startedAt: new Date().toISOString(),
+            completedAt: new Date().toISOString(),
+            answers: {},
+          };
+
+          return {
+            evaluations: [...state.evaluations, newEvaluation],
+            stats: state.stats ? {
+              ...state.stats,
+              totalEvaluations: (state.stats.totalEvaluations || 0) + 1,
+              totalEarned: (parseFloat(state.stats.totalEarned || "0") + parseFloat(earning)).toFixed(2),
+            } : null,
+          };
+        });
+      },
+
+      incrementDailyEvaluations: () => {
+        set((state) => ({
+          stats: state.stats ? {
+            ...state.stats,
+            todayEvaluations: (state.stats.todayEvaluations || 0) + 1,
+          } : null,
+        }));
+      },
+
+      logout: () => {
+        localStorage.removeItem("access_token");
+        set({
+          user: null,
+          transactions: [],
+          evaluations: [],
+          stats: null,
+          currentContent: null,
+          loading: false,
+        });
+      },
+    }),
+    {
+      name: "app-storage",
+      partialize: (state) => ({
+        evaluations: state.evaluations,
+        stats: state.stats,
+        user: state.user,
+      }),
+    }
+  )
+);
