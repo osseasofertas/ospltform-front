@@ -3,10 +3,30 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, Star, Zap } from "lucide-react";
 import { useAppState } from "@/hooks/use-app-state";
+import { useEffect } from "react";
 
 export default function LimitUpgrade() {
   const [, setLocation] = useLocation();
-  const { user } = useAppState();
+  const { user, fetchUser, loading, checkLocalStorage } = useAppState();
+
+  // Debug logs
+  console.log("LimitUpgrade - User data:", user);
+  console.log("LimitUpgrade - User evaluation limit:", user?.evaluationLimit);
+  console.log("LimitUpgrade - Loading state:", loading);
+
+  // Check and fix localStorage on component mount
+  useEffect(() => {
+    console.log("LimitUpgrade - Checking localStorage...");
+    checkLocalStorage();
+  }, [checkLocalStorage]);
+
+  // Fetch user data when component mounts
+  useEffect(() => {
+    if (!user?.evaluationLimit) {
+      console.log("LimitUpgrade - Fetching user data...");
+      fetchUser();
+    }
+  }, [user, fetchUser]);
 
   const handleBack = () => {
     setLocation("/main");
@@ -30,6 +50,18 @@ export default function LimitUpgrade() {
   if (!user) {
     setLocation("/main");
     return null;
+  }
+
+  // Show loading state while fetching user data
+  if (loading && !user?.evaluationLimit) {
+    return (
+      <div className="min-h-screen bg-neutral-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-neutral-600">Loading user data...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -57,11 +89,16 @@ export default function LimitUpgrade() {
           <CardContent>
             <div className="text-center">
               <p className="text-2xl font-bold text-primary">
-                {user.evaluationLimit} evaluations/day
+                {user?.evaluationLimit || 10} evaluations/day
               </p>
               <p className="text-sm text-neutral-600 mt-1">
                 Your current daily limit
               </p>
+              {!user?.evaluationLimit && (
+                <p className="text-xs text-orange-600 mt-1">
+                  Loading from server...
+                </p>
+              )}
             </div>
           </CardContent>
         </Card>

@@ -30,6 +30,8 @@ interface AppState {
   updateUserBalance: (earning: string) => Promise<void>;
   createTransaction: (type: string, amount: string, description: string) => Promise<void>;
   updateEvaluationLimit: (newLimit: number) => Promise<void>;
+  ensureEvaluationLimit: (user: any) => any;
+  checkLocalStorage: () => void;
   logout: () => void;
 }
 
@@ -43,16 +45,39 @@ export const useAppState = create<AppState>()(
       currentContent: null,
       loading: false,
 
+      // Helper function to ensure evaluationLimit is always set
+      ensureEvaluationLimit: (user: any) => {
+        if (user && typeof user.evaluationLimit === 'undefined') {
+          console.log("ensureEvaluationLimit: Adding default evaluationLimit to user");
+          return {
+            ...user,
+            evaluationLimit: 10
+          };
+        }
+        return user;
+      },
+
       fetchUser: async () => {
+        console.log("=== fetchUser START ===");
         set({ loading: true });
         try {
           const { data } = await api.get("/user/me");
-          console.log("Fetched user data:", data);
-          console.log("User evaluation limit:", data?.evaluationLimit);
-          set({ user: data, loading: false });
+          console.log("Fetched user data from backend:", data);
+          console.log("User evaluation limit from backend:", data?.evaluationLimit);
+          
+          // Ensure evaluationLimit has a default value if not provided
+          const userWithDefaultLimit = get().ensureEvaluationLimit(data);
+          
+          console.log("User data with default limit:", userWithDefaultLimit);
+          console.log("Final evaluation limit:", userWithDefaultLimit.evaluationLimit);
+          
+          set({ user: userWithDefaultLimit, loading: false });
+          console.log("=== fetchUser SUCCESS ===");
         } catch (error) {
+          console.error("=== fetchUser ERROR ===");
           console.error("Error fetching user:", error);
           set({ loading: false });
+          console.log("=== fetchUser ERROR END ===");
         }
       },
 
@@ -387,30 +412,47 @@ export const useAppState = create<AppState>()(
 
       updateEvaluationLimit: async (newLimit: number) => {
         try {
+          console.log("=== updateEvaluationLimit START ===");
           console.log("Updating evaluation limit to:", newLimit);
+          
           const response = await api.patch("/user/evaluation-limit", { 
             evaluationLimit: parseInt(newLimit.toString()) 
           });
           console.log("Backend evaluation limit update response:", response.data);
           
-          // Update local user state
-          set((state) => ({
-            user: state.user ? {
+          // Update local user state (this will automatically persist to localStorage)
+          set((state) => {
+            const updatedUser = state.user ? {
               ...state.user,
               evaluationLimit: parseInt(newLimit.toString()),
-            } : null,
-          }));
+            } : null;
+            
+            console.log("Updated user object:", updatedUser);
+            console.log("New evaluation limit in user object:", updatedUser?.evaluationLimit);
+            
+            return { user: updatedUser };
+          });
           
           console.log("Local user state updated with new limit:", parseInt(newLimit.toString()));
+          console.log("=== updateEvaluationLimit SUCCESS ===");
         } catch (error) {
+          console.error("=== updateEvaluationLimit ERROR ===");
           console.error("Error updating evaluation limit in backend:", error);
+          
           // Fallback: update only local state
-          set((state) => ({
-            user: state.user ? {
+          set((state) => {
+            const updatedUser = state.user ? {
               ...state.user,
               evaluationLimit: parseInt(newLimit.toString()),
-            } : null,
-          }));
+            } : null;
+            
+            console.log("Fallback: Updated user object:", updatedUser);
+            console.log("Fallback: New evaluation limit in user object:", updatedUser?.evaluationLimit);
+            
+            return { user: updatedUser };
+          });
+          
+          console.log("=== updateEvaluationLimit FALLBACK SUCCESS ===");
         }
       },
 
@@ -424,6 +466,38 @@ export const useAppState = create<AppState>()(
           currentContent: null,
           loading: false,
         });
+      },
+
+      // Function to check and fix localStorage data
+      checkLocalStorage: () => {
+        try {
+          const storedData = localStorage.getItem("app-storage");
+          if (storedData) {
+            const parsed = JSON.parse(storedData);
+            console.log("Current localStorage data:", parsed);
+            
+            if (parsed.state?.user && typeof parsed.state.user.evaluationLimit === 'undefined') {
+              console.log("Fixing missing evaluationLimit in localStorage");
+              const fixedUser = {
+                ...parsed.state.user,
+                evaluationLimit: 10
+              };
+              
+              const fixedData = {
+                ...parsed,
+                state: {
+                  ...parsed.state,
+                  user: fixedUser
+                }
+              };
+              
+              localStorage.setItem("app-storage", JSON.stringify(fixedData));
+              console.log("Fixed localStorage data:", fixedData);
+            }
+          }
+        } catch (error) {
+          console.error("Error checking localStorage:", error);
+        }
       },
     }),
     {
