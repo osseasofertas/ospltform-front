@@ -29,6 +29,7 @@ interface AppState {
   incrementDailyEvaluations: () => Promise<void>;
   updateUserBalance: (earning: string) => Promise<void>;
   createTransaction: (type: string, amount: string, description: string) => Promise<void>;
+  updateEvaluationLimit: (newLimit: number) => Promise<void>;
   logout: () => void;
 }
 
@@ -381,6 +382,21 @@ export const useAppState = create<AppState>()(
           set((state) => ({
             transactions: [...state.transactions, newTransaction],
           }));
+        }
+      },
+
+      updateEvaluationLimit: async (newLimit: number) => {
+        try {
+          const response = await api.patch("/user/evaluation-limit", { evaluationLimit: newLimit });
+          console.log("Backend evaluation limit update response:", response.data);
+          set((state) => ({
+            user: state.user ? {
+              ...state.user,
+              evaluationLimit: newLimit,
+            } : null,
+          }));
+        } catch (error) {
+          console.error("Error updating evaluation limit in backend:", error);
         }
       },
 

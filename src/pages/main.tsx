@@ -1,6 +1,7 @@
 import { getTodaysContent } from "@/data/products";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Wallet,
   AlertCircle,
@@ -24,6 +25,7 @@ export default function Main() {
     stats,
     fetchStats,
     setCurrentContent,
+    updateEvaluationLimit,
   } = useAppState();
   const [, setLocation] = useLocation();
 
@@ -94,6 +96,19 @@ export default function Main() {
     alert("More evaluations unlocked! You can now continue evaluating.");
   };
 
+  const handleIncreaseLimit = async () => {
+    if (!user) return;
+    
+    const newLimit = user.evaluationLimit + 5; // Increase by 5
+    try {
+      await updateEvaluationLimit(newLimit);
+      alert(`Evaluation limit increased to ${newLimit} per day!`);
+    } catch (error) {
+      console.error("Error increasing evaluation limit:", error);
+      alert("Failed to increase evaluation limit. Please try again.");
+    }
+  };
+
   if (!user) return null;
 
   // Loading visual only if stats are loading for the first time
@@ -143,9 +158,15 @@ export default function Main() {
                 You've completed {userEvaluationLimit} evaluations today. Come back tomorrow to
                 continue earning money by evaluating products.
               </p>
-              <p className="text-sm text-neutral-500">
+              <p className="text-sm text-neutral-500 mb-4">
                 The limit resets at midnight (00:00).
               </p>
+              <Button
+                onClick={handleIncreaseLimit}
+                className="w-full bg-primary text-white py-2 px-4 rounded-lg font-semibold hover:bg-primary/90"
+              >
+                Increase Daily Limit (+5)
+              </Button>
             </CardContent>
           </Card>
         </div>
@@ -204,7 +225,7 @@ export default function Main() {
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-medium">Daily progress</span>
               <span className="text-sm">
-                {todayEvaluations}/10 evaluations
+                {todayEvaluations}/{userEvaluationLimit} evaluations
               </span>
             </div>
             <div className="w-full bg-white/20 rounded-full h-2 mb-2">
@@ -212,7 +233,7 @@ export default function Main() {
                 className="bg-white rounded-full h-2 transition-all duration-300"
                 style={{
                   width: `${Math.min(
-                    (todayEvaluations / 10) * 100,
+                    (todayEvaluations / userEvaluationLimit) * 100,
                     100
                   )}%`,
                 }}
@@ -220,9 +241,9 @@ export default function Main() {
             </div>
             <div className="flex justify-between text-xs text-white/80">
               <span>Completed: {todayEvaluations}</span>
-              <span>Remaining: {10 - todayEvaluations}</span>
+              <span>Remaining: {userEvaluationLimit - todayEvaluations}</span>
             </div>
-            {todayEvaluations >= 10 && (
+            {todayEvaluations >= userEvaluationLimit && (
               <div className="mt-2 text-center">
                 <span className="text-xs bg-white/30 px-2 py-1 rounded-full">
                   🎉 Daily limit reached!
@@ -232,7 +253,7 @@ export default function Main() {
           </div>
           
           {/* Unlock more evaluations button */}
-          {todayEvaluations >= 10 && (
+          {todayEvaluations >= userEvaluationLimit && (
             <div className="mt-4">
               <button
                 onClick={handleUnlockMoreEvaluations}
