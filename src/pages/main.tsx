@@ -32,18 +32,6 @@ export default function Main() {
     fetchStats();
   }, [fetchEvaluations, fetchStats]);
 
-  // Refresh evaluations when user returns from evaluation page
-  useEffect(() => {
-    const handleFocus = () => {
-      console.log("Main page focused - refreshing evaluations");
-      fetchEvaluations();
-      fetchStats();
-    };
-
-    window.addEventListener('focus', handleFocus);
-    return () => window.removeEventListener('focus', handleFocus);
-  }, [fetchEvaluations, fetchStats]);
-
   // Fallbacks to ensure the page never breaks
   const todayEvaluations = stats?.todayEvaluations ?? 0;
   const isDailyLimitReached = todayEvaluations >= 10;

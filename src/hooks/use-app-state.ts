@@ -82,11 +82,18 @@ export const useAppState = create<AppState>()(
           console.log("Evaluations is array:", Array.isArray(data));
           console.log("Evaluations length:", data?.length);
           
-          const evaluations = data ?? [];
-          console.log("Setting evaluations to:", evaluations);
-          set({ evaluations, loading: false });
+          // Only update if we got valid data from backend
+          if (data && Array.isArray(data) && data.length > 0) {
+            const evaluations = data;
+            console.log("Setting evaluations from backend:", evaluations);
+            set({ evaluations, loading: false });
+          } else {
+            console.log("No valid evaluations from backend, keeping local state");
+            set({ loading: false });
+          }
         } catch (error) {
           console.error("Error fetching evaluations:", error);
+          console.log("Error occurred, keeping local evaluations state");
           set({ loading: false });
         }
       },
