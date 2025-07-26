@@ -1,4 +1,4 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, useLocation } from "wouter";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Welcome from "@/pages/welcome";
@@ -21,6 +21,7 @@ import Register from "@/pages/register";
 
 function Router() {
   const { user } = useAppState();
+  const [location] = useLocation();
 
   return (
     <div className="min-h-screen bg-neutral-50">
@@ -41,7 +42,7 @@ function Router() {
         <Route path="/verification" component={user ? Verification : Login} />
         <Route component={NotFound} />
       </Switch>
-      {user && <BottomNavigation />}
+      {user && location !== '/verification' && <BottomNavigation />}
     </div>
   );
 }
