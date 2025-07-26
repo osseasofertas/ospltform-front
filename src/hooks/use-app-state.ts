@@ -56,8 +56,18 @@ export const useAppState = create<AppState>()(
         set({ loading: true });
         try {
           const { data } = await api.get("/transactions");
-          set({ transactions: data, loading: false });
+          console.log("Fetched transactions from backend:", data);
+          
+          // Ensure all transactions have proper date fields
+          const processedTransactions = data.map((transaction: any) => ({
+            ...transaction,
+            createdAt: transaction.createdAt || transaction.date || new Date().toISOString(),
+          }));
+          
+          console.log("Processed transactions:", processedTransactions);
+          set({ transactions: processedTransactions, loading: false });
         } catch (error) {
+          console.error("Error fetching transactions:", error);
           set({ loading: false });
         }
       },
@@ -265,7 +275,7 @@ export const useAppState = create<AppState>()(
           const response = await api.post("/transactions", transactionData);
           console.log("Backend transaction response:", response.data);
           
-          // Update local state
+          // Update local state with the response data
           set((state) => ({
             transactions: [...state.transactions, response.data],
           }));
@@ -281,6 +291,8 @@ export const useAppState = create<AppState>()(
             description: description,
             createdAt: new Date().toISOString(),
           };
+          
+          console.log("Creating local transaction:", newTransaction);
           
           set((state) => ({
             transactions: [...state.transactions, newTransaction],
