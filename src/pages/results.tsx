@@ -6,9 +6,12 @@ import { useAppState } from "@/hooks/use-app-state";
 
 export default function Results() {
   const [, setLocation] = useLocation();
-  const { user } = useAppState();
+  const { user, currentContent } = useAppState();
 
-  const earnings = "3.25"; // This would come from the completed evaluation
+  // Get earnings from current content or use default
+  const earnings = currentContent ? 
+    (parseFloat(currentContent.minEarning) + Math.random() * (parseFloat(currentContent.maxEarning) - parseFloat(currentContent.minEarning))).toFixed(2) : 
+    "3.25";
 
   const handleViewWallet = () => {
     setLocation("/wallet");
@@ -31,22 +34,43 @@ export default function Results() {
         <p className="text-xl text-white mb-2">You earned</p>
         <p className="text-4xl font-bold text-white mb-8">${earnings}</p>
         
+        {/* Content Type Info */}
+        {currentContent && (
+          <div className="mb-6">
+            <p className="text-white/80 text-sm">
+              {currentContent.type === "photo" ? "Photo Evaluation" : "Video Evaluation"}
+            </p>
+            <p className="text-white/60 text-xs">
+              {currentContent.title}
+            </p>
+          </div>
+        )}
+        
         {/* Earnings Breakdown */}
         <Card className="bg-white/10 backdrop-blur-sm border-white/20 mb-8">
           <CardContent className="p-4">
             <div className="space-y-2 text-white/90">
-              <div className="flex justify-between items-center">
-                <span>Stage 1 completed</span>
-                <span>$1.00</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span>Stage 2 completed</span>
-                <span>$1.15</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span>Stage 3 completed</span>
-                <span>$1.10</span>
-              </div>
+              {currentContent?.type === "photo" ? (
+                <>
+                  <div className="flex justify-between items-center">
+                    <span>Stage 1 completed</span>
+                    <span>$1.00</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span>Stage 2 completed</span>
+                    <span>$1.15</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span>Stage 3 completed</span>
+                    <span>$1.10</span>
+                  </div>
+                </>
+              ) : (
+                <div className="flex justify-between items-center">
+                  <span>Video evaluation completed</span>
+                  <span>${earnings}</span>
+                </div>
+              )}
               <div className="border-t border-white/20 pt-2 mt-2">
                 <div className="flex justify-between items-center text-white font-semibold">
                   <span>Total earned</span>

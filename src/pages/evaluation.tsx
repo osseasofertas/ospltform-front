@@ -117,7 +117,8 @@ export default function Evaluation() {
   };
 
   const handleReturnHome = () => {
-    setLocation("/");
+    setShowCompletionModal(false);
+    setLocation("/results");
   };
 
   if (!currentContent) {

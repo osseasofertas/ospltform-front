@@ -24,6 +24,8 @@ interface AppState {
   updatePaypal: (paypalAccount: string) => Promise<void>;
   updateBank: (bankAccount: string) => Promise<void>;
   setCurrentContent: (content: AppContent | null) => void;
+  completeEvaluation: (contentId: number, contentType: string, earning: string) => void;
+  incrementDailyEvaluations: () => void;
   logout: () => void;
 }
 
@@ -74,6 +76,23 @@ export const useAppState = create<AppState>((set) => ({
 
   setCurrentContent: (content) => {
     set({ currentContent: content });
+  },
+
+  completeEvaluation: (contentId, contentType, earning) => {
+    set((state) => ({
+      evaluations: state.evaluations.map((evaluation) =>
+        evaluation.id === contentId ? { ...evaluation, completed: true, totalEarned: earning } : evaluation
+      ),
+    }));
+  },
+
+  incrementDailyEvaluations: () => {
+    set((state) => ({
+      stats: state.stats ? {
+        ...state.stats,
+        todayEvaluations: (state.stats.todayEvaluations || 0) + 1,
+      } : null,
+    }));
   },
 
   logout: () => {
