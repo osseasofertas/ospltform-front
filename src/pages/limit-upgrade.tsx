@@ -98,10 +98,6 @@ export default function LimitUpgrade() {
                 </div>
                 <div className="flex items-center gap-2">
                   <Star className="h-4 w-4 text-yellow-500 fill-current" />
-                  <span className="text-sm">New limit: {user.evaluationLimit + 5} evaluations/day</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Star className="h-4 w-4 text-yellow-500 fill-current" />
                   <span className="text-sm">Instant activation</span>
                 </div>
               </div>
@@ -140,10 +136,6 @@ export default function LimitUpgrade() {
                 <div className="flex items-center gap-2">
                   <Star className="h-4 w-4 text-yellow-500 fill-current" />
                   <span className="text-sm">+10 evaluations per day</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Star className="h-4 w-4 text-yellow-500 fill-current" />
-                  <span className="text-sm">New limit: {user.evaluationLimit + 10} evaluations/day</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Star className="h-4 w-4 text-yellow-500 fill-current" />
