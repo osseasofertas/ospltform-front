@@ -37,7 +37,7 @@ export default function LimitUpgrade() {
       type: packageType,
       currentLimit: user?.evaluationLimit || 10,
       newLimit: packageType === "basic" ? (user?.evaluationLimit || 10) + 5 : (user?.evaluationLimit || 10) + 10,
-      price: packageType === "basic" ? 10.00 : 19.99,
+      price: packageType === "basic" ? 9.99 : 19.99, // Updated to match SpeedSellX prices
     };
     
     // Store package data in localStorage for payment page
@@ -123,7 +123,7 @@ export default function LimitUpgrade() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-2xl font-bold text-neutral-800">$10.00</p>
+                  <p className="text-2xl font-bold text-neutral-800">$9.99</p>
                   <p className="text-sm text-neutral-600">One-time payment</p>
                 </div>
               </div>

@@ -38,12 +38,12 @@ interface AppState {
 export const useAppState = create<AppState>()(
   persist(
     (set, get) => ({
-      user: null,
-      transactions: [],
-      evaluations: [],
-      stats: null,
+  user: null,
+  transactions: [],
+  evaluations: [],
+  stats: null,
       currentContent: null,
-      loading: false,
+  loading: false,
 
       // Helper function to ensure evaluationLimit is always set
       ensureEvaluationLimit: (user: any) => {
@@ -57,11 +57,11 @@ export const useAppState = create<AppState>()(
         return user;
       },
 
-      fetchUser: async () => {
+  fetchUser: async () => {
         console.log("=== fetchUser START ===");
-        set({ loading: true });
+    set({ loading: true });
         try {
-          const { data } = await api.get("/user/me");
+    const { data } = await api.get("/user/me");
           console.log("Fetched user data from backend:", data);
           console.log("User evaluation limit from backend:", data?.evaluationLimit);
           
@@ -79,12 +79,12 @@ export const useAppState = create<AppState>()(
           set({ loading: false });
           console.log("=== fetchUser ERROR END ===");
         }
-      },
+  },
 
-      fetchTransactions: async () => {
-        set({ loading: true });
+  fetchTransactions: async () => {
+    set({ loading: true });
         try {
-          const { data } = await api.get("/transactions");
+    const { data } = await api.get("/transactions");
           console.log("Fetched transactions from backend:", data);
           
           // Ensure all transactions have proper date fields
@@ -99,14 +99,14 @@ export const useAppState = create<AppState>()(
           console.error("Error fetching transactions:", error);
           set({ loading: false });
         }
-      },
+  },
 
-      fetchEvaluations: async () => {
+  fetchEvaluations: async () => {
         console.log("=== fetchEvaluations START ===");
         console.log("fetchEvaluations called");
-        set({ loading: true });
+    set({ loading: true });
         try {
-          const { data } = await api.get("/evaluations");
+    const { data } = await api.get("/evaluations");
           console.log("Fetched evaluations from backend:", data);
           console.log("Evaluations data type:", typeof data);
           console.log("Evaluations is array:", Array.isArray(data));
@@ -133,12 +133,12 @@ export const useAppState = create<AppState>()(
           set({ loading: false });
           console.log("=== fetchEvaluations ERROR END ===");
         }
-      },
+  },
 
-      fetchStats: async () => {
-        set({ loading: true });
+  fetchStats: async () => {
+    set({ loading: true });
         try {
-          const { data } = await api.get("/stats/summary");
+    const { data } = await api.get("/stats/summary");
           console.log("Fetched stats from backend:", data);
           
           // Check if it's a new day (midnight reset)
@@ -166,15 +166,15 @@ export const useAppState = create<AppState>()(
           console.error("Error fetching stats:", error);
           set({ loading: false });
         }
-      },
+  },
 
-      updatePaypal: async (paypalAccount) => {
-        await api.patch("/user", { paypalAccount });
+  updatePaypal: async (paypalAccount) => {
+    await api.patch("/user", { paypalAccount });
         await get().fetchUser();
-      },
+  },
 
-      updateBank: async (bankAccount) => {
-        await api.patch("/user", { bankAccount });
+  updateBank: async (bankAccount) => {
+    await api.patch("/user", { bankAccount });
         await get().fetchUser();
       },
 
@@ -454,19 +454,19 @@ export const useAppState = create<AppState>()(
           
           console.log("=== updateEvaluationLimit FALLBACK SUCCESS ===");
         }
-      },
+  },
 
-      logout: () => {
-        localStorage.removeItem("access_token");
-        set({
-          user: null,
-          transactions: [],
-          evaluations: [],
-          stats: null,
+  logout: () => {
+    localStorage.removeItem("access_token");
+    set({
+      user: null,
+      transactions: [],
+      evaluations: [],
+      stats: null,
           currentContent: null,
-          loading: false,
-        });
-      },
+      loading: false,
+    });
+  },
 
       // Function to check and fix localStorage data
       checkLocalStorage: () => {

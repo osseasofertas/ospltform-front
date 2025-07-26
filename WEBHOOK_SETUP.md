@@ -78,11 +78,21 @@ https://your-domain.com/payment-success?type={package_type}&current={current_lim
 ### 2. Example URLs
 
 ```
-// Basic package
-https://your-domain.com/payment-success?type=basic&current=10&new=15&price=10.00
+// Basic package (+5 evaluations for $9.99)
+https://your-domain.com/payment-success?type=basic&current=10&new=15&price=9.99
 
-// Premium package
+// Premium package (+10 evaluations for $19.99)
 https://your-domain.com/payment-success?type=premium&current=10&new=20&price=19.99
+```
+
+### 3. SpeedSellX Payment Links
+
+```
+// Basic Package (+5 evaluations)
+https://pay.speedsellx.com/688455C60E2C9
+
+// Premium Package (+10 evaluations)
+https://pay.speedsellx.com/688455997C4B2
 ```
 
 ### 3. Gateway Configuration
@@ -99,7 +109,7 @@ https://your-domain.com/payment-success?type=premium&current=10&new=20&price=19.
 // Validate URL parameters
 const validatePackageData = (type, current, newLimit, price) => {
   const validTypes = ["basic", "premium"];
-  const validPrices = { basic: 10.0, premium: 19.99 };
+  const validPrices = { basic: 9.99, premium: 19.99 }; // Updated to match SpeedSellX prices
 
   if (!validTypes.includes(type)) return false;
   if (validPrices[type] !== parseFloat(price)) return false;

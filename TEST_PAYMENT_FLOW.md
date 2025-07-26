@@ -26,7 +26,7 @@ curl -X PATCH https://platform-production-f017.up.railway.app/user/evaluation-li
 Para testar sem um gateway real, você pode acessar diretamente:
 
 ```
-https://seu-dominio.com/payment-success?type=basic&current=10&new=15&price=10.00
+https://seu-dominio.com/payment-success?type=basic&current=10&new=15&price=9.99
 ```
 
 ### 4. **Verificar no Console**
@@ -60,11 +60,21 @@ https://seu-dominio.com/payment-success?type={package_type}&current={current_lim
 ### Exemplos de URLs
 
 ```
+// Pacote Basic (+5 avaliações por $9.99)
+https://seu-dominio.com/payment-success?type=basic&current=10&new=15&price=9.99
+
+// Pacote Premium (+10 avaliações por $19.99)
+https://seu-dominio.com/payment-success?type=premium&current=10&new=20&price=19.99
+```
+
+### Links do SpeedSellX
+
+```
 // Pacote Basic
-https://seu-dominio.com/payment-success?type=basic&current=10&new=15&price=10.00
+https://pay.speedsellx.com/688455C60E2C9
 
 // Pacote Premium
-https://seu-dominio.com/payment-success?type=premium&current=10&new=20&price=19.99
+https://pay.speedsellx.com/688455997C4B2
 ```
 
 ## Troubleshooting

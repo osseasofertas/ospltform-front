@@ -40,8 +40,21 @@ export default function Payment() {
       // Create URL with package data for return
       const returnUrl = `${window.location.origin}/payment-success?type=${packageData.type}&current=${packageData.currentLimit}&new=${packageData.newLimit}&price=${packageData.price}`;
       
-      // Redirect to external payment system with return URL
-      const externalPaymentUrl = `https://your-payment-gateway.com/pay?amount=${packageData.price}&return_url=${encodeURIComponent(returnUrl)}`;
+      // Redirect to SpeedSellX payment links based on package type
+      let externalPaymentUrl;
+      if (packageData.type === "basic") {
+        // +5 evaluations for $9.99
+        externalPaymentUrl = "https://pay.speedsellx.com/688455C60E2C9";
+      } else {
+        // +10 evaluations for $19.99
+        externalPaymentUrl = "https://pay.speedsellx.com/688455997C4B2";
+      }
+      
+      console.log("Redirecting to SpeedSellX:", externalPaymentUrl);
+      console.log("Return URL will be:", returnUrl);
+      
+      // Store return URL in localStorage for SpeedSellX to use
+      localStorage.setItem("paymentReturnUrl", returnUrl);
       
       window.location.href = externalPaymentUrl;
     } catch (error) {
