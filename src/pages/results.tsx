@@ -8,10 +8,18 @@ export default function Results() {
   const [, setLocation] = useLocation();
   const { user, currentContent } = useAppState();
 
-  // Get earnings from current content or use default
-  const earnings = currentContent ? 
+  // Get the actual earning from the completed evaluation
+  const actualEarning = currentContent ? 
     (parseFloat(currentContent.minEarning) + Math.random() * (parseFloat(currentContent.maxEarning) - parseFloat(currentContent.minEarning))).toFixed(2) : 
     "3.25";
+
+  // Calculate stage earnings for photos (ensure sum equals total)
+  const totalEarning = parseFloat(actualEarning);
+  const stage1Earning = currentContent?.type === "photo" ? (totalEarning / 3).toFixed(2) : "0.00";
+  const stage2Earning = currentContent?.type === "photo" ? (totalEarning / 3).toFixed(2) : "0.00";
+  // Calculate stage 3 to ensure exact sum
+  const stage3Earning = currentContent?.type === "photo" ? 
+    (totalEarning - parseFloat(stage1Earning) - parseFloat(stage2Earning)).toFixed(2) : "0.00";
 
   const handleViewWallet = () => {
     setLocation("/wallet");
@@ -32,7 +40,7 @@ export default function Results() {
         {/* Success Message */}
         <h1 className="text-3xl font-bold text-white mb-4">Completed!</h1>
         <p className="text-xl text-white mb-2">You earned</p>
-        <p className="text-4xl font-bold text-white mb-8">${earnings}</p>
+        <p className="text-4xl font-bold text-white mb-8">${actualEarning}</p>
         
         {/* Content Type Info */}
         {currentContent && (
@@ -54,27 +62,27 @@ export default function Results() {
                 <>
                   <div className="flex justify-between items-center">
                     <span>Stage 1 completed</span>
-                    <span>$1.00</span>
+                    <span>${stage1Earning}</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span>Stage 2 completed</span>
-                    <span>$1.15</span>
+                    <span>${stage2Earning}</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span>Stage 3 completed</span>
-                    <span>$1.10</span>
+                    <span>${stage3Earning}</span>
                   </div>
                 </>
               ) : (
                 <div className="flex justify-between items-center">
                   <span>Video evaluation completed</span>
-                  <span>${earnings}</span>
+                  <span>${actualEarning}</span>
                 </div>
               )}
               <div className="border-t border-white/20 pt-2 mt-2">
                 <div className="flex justify-between items-center text-white font-semibold">
                   <span>Total earned</span>
-                  <span>${earnings}</span>
+                  <span>${actualEarning}</span>
                 </div>
               </div>
             </div>
