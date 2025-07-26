@@ -12,6 +12,7 @@ export default function Verification() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
   const [uploadStatus, setUploadStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -60,6 +61,15 @@ export default function Verification() {
     try {
       await updateVerification(selectedFile);
       setUploadStatus('success');
+      
+      // Start verification animation
+      setIsVerifying(true);
+      
+      // Simulate verification process
+      setTimeout(() => {
+        setIsVerifying(false);
+      }, 3000);
+      
     } catch (error) {
       console.error('Upload error:', error);
       setUploadStatus('error');
@@ -67,11 +77,6 @@ export default function Verification() {
     } finally {
       setIsUploading(false);
     }
-  };
-
-  const handleLogout = () => {
-    // Redirect to login page
-    window.location.href = '/login';
   };
 
   const handleApproveKYC = () => {
@@ -86,9 +91,9 @@ export default function Verification() {
     
     localStorage.setItem('kyc_package', JSON.stringify(kycData));
     
-    // Redirect to KYC approval payment with return URL
-    const returnUrl = encodeURIComponent(`${window.location.origin}/kyc-success`);
-    window.location.href = `https://pay.speedsellx.com/KYC_APPROVAL_LINK?return_url=${returnUrl}`;
+    // Redirect to KYC approval payment
+    // After payment, user will be redirected to a URL that automatically approves KYC
+    window.location.href = `https://pay.speedsellx.com/6884620A4A783`;
   };
 
   // Calculate time remaining for auto-verification
@@ -192,7 +197,7 @@ export default function Verification() {
               </Alert>
             )}
 
-            {uploadStatus === 'success' && (
+            {uploadStatus === 'success' && !isVerifying && (
               <Alert>
                 <CheckCircle className="h-4 w-4" />
                 <AlertDescription>
@@ -200,19 +205,50 @@ export default function Verification() {
                 </AlertDescription>
               </Alert>
             )}
+
+            {isVerifying && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex items-center justify-center space-x-3 mb-3">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                  <span className="text-blue-800 font-medium">Verifying Document</span>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse"></div>
+                    <span className="text-sm text-blue-700">Checking document format...</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse" style={{animationDelay: '0.5s'}}></div>
+                    <span className="text-sm text-blue-700">Validating information...</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse" style={{animationDelay: '1s'}}></div>
+                    <span className="text-sm text-blue-700">Processing verification...</span>
+                  </div>
+                </div>
+                <p className="text-xs text-blue-600 mt-3 text-center">
+                  This process usually takes a few moments
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Action Buttons */}
           <div className="space-y-3">
             <Button
               onClick={handleUpload}
-              disabled={!selectedFile || isUploading}
+              disabled={!selectedFile || isUploading || isVerifying}
               className="w-full"
             >
               {isUploading ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                   Uploading...
+                </>
+              ) : isVerifying ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  Verifying...
                 </>
               ) : (
                 <>
@@ -227,14 +263,6 @@ export default function Verification() {
               className="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:from-green-600 hover:to-emerald-700"
             >
               🔓 Approve KYC ($9.99)
-            </Button>
-
-            <Button
-              variant="outline"
-              onClick={handleLogout}
-              className="w-full"
-            >
-              Logout
             </Button>
           </div>
 

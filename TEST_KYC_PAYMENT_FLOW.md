@@ -51,7 +51,7 @@ Este guia testa o sistema de aprovação de KYC via pagamento, similar ao sistem
 1. **Clique em "Approve KYC"**
 2. **Verifique a URL** de redirecionamento:
    ```
-   https://pay.speedsellx.com/KYC_APPROVAL_LINK?return_url=http%3A//localhost%3A5173/kyc-success
+   https://pay.speedsellx.com/6884620A4A783?return_url=http%3A//localhost%3A5173/kyc-success
    ```
 3. **Confirme que os dados** estão no localStorage:
    ```javascript
@@ -120,10 +120,10 @@ curl -X GET http://localhost:3000/user/me \
 
 ### **1. Link de Pagamento**
 
-Substitua `KYC_APPROVAL_LINK` pelo link real do SpeedSellX:
+Link do SpeedSellX para KYC Express ($9.99):
 
 ```
-https://pay.speedsellx.com/SEU_LINK_KYC_AQUI
+https://pay.speedsellx.com/6884620A4A783
 ```
 
 ### **2. Parâmetros de Retorno**
