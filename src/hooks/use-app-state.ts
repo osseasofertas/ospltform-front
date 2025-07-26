@@ -5,6 +5,7 @@ import type {
   AppTransaction as Transaction,
   AppEvaluation as Evaluation,
   AppStats as UserStats,
+  AppContent,
 } from "@/types";
 
 interface AppState {
@@ -12,6 +13,7 @@ interface AppState {
   transactions: Transaction[];
   evaluations: Evaluation[];
   stats: UserStats | null;
+  currentContent: AppContent | null;
   loading: boolean;
 
   // Actions
@@ -21,6 +23,7 @@ interface AppState {
   fetchStats: () => Promise<void>;
   updatePaypal: (paypalAccount: string) => Promise<void>;
   updateBank: (bankAccount: string) => Promise<void>;
+  setCurrentContent: (content: AppContent | null) => void;
   logout: () => void;
 }
 
@@ -29,6 +32,7 @@ export const useAppState = create<AppState>((set) => ({
   transactions: [],
   evaluations: [],
   stats: null,
+  currentContent: null,
   loading: false,
 
   fetchUser: async () => {
@@ -68,6 +72,10 @@ export const useAppState = create<AppState>((set) => ({
     await useAppState.getState().fetchUser();
   },
 
+  setCurrentContent: (content) => {
+    set({ currentContent: content });
+  },
+
   logout: () => {
     localStorage.removeItem("access_token");
     set({
@@ -75,6 +83,7 @@ export const useAppState = create<AppState>((set) => ({
       transactions: [],
       evaluations: [],
       stats: null,
+      currentContent: null,
       loading: false,
     });
   },

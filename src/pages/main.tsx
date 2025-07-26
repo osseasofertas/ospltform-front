@@ -23,9 +23,9 @@ export default function Main() {
     fetchEvaluations,
     stats,
     fetchStats,
+    setCurrentContent,
   } = useAppState();
   const [, setLocation] = useLocation();
-  const [currentContent, setCurrentContent] = useState<AppContent | null>(null);
 
   useEffect(() => {
     fetchEvaluations();
@@ -45,6 +45,22 @@ export default function Main() {
   const handleContentSelect = (selectedContent: AppContent) => {
     setCurrentContent(selectedContent);
     setLocation("/evaluation");
+  };
+
+  const handleUnlockMoreEvaluations = () => {
+    // Reset daily evaluations count in localStorage
+    const today = new Date().toDateString();
+    const dailyStats = JSON.parse(localStorage.getItem('dailyStats') || '{}');
+    
+    // Reset today's evaluation count
+    dailyStats[today] = 0;
+    localStorage.setItem('dailyStats', JSON.stringify(dailyStats));
+    
+    // Refresh stats
+    fetchStats();
+    
+    // Show success message
+    alert("More evaluations unlocked! You can now continue evaluating.");
   };
 
   if (!user) return null;
@@ -183,6 +199,18 @@ export default function Main() {
               </div>
             )}
           </div>
+          
+          {/* Unlock more evaluations button */}
+          {todayEvaluations >= 10 && (
+            <div className="mt-4">
+              <button
+                onClick={handleUnlockMoreEvaluations}
+                className="w-full bg-gradient-to-r from-yellow-400 to-orange-500 text-white py-3 px-4 rounded-lg font-semibold text-sm hover:from-yellow-500 hover:to-orange-600 transition-all duration-200 shadow-lg"
+              >
+                🔓 Unlock More Evaluations
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
