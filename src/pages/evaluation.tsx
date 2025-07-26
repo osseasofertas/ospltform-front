@@ -74,7 +74,7 @@ export default function Evaluation() {
     }
   };
 
-  const handleComplete = () => {
+  const handleComplete = async () => {
     console.log("handleComplete called with currentContent:", currentContent);
     if (!currentContent || !user) return;
 
@@ -107,17 +107,26 @@ export default function Evaluation() {
     console.log("Calculated earning:", earning);
     console.log("Calling completeEvaluation with:", { contentId: currentContent.id, contentType: currentContent.type, earning });
     
-    // Complete evaluation
-    completeEvaluation(currentContent.id, currentContent.type, earning);
-    incrementDailyEvaluations();
-    
-    setEarnings(earning);
-    setShowCompletionModal(true);
-    
-    toast({
-      title: "Evaluation completed!",
-      description: `You earned $${earning} for this evaluation`,
-    });
+    try {
+      // Complete evaluation (now async)
+      await completeEvaluation(currentContent.id, currentContent.type, earning);
+      await incrementDailyEvaluations();
+      
+      setEarnings(earning);
+      setShowCompletionModal(true);
+      
+      toast({
+        title: "Evaluation completed!",
+        description: `You earned $${earning} for this evaluation`,
+      });
+    } catch (error) {
+      console.error("Error completing evaluation:", error);
+      toast({
+        title: "Error",
+        description: "Failed to save evaluation. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleReturnHome = () => {

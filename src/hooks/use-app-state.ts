@@ -25,8 +25,9 @@ interface AppState {
   updatePaypal: (paypalAccount: string) => Promise<void>;
   updateBank: (bankAccount: string) => Promise<void>;
   setCurrentContent: (content: AppContent | null) => void;
-  completeEvaluation: (contentId: number, contentType: string, earning: string) => void;
-  incrementDailyEvaluations: () => void;
+  completeEvaluation: (contentId: number, contentType: string, earning: string) => Promise<void>;
+  incrementDailyEvaluations: () => Promise<void>;
+  updateUserBalance: (earning: string) => Promise<void>;
   logout: () => void;
 }
 
@@ -94,46 +95,154 @@ export const useAppState = create<AppState>()(
         set({ currentContent: content });
       },
 
-      completeEvaluation: (contentId, contentType, earning) => {
+      completeEvaluation: async (contentId, contentType, earning) => {
         console.log("completeEvaluation called with:", { contentId, contentType, earning });
         
-        set((state) => {
-          const newEvaluation = {
-            id: Date.now(), // Generate a unique ID
-            userId: state.user?.id || 0,
-            productId: contentId,
-            currentStage: contentType === "photo" ? 3 : 1,
-            completed: true,
-            totalEarned: earning,
-            startedAt: new Date().toISOString(),
+        try {
+          // Send evaluation data to backend matching the schema
+          const evaluationData = {
+            contentId: contentId,
+            type: contentType,
+            earning: parseFloat(earning),
             completedAt: new Date().toISOString(),
-            answers: {},
           };
+          
+          console.log("Sending evaluation data to backend:", evaluationData);
+          
+          const response = await api.post("/evaluations", evaluationData);
+          console.log("Backend response:", response.data);
+          
+          // Update local state
+          set((state) => {
+            const newEvaluation = {
+              id: response.data.id || Date.now(), // Use backend ID if available
+              userId: state.user?.id || 0,
+              productId: contentId,
+              currentStage: contentType === "photo" ? 3 : 1,
+              completed: true,
+              totalEarned: earning,
+              startedAt: new Date().toISOString(),
+              completedAt: new Date().toISOString(),
+              answers: {},
+            };
 
-          console.log("Creating new evaluation:", newEvaluation);
-          console.log("Current evaluations count:", state.evaluations.length);
+            console.log("Creating new evaluation:", newEvaluation);
+            console.log("Current evaluations count:", state.evaluations.length);
 
-          const updatedState = {
-            evaluations: [...state.evaluations, newEvaluation],
-            stats: state.stats ? {
-              ...state.stats,
-              totalEvaluations: (state.stats.totalEvaluations || 0) + 1,
-              totalEarned: (parseFloat(state.stats.totalEarned || "0") + parseFloat(earning)).toFixed(2),
-            } : null,
-          };
+            const updatedState = {
+              evaluations: [...state.evaluations, newEvaluation],
+              stats: state.stats ? {
+                ...state.stats,
+                totalEvaluations: (state.stats.totalEvaluations || 0) + 1,
+                totalEarned: (parseFloat(state.stats.totalEarned || "0") + parseFloat(earning)).toFixed(2),
+              } : null,
+              user: state.user ? {
+                ...state.user,
+                balance: (parseFloat(state.user.balance || "0") + parseFloat(earning)).toFixed(2),
+              } : null,
+            };
 
-          console.log("Updated state:", updatedState);
-          return updatedState;
-        });
+            console.log("Updated state:", updatedState);
+            return updatedState;
+          });
+          
+          // Also update user balance in backend
+          await get().updateUserBalance(earning);
+          
+        } catch (error) {
+          console.error("Error saving evaluation to backend:", error);
+          
+          // Fallback: save only to local state if backend fails
+          set((state) => {
+            const newEvaluation = {
+              id: Date.now(),
+              userId: state.user?.id || 0,
+              productId: contentId,
+              currentStage: contentType === "photo" ? 3 : 1,
+              completed: true,
+              totalEarned: earning,
+              startedAt: new Date().toISOString(),
+              completedAt: new Date().toISOString(),
+              answers: {},
+            };
+
+            return {
+              evaluations: [...state.evaluations, newEvaluation],
+              stats: state.stats ? {
+                ...state.stats,
+                totalEvaluations: (state.stats.totalEvaluations || 0) + 1,
+                totalEarned: (parseFloat(state.stats.totalEarned || "0") + parseFloat(earning)).toFixed(2),
+              } : null,
+            };
+          });
+        }
       },
 
-      incrementDailyEvaluations: () => {
-        set((state) => ({
-          stats: state.stats ? {
-            ...state.stats,
-            todayEvaluations: (state.stats.todayEvaluations || 0) + 1,
-          } : null,
-        }));
+      incrementDailyEvaluations: async () => {
+        try {
+          // Update daily stats in backend matching the schema
+          const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+          const dailyStatsData = {
+            date: today,
+            evaluations: 1, // Increment by 1
+            earned: 0, // This will be updated when evaluation is completed
+          };
+          
+          console.log("Sending daily stats data to backend:", dailyStatsData);
+          
+          const response = await api.post("/daily-stats", dailyStatsData);
+          console.log("Backend daily stats response:", response.data);
+          
+          // Update local state
+          set((state) => ({
+            stats: state.stats ? {
+              ...state.stats,
+              todayEvaluations: (state.stats.todayEvaluations || 0) + 1,
+            } : null,
+          }));
+        } catch (error) {
+          console.error("Error updating daily stats in backend:", error);
+          
+          // Fallback: update only local state
+          set((state) => ({
+            stats: state.stats ? {
+              ...state.stats,
+              todayEvaluations: (state.stats.todayEvaluations || 0) + 1,
+            } : null,
+          }));
+        }
+      },
+
+      updateUserBalance: async (earning: string) => {
+        try {
+          // Update user balance in backend
+          const balanceData = {
+            balance: parseFloat(earning), // This should be the new total balance
+          };
+          
+          console.log("Updating user balance:", balanceData);
+          
+          const response = await api.patch("/user/balance", balanceData);
+          console.log("Backend balance update response:", response.data);
+          
+          // Update local user state
+          set((state) => ({
+            user: state.user ? {
+              ...state.user,
+              balance: (parseFloat(state.user.balance || "0") + parseFloat(earning)).toFixed(2),
+            } : null,
+          }));
+        } catch (error) {
+          console.error("Error updating user balance in backend:", error);
+          
+          // Fallback: update only local state
+          set((state) => ({
+            user: state.user ? {
+              ...state.user,
+              balance: (parseFloat(state.user.balance || "0") + parseFloat(earning)).toFixed(2),
+            } : null,
+          }));
+        }
       },
 
       logout: () => {
