@@ -76,8 +76,10 @@ export const useAppState = create<AppState>()(
         set({ loading: true });
         try {
           const { data } = await api.get("/evaluations");
+          console.log("Fetched evaluations from backend:", data);
           set({ evaluations: data ?? [], loading: false });
         } catch (error) {
+          console.error("Error fetching evaluations:", error);
           set({ loading: false });
         }
       },

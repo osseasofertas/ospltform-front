@@ -32,6 +32,18 @@ export default function Main() {
     fetchStats();
   }, [fetchEvaluations, fetchStats]);
 
+  // Refresh evaluations when user returns from evaluation page
+  useEffect(() => {
+    const handleFocus = () => {
+      console.log("Main page focused - refreshing evaluations");
+      fetchEvaluations();
+      fetchStats();
+    };
+
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, [fetchEvaluations, fetchStats]);
+
   // Fallbacks to ensure the page never breaks
   const todayEvaluations = stats?.todayEvaluations ?? 0;
   const isDailyLimitReached = todayEvaluations >= 10;
@@ -41,6 +53,14 @@ export default function Main() {
         (item) => !evaluatedIds.has(item.id)
       )
     : [];
+
+  // Debug logs
+  useEffect(() => {
+    console.log("Main page - Current evaluations:", evaluations);
+    console.log("Main page - Evaluated IDs:", Array.from(evaluatedIds));
+    console.log("Main page - Available content:", content);
+    console.log("Main page - Total content before filter:", getTodaysContent(user?.registrationDate || "").length);
+  }, [evaluations, evaluatedIds, content, user?.registrationDate]);
 
   const handleContentSelect = (selectedContent: AppContent) => {
     setCurrentContent(selectedContent);
