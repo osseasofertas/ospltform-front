@@ -5,6 +5,7 @@ export interface AppUser {
   balance: string;
   evaluationLimit: number; // Add evaluation limit from database
   isVerified: boolean;
+  verifiedDate?: string; // Date when document was uploaded
   registrationDate: string;
   dailyEvaluationsUsed: number;
   isDemo: boolean;

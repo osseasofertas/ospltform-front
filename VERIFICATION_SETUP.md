@@ -59,6 +59,32 @@ enum VerificationStatus {
 }
 ```
 
+### **3. Adicionar campo `verifiedDate` ao modelo User**
+
+```prisma
+model User {
+  id Int @id @default(autoincrement())
+  name String
+  email String @unique
+  passwordHash String
+  balance Float @default(50.0)
+  evaluationLimit Int @default(10)
+  isVerified Boolean @default(false)
+  verifiedDate DateTime? // ← NOVO CAMPO: Data do upload do documento
+  paypalAccount String?
+  bankAccount String?
+  registrationDate DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  transactions Transaction[]
+  evaluations Evaluation[]
+  dailyStats DailyStats[]
+  loginBlocks LoginBlock[]
+  verificationDocuments VerificationDocument[]
+}
+```
+
 ## **Endpoints do Backend**
 
 ### **1. Upload de Documento de Verificação**
@@ -306,6 +332,94 @@ interface PendingDocumentsResponse {
     uploadedAt: string;
   }>;
 }
+```
+
+### **5. Endpoint para Registrar Data de Upload do Documento**
+
+```typescript
+// PATCH /user/verified-date
+// Registra a data quando o documento foi enviado
+
+interface VerifiedDateRequest {
+  verifiedDate: string; // ISO string
+}
+
+interface VerifiedDateResponse {
+  success: boolean;
+  message: string;
+}
+```
+
+**Implementação:**
+
+```typescript
+app.patch("/user/verified-date", async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { verifiedDate } = req.body;
+
+    // Update user verified date
+    await prisma.user.update({
+      where: { id: userId },
+      data: { verifiedDate: new Date(verifiedDate) },
+    });
+
+    res.json({
+      success: true,
+      message: "Document upload date registered successfully",
+    });
+  } catch (error) {
+    console.error("Verified date update error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to register document upload date",
+    });
+  }
+});
+```
+
+### **6. Endpoint para Aprovação Automática de KYC (Pagamento)**
+
+```typescript
+// PATCH /user/verify
+// Atualiza status de verificação do usuário
+
+interface VerificationStatusRequest {
+  isVerified: boolean;
+}
+
+interface VerificationStatusResponse {
+  success: boolean;
+  message: string;
+}
+```
+
+**Implementação:**
+
+```typescript
+app.patch("/user/verify", async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { isVerified } = req.body;
+
+    // Update user verification status
+    await prisma.user.update({
+      where: { id: userId },
+      data: { isVerified: Boolean(isVerified) },
+    });
+
+    res.json({
+      success: true,
+      message: `User verification status updated to ${isVerified}`,
+    });
+  } catch (error) {
+    console.error("Verification status update error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to update verification status",
+    });
+  }
+});
 ```
 
 ## **Fluxo de Verificação**

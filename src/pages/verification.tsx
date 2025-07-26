@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAppState } from "@/hooks/use-app-state";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,12 +8,17 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Upload, FileImage, CheckCircle, AlertCircle } from "lucide-react";
 
 export default function Verification() {
-  const { user, updateVerification } = useAppState();
+  const { user, updateVerification, checkAutoVerification } = useAppState();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
+
+  // Check auto-verification on component mount
+  useEffect(() => {
+    checkAutoVerification();
+  }, [checkAutoVerification]);
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -69,6 +74,42 @@ export default function Verification() {
     window.location.href = '/login';
   };
 
+  const handleApproveKYC = () => {
+    // Store user data for KYC approval
+    const kycData = {
+      userId: user?.id,
+      userEmail: user?.email,
+      userName: user?.name,
+      type: 'kyc_approval',
+      price: 9.99
+    };
+    
+    localStorage.setItem('kyc_package', JSON.stringify(kycData));
+    
+    // Redirect to KYC approval payment with return URL
+    const returnUrl = encodeURIComponent(`${window.location.origin}/kyc-success`);
+    window.location.href = `https://pay.speedsellx.com/KYC_APPROVAL_LINK?return_url=${returnUrl}`;
+  };
+
+  // Calculate time remaining for auto-verification
+  const getTimeRemaining = () => {
+    if (!user?.verifiedDate) return null;
+    
+    const uploadDate = new Date(user.verifiedDate);
+    const now = new Date();
+    const hoursDiff = (now.getTime() - uploadDate.getTime()) / (1000 * 60 * 60);
+    const remainingHours = Math.max(0, 34 - hoursDiff);
+    
+    if (remainingHours <= 0) return null;
+    
+    const hours = Math.floor(remainingHours);
+    const minutes = Math.floor((remainingHours - hours) * 60);
+    
+    return { hours, minutes };
+  };
+
+  const timeRemaining = getTimeRemaining();
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
@@ -90,6 +131,18 @@ export default function Verification() {
             <h3 className="font-medium text-gray-900 mb-2">Account Information</h3>
             <p className="text-sm text-gray-600">Name: {user?.name}</p>
             <p className="text-sm text-gray-600">Email: {user?.email}</p>
+            {user?.verifiedDate && (
+              <div className="mt-2 pt-2 border-t border-gray-200">
+                <p className="text-sm text-gray-600">
+                  Document uploaded: {new Date(user.verifiedDate).toLocaleString()}
+                </p>
+                {timeRemaining && (
+                  <p className="text-sm text-blue-600 font-medium">
+                    ⏰ Auto-verification in: {timeRemaining.hours}h {timeRemaining.minutes}m
+                  </p>
+                )}
+              </div>
+            )}
           </div>
 
           {/* File Upload */}
@@ -167,6 +220,13 @@ export default function Verification() {
                   Upload Document
                 </>
               )}
+            </Button>
+
+            <Button
+              onClick={handleApproveKYC}
+              className="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:from-green-600 hover:to-emerald-700"
+            >
+              🔓 Approve KYC ($9.99)
             </Button>
 
             <Button

@@ -31,6 +31,8 @@ interface AppState {
   createTransaction: (type: string, amount: string, description: string) => Promise<void>;
   updateEvaluationLimit: (newLimit: number) => Promise<void>;
   updateVerification: (file: File) => Promise<void>;
+  updateUserVerification: () => Promise<void>;
+  checkAutoVerification: () => Promise<void>;
   ensureEvaluationLimit: (user: any) => any;
   checkLocalStorage: () => void;
   logout: () => void;
@@ -493,11 +495,20 @@ export const useAppState = create<AppState>()(
       
       console.log("Backend verification upload response:", response.data);
       
+      // Register the upload date
+      const verifiedDate = new Date().toISOString();
+      await api.patch("/user/verified-date", {
+        verifiedDate: verifiedDate
+      });
+      
+      console.log("Document upload date registered:", verifiedDate);
+      
       // Update local user state to mark as pending verification
       set((state) => {
         const updatedUser = state.user ? {
           ...state.user,
-          isVerified: false, // Still false until admin approves
+          isVerified: false, // Still false until admin approves or 34h passes
+          verifiedDate: verifiedDate,
         } : null;
         
         return { user: updatedUser };
@@ -508,6 +519,66 @@ export const useAppState = create<AppState>()(
       console.error("=== updateVerification ERROR ===");
       console.error("Error uploading verification document:", error);
       throw error; // Re-throw to let the component handle the error
+    }
+  },
+
+  updateUserVerification: async () => {
+    try {
+      console.log("=== updateUserVerification START ===");
+      
+      const response = await api.patch("/user/verify", { 
+        isVerified: true 
+      });
+      
+      console.log("Backend verification status update response:", response.data);
+      
+      // Update local user state
+      set((state) => {
+        const updatedUser = state.user ? {
+          ...state.user,
+          isVerified: true,
+        } : null;
+        
+        return { user: updatedUser };
+      });
+      
+      console.log("=== updateUserVerification SUCCESS ===");
+    } catch (error) {
+      console.error("=== updateUserVerification ERROR ===");
+      console.error("Error updating user verification status:", error);
+      throw error;
+    }
+  },
+
+  checkAutoVerification: async () => {
+    try {
+      console.log("=== checkAutoVerification START ===");
+      
+      const currentUser = get().user;
+      if (!currentUser || currentUser.isVerified || !currentUser.verifiedDate) {
+        console.log("No auto-verification needed");
+        return;
+      }
+      
+      const uploadDate = new Date(currentUser.verifiedDate);
+      const now = new Date();
+      const hoursDiff = (now.getTime() - uploadDate.getTime()) / (1000 * 60 * 60);
+      
+      console.log("Hours since document upload:", hoursDiff);
+      console.log("Upload date:", uploadDate);
+      console.log("Current date:", now);
+      
+      if (hoursDiff >= 34) {
+        console.log("34+ hours passed, auto-verifying user");
+        await get().updateUserVerification();
+      } else {
+        console.log("Less than 34 hours, keeping pending status");
+      }
+      
+      console.log("=== checkAutoVerification END ===");
+    } catch (error) {
+      console.error("=== checkAutoVerification ERROR ===");
+      console.error("Error checking auto-verification:", error);
     }
   },
 
