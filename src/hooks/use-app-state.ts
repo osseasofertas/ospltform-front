@@ -73,6 +73,7 @@ export const useAppState = create<AppState>()(
       },
 
       fetchEvaluations: async () => {
+        console.log("=== fetchEvaluations START ===");
         console.log("fetchEvaluations called");
         set({ loading: true });
         try {
@@ -86,15 +87,22 @@ export const useAppState = create<AppState>()(
           if (data && Array.isArray(data) && data.length > 0) {
             const evaluations = data;
             console.log("Setting evaluations from backend:", evaluations);
+            console.log("Setting evaluations count:", evaluations.length);
             set({ evaluations, loading: false });
+            console.log("=== fetchEvaluations SUCCESS (backend) ===");
           } else {
             console.log("No valid evaluations from backend, keeping local state");
+            console.log("Current local evaluations:", get().evaluations);
             set({ loading: false });
+            console.log("=== fetchEvaluations SUCCESS (local) ===");
           }
         } catch (error) {
+          console.error("=== fetchEvaluations ERROR ===");
           console.error("Error fetching evaluations:", error);
           console.log("Error occurred, keeping local evaluations state");
+          console.log("Current local evaluations:", get().evaluations);
           set({ loading: false });
+          console.log("=== fetchEvaluations ERROR END ===");
         }
       },
 
@@ -123,6 +131,7 @@ export const useAppState = create<AppState>()(
       },
 
       completeEvaluation: async (contentId: number, contentType: string, earning: string) => {
+        console.log("=== completeEvaluation START ===");
         console.log("completeEvaluation called with:", { contentId, contentType, earning });
         
         try {
@@ -140,6 +149,11 @@ export const useAppState = create<AppState>()(
           
           // Update local state
           set((state) => {
+            console.log("Current state before update:", {
+              evaluationsCount: state.evaluations.length,
+              evaluations: state.evaluations
+            });
+            
             const newEvaluation = {
               id: response.data.id || Date.now(), // Use backend ID if available
               userId: state.user?.id || 0,
@@ -154,11 +168,11 @@ export const useAppState = create<AppState>()(
 
             console.log("Creating new evaluation with productId:", newEvaluation.productId);
             console.log("Creating new evaluation with totalEarned:", newEvaluation.totalEarned);
-            console.log("Current evaluations count:", state.evaluations.length);
-            console.log("Current evaluations:", state.evaluations);
+            console.log("New evaluation object:", newEvaluation);
 
             const updatedEvaluations = [...state.evaluations, newEvaluation];
             console.log("Updated evaluations array:", updatedEvaluations);
+            console.log("Updated evaluations count:", updatedEvaluations.length);
 
             const updatedState = {
               evaluations: updatedEvaluations,
@@ -173,7 +187,8 @@ export const useAppState = create<AppState>()(
               } : null,
             };
 
-            console.log("Updated state with new evaluation:", updatedState);
+            console.log("Final updated state:", updatedState);
+            console.log("=== completeEvaluation SUCCESS ===");
             return updatedState;
           });
           
@@ -185,10 +200,17 @@ export const useAppState = create<AppState>()(
           await get().createTransaction("evaluation", earning, transactionDescription);
           
         } catch (error) {
+          console.error("=== completeEvaluation ERROR ===");
           console.error("Error saving evaluation to backend:", error);
           
           // Fallback: save only to local state if backend fails
           set((state) => {
+            console.log("Falling back to local state only");
+            console.log("Current state before fallback:", {
+              evaluationsCount: state.evaluations.length,
+              evaluations: state.evaluations
+            });
+            
             const newEvaluation = {
               id: Date.now(),
               userId: state.user?.id || 0,
@@ -203,15 +225,24 @@ export const useAppState = create<AppState>()(
 
             console.log("Creating local evaluation with productId:", newEvaluation.productId);
             console.log("Creating local evaluation with totalEarned:", newEvaluation.totalEarned);
+            console.log("Local evaluation object:", newEvaluation);
 
-            return {
-              evaluations: [...state.evaluations, newEvaluation],
+            const updatedEvaluations = [...state.evaluations, newEvaluation];
+            console.log("Updated evaluations array (local):", updatedEvaluations);
+            console.log("Updated evaluations count (local):", updatedEvaluations.length);
+
+            const result = {
+              evaluations: updatedEvaluations,
               stats: state.stats ? {
                 ...state.stats,
                 totalEvaluations: (state.stats.totalEvaluations || 0) + 1,
                 totalEarned: (parseFloat(state.stats.totalEarned || "0") + parseFloat(earning)).toFixed(2),
               } : null,
             };
+            
+            console.log("Final fallback state:", result);
+            console.log("=== completeEvaluation FALLBACK SUCCESS ===");
+            return result;
           });
         }
       },

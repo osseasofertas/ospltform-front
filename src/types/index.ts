@@ -34,6 +34,7 @@ export interface AppEvaluation {
   id: number;
   userId: number;
   productId: number;
+  contentId?: number; // Add contentId for backend compatibility
   currentStage: number;
   completed: boolean;
   totalEarned: string;

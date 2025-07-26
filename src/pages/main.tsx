@@ -35,7 +35,7 @@ export default function Main() {
   // Fallbacks to ensure the page never breaks
   const todayEvaluations = stats?.todayEvaluations ?? 0;
   const isDailyLimitReached = todayEvaluations >= 10;
-  const evaluatedIds = new Set((evaluations ?? []).map((e) => e.productId));
+  const evaluatedIds = new Set((evaluations ?? []).map((e) => e.productId || e.contentId));
   const content = user
     ? getTodaysContent(user.registrationDate).filter(
         (item) => !evaluatedIds.has(item.id)
@@ -44,10 +44,14 @@ export default function Main() {
 
   // Debug logs
   useEffect(() => {
+    console.log("=== Main page DEBUG ===");
     console.log("Main page - User registration date:", user?.registrationDate);
     console.log("Main page - Current evaluations:", evaluations);
+    console.log("Main page - Evaluations count:", evaluations?.length);
     console.log("Main page - Evaluated IDs:", Array.from(evaluatedIds));
+    console.log("Main page - Evaluated IDs count:", evaluatedIds.size);
     console.log("Main page - Available content:", content);
+    console.log("Main page - Available content count:", content?.length);
     console.log("Main page - Total content before filter:", getTodaysContent(user?.registrationDate || "").length);
     
     // Debug each content item
@@ -62,6 +66,7 @@ export default function Main() {
     
     // Debug user info
     console.log("Main page - User info:", user);
+    console.log("=== Main page DEBUG END ===");
   }, [evaluations, evaluatedIds, content, user?.registrationDate, user]);
 
   const handleContentSelect = (selectedContent: AppContent) => {
