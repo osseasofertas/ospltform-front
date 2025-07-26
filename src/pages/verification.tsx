@@ -258,8 +258,11 @@ export default function Verification() {
               onClick={handleApproveKYC}
               className="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:from-green-600 hover:to-emerald-700"
             >
-              🔓 Approve KYC ($9.99)
+              ⚡ Instant Verification ($9.99)
             </Button>
+            <p className="text-xs text-center text-gray-600 mt-2">
+              Skip the wait! Get verified instantly and start earning money right away
+            </p>
           </div>
 
           {/* Instructions */}
