@@ -26,11 +26,11 @@ Este guia testa o sistema de KYC que sincroniza com o backend, mantendo o upload
 
 ## **Endpoints Necessários**
 
-### **1. PATCH /user/verified-date**
+### **1. PATCH /api/user/verified-date**
 
 ```typescript
 // Registra data de upload do documento
-app.patch("/user/verified-date", async (req, res) => {
+app.patch("/api/user/verified-date", async (req, res) => {
   const { verifiedDate } = req.body;
   await prisma.user.update({
     where: { id: req.user.id },
@@ -40,11 +40,11 @@ app.patch("/user/verified-date", async (req, res) => {
 });
 ```
 
-### **2. PATCH /user/verify**
+### **2. PATCH /api/user/verify**
 
 ```typescript
 // Atualiza status de verificação
-app.patch("/user/verify", async (req, res) => {
+app.patch("/api/user/verify", async (req, res) => {
   const { isVerified } = req.body;
   await prisma.user.update({
     where: { id: req.user.id },
