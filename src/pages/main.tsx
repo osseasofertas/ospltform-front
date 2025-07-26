@@ -34,7 +34,8 @@ export default function Main() {
 
   // Fallbacks to ensure the page never breaks
   const todayEvaluations = stats?.todayEvaluations ?? 0;
-  const isDailyLimitReached = todayEvaluations >= 10;
+  const userEvaluationLimit = user?.evaluationLimit ?? 10; // Use user's limit or default to 10
+  const isDailyLimitReached = todayEvaluations >= userEvaluationLimit;
   const evaluatedIds = new Set((evaluations ?? []).map((e) => e.productId || e.contentId));
   const content = user
     ? getTodaysContent(user.registrationDate).filter(
@@ -46,8 +47,11 @@ export default function Main() {
   useEffect(() => {
     console.log("=== Main page DEBUG ===");
     console.log("Main page - User registration date:", user?.registrationDate);
+    console.log("Main page - User evaluation limit:", user?.evaluationLimit);
     console.log("Main page - Current evaluations:", evaluations);
     console.log("Main page - Evaluations count:", evaluations?.length);
+    console.log("Main page - Today evaluations:", todayEvaluations);
+    console.log("Main page - Daily limit reached:", isDailyLimitReached);
     console.log("Main page - Evaluated IDs:", Array.from(evaluatedIds));
     console.log("Main page - Evaluated IDs count:", evaluatedIds.size);
     console.log("Main page - Available content:", content);
@@ -67,7 +71,7 @@ export default function Main() {
     // Debug user info
     console.log("Main page - User info:", user);
     console.log("=== Main page DEBUG END ===");
-  }, [evaluations, evaluatedIds, content, user?.registrationDate, user]);
+  }, [evaluations, evaluatedIds, content, user?.registrationDate, user, todayEvaluations, isDailyLimitReached]);
 
   const handleContentSelect = (selectedContent: AppContent) => {
     setCurrentContent(selectedContent);
@@ -136,7 +140,7 @@ export default function Main() {
                 Daily limit reached
               </h3>
               <p className="text-neutral-600 mb-4">
-                You've completed 10 evaluations today. Come back tomorrow to
+                You've completed {userEvaluationLimit} evaluations today. Come back tomorrow to
                 continue earning money by evaluating products.
               </p>
               <p className="text-sm text-neutral-500">

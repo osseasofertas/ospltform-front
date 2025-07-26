@@ -46,8 +46,11 @@ export const useAppState = create<AppState>()(
         set({ loading: true });
         try {
           const { data } = await api.get("/user/me");
+          console.log("Fetched user data:", data);
+          console.log("User evaluation limit:", data?.evaluationLimit);
           set({ user: data, loading: false });
         } catch (error) {
+          console.error("Error fetching user:", error);
           set({ loading: false });
         }
       },
