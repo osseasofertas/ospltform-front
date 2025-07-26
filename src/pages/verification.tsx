@@ -141,11 +141,7 @@ export default function Verification() {
                 <p className="text-sm text-gray-600">
                   Document uploaded: {new Date(user.verifiedDate).toLocaleString()}
                 </p>
-                {timeRemaining && (
-                  <p className="text-sm text-blue-600 font-medium">
-                    ⏰ Auto-verification in: {timeRemaining.hours}h {timeRemaining.minutes}m
-                  </p>
-                )}
+                
               </div>
             )}
           </div>
