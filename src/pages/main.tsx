@@ -48,6 +48,7 @@ export default function Main() {
   // Debug logs
   useEffect(() => {
     console.log("=== Main page DEBUG ===");
+    console.log("Main page - User balance:", user?.balance);
     console.log("Main page - User registration date:", user?.registrationDate);
     console.log("Main page - User evaluation limit:", user?.evaluationLimit);
     console.log("Main page - Current evaluations:", evaluations);

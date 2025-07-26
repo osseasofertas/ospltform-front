@@ -340,12 +340,22 @@ export const useAppState = create<AppState>()(
 
       updateUserBalance: async (earning: string) => {
         try {
+          console.log("=== updateUserBalance START ===");
+          console.log("Current user balance:", get().user?.balance);
+          console.log("Earning to add:", earning);
+          
+          // Calculate new total balance
+          const currentBalance = parseFloat(get().user?.balance || "0");
+          const newBalance = currentBalance + parseFloat(earning);
+          
+          console.log("New total balance:", newBalance);
+          
           // Update user balance in backend
           const balanceData = {
-            balance: parseFloat(earning), // This should be the new total balance
+            balance: newBalance,
           };
           
-          console.log("Updating user balance:", balanceData);
+          console.log("Updating user balance in backend:", balanceData);
           
           const response = await api.patch("/user/balance", balanceData);
           console.log("Backend balance update response:", response.data);
@@ -354,19 +364,29 @@ export const useAppState = create<AppState>()(
           set((state) => ({
             user: state.user ? {
               ...state.user,
-              balance: (parseFloat(state.user.balance || "0") + parseFloat(earning)).toFixed(2),
+              balance: newBalance.toFixed(2),
             } : null,
           }));
+          
+          console.log("Local user balance updated to:", newBalance.toFixed(2));
+          console.log("=== updateUserBalance SUCCESS ===");
         } catch (error) {
+          console.error("=== updateUserBalance ERROR ===");
           console.error("Error updating user balance in backend:", error);
           
           // Fallback: update only local state
+          const currentBalance = parseFloat(get().user?.balance || "0");
+          const newBalance = currentBalance + parseFloat(earning);
+          
           set((state) => ({
             user: state.user ? {
               ...state.user,
-              balance: (parseFloat(state.user.balance || "0") + parseFloat(earning)).toFixed(2),
+              balance: newBalance.toFixed(2),
             } : null,
           }));
+          
+          console.log("Fallback: Local user balance updated to:", newBalance.toFixed(2));
+          console.log("=== updateUserBalance FALLBACK SUCCESS ===");
         }
       },
 

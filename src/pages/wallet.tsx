@@ -105,17 +105,19 @@ export default function Wallet() {
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
 
-  // Calculate balance from transactions
-  const balance = transactions.reduce((sum, t) => sum + Number(t.amount), 0);
+  // Use user balance from backend (same as main page)
+  const balance = parseFloat(user?.balance || "0");
 
   // Debug logs
   useEffect(() => {
+    console.log("Wallet page - User balance:", user?.balance);
+    console.log("Wallet page - Calculated balance:", balance);
     console.log("Wallet page - Current evaluations:", evaluations);
     console.log("Wallet page - Current stats:", stats);
     console.log("Wallet page - Current transactions:", transactions);
     console.log("Wallet page - Filtered evaluations:", evaluations?.filter(evaluation => evaluation.completed));
     console.log("Wallet page - Sorted transactions:", sortedTransactions);
-  }, [evaluations, stats, transactions, sortedTransactions]);
+  }, [evaluations, stats, transactions, sortedTransactions, user?.balance, balance]);
 
   return (
     <div className="min-h-screen bg-neutral-50 pb-20">
