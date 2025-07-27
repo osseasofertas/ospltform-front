@@ -29,6 +29,12 @@ export default function Login() {
       if (response.data && response.data.access_token) {
         // Save the access_token in localStorage
         localStorage.setItem("access_token", response.data.access_token);
+        
+        // Save refresh_token if provided
+        if (response.data.refresh_token) {
+          localStorage.setItem("refresh_token", response.data.refresh_token);
+        }
+        
         // Fetch the authenticated user data and update the global state
         await fetchUser();
         

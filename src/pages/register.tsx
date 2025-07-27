@@ -27,6 +27,12 @@ export default function Register() {
       // If registration is successful, try to get the token
       if (response.data && response.data.access_token) {
         localStorage.setItem("access_token", response.data.access_token);
+        
+        // Save refresh_token if provided
+        if (response.data.refresh_token) {
+          localStorage.setItem("refresh_token", response.data.refresh_token);
+        }
+        
         await fetchUser();
       }
       

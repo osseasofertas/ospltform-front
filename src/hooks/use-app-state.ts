@@ -581,6 +581,7 @@ export const useAppState = create<AppState>()(
 
   logout: () => {
     localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
     set({
       user: null,
       transactions: [],
@@ -633,3 +634,29 @@ export const useAppState = create<AppState>()(
     }
   )
 );
+
+// Listen for token expiration events
+if (typeof window !== 'undefined') {
+  window.addEventListener('tokenExpired', (event: any) => {
+    const message = event.detail?.message || 'Your session has expired. Please log in again.';
+    console.log(message);
+    
+    // Get the current state and logout
+    const { logout } = useAppState.getState();
+    logout();
+    
+    // Show toast notification
+    import('@/hooks/use-toast').then(({ toast }) => {
+      toast({
+        title: "Session Expired",
+        description: message,
+        variant: "destructive",
+      });
+    });
+    
+    // Redirect to login after a short delay
+    setTimeout(() => {
+      window.location.href = '/login';
+    }, 2000);
+  });
+}
