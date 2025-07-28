@@ -80,15 +80,22 @@ export default function Verification() {
   };
 
   const handleApproveKYC = () => {
+    if (!user) {
+      setErrorMessage('User not found. Please log in again.');
+      return;
+    }
+    
     // Store user data for KYC approval
     const kycData = {
-      userId: user?.id,
-      userEmail: user?.email,
-      userName: user?.name,
+      userId: user.id,
+      userEmail: user.email,
+      userName: user.name,
       type: 'kyc_approval',
-      price: 9.99
+      price: 9.99,
+      timestamp: new Date().toISOString()
     };
     
+    console.log("Storing KYC data:", kycData);
     localStorage.setItem('kyc_package', JSON.stringify(kycData));
     
     // Redirect to KYC approval payment

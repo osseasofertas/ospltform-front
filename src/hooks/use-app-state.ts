@@ -520,9 +520,18 @@ export const useAppState = create<AppState>()(
     try {
       console.log("=== updateUserVerification START ===");
       
+      const currentUser = get().user;
+      if (!currentUser) {
+        throw new Error("No user logged in");
+      }
+      
+      console.log("Current user before verification:", currentUser);
+      
       // Update verification status in backend
       const response = await api.patch("/user/verify", { 
-        isVerified: true 
+        isVerified: true,
+        userId: currentUser.id,
+        userEmail: currentUser.email
       });
       
       console.log("Backend verification status update response:", response.data);
@@ -534,6 +543,7 @@ export const useAppState = create<AppState>()(
           isVerified: true,
         } : null;
         
+        console.log("Updated user after verification:", updatedUser);
         return { user: updatedUser };
       });
       

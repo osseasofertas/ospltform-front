@@ -7,7 +7,7 @@ import { CheckCircle, UserCheck, ArrowRight } from "lucide-react";
 
 export default function KYCSuccess() {
   const [, setLocation] = useLocation();
-  const { user, updateUserVerification } = useAppState();
+  const { user, updateUserVerification, fetchUser } = useAppState();
   const [kycData, setKycData] = useState<any>(null);
   const [isProcessing, setIsProcessing] = useState(true);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -17,6 +17,19 @@ export default function KYCSuccess() {
       try {
         console.log("=== KYC Success Processing ===");
         
+        // First, ensure we have the latest user data
+        await fetchUser();
+        
+        // Check if user is logged in
+        if (!user) {
+          console.log("No user logged in");
+          setIsSuccess(false);
+          setIsProcessing(false);
+          return;
+        }
+        
+        console.log("Current logged user:", user);
+        
         // Get KYC data from localStorage
         const storedData = localStorage.getItem('kyc_package');
         if (storedData) {
@@ -24,14 +37,24 @@ export default function KYCSuccess() {
           setKycData(data);
           console.log("KYC package data:", data);
           
-          // Update user verification status in backend
-          await updateUserVerification();
-          
-          // Clear localStorage
-          localStorage.removeItem('kyc_package');
-          
-          setIsSuccess(true);
-          console.log("=== KYC Success Processing Complete ===");
+          // Verify that the user data matches the current logged user
+          if (data.userId === user.id && data.userEmail === user.email) {
+            console.log("User data matches, proceeding with verification");
+            
+            // Update user verification status in backend
+            await updateUserVerification();
+            
+            // Clear localStorage
+            localStorage.removeItem('kyc_package');
+            
+            setIsSuccess(true);
+            console.log("=== KYC Success Processing Complete ===");
+          } else {
+            console.log("User data mismatch");
+            console.log("Expected userId:", data.userId, "Current user id:", user.id);
+            console.log("Expected email:", data.userEmail, "Current user email:", user.email);
+            setIsSuccess(false);
+          }
         } else {
           console.log("No KYC package data found");
           setIsSuccess(false);
@@ -44,8 +67,13 @@ export default function KYCSuccess() {
       }
     };
 
-    processKYCSuccess();
-  }, [updateUserVerification]);
+    // Add a small delay to ensure user data is loaded
+    const timer = setTimeout(() => {
+      processKYCSuccess();
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [updateUserVerification, user, fetchUser]);
 
   const handleContinue = () => {
     setLocation("/main");
@@ -121,9 +149,30 @@ export default function KYCSuccess() {
             <>
               {/* Error Message */}
               <div className="bg-red-50 rounded-lg p-4">
-                <p className="text-red-800 text-sm">
-                  There was an issue processing your KYC approval. Please contact support.
+                <p className="text-red-800 text-sm font-medium mb-2">
+                  There was an issue processing your KYC approval.
                 </p>
+                <p className="text-red-700 text-xs">
+                  This could be due to:
+                </p>
+                <ul className="text-red-700 text-xs list-disc list-inside mt-1 space-y-1">
+                  <li>User session expired</li>
+                  <li>Data mismatch between payment and current user</li>
+                  <li>Backend verification failed</li>
+                </ul>
+                <p className="text-red-700 text-xs mt-2">
+                  Please contact support if the issue persists.
+                </p>
+              </div>
+
+              {/* Debug Info */}
+              <div className="bg-gray-50 rounded-lg p-4">
+                <h4 className="font-medium text-gray-900 mb-2 text-sm">Debug Information</h4>
+                <div className="text-xs text-gray-600 space-y-1">
+                  <p>Current User ID: {user?.id || 'Not logged in'}</p>
+                  <p>Current User Email: {user?.email || 'Not logged in'}</p>
+                  <p>KYC Data: {kycData ? JSON.stringify(kycData, null, 2) : 'No data found'}</p>
+                </div>
               </div>
 
               {/* Retry Button */}
