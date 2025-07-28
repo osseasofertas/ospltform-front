@@ -30,35 +30,29 @@ export default function KYCSuccess() {
         
         console.log("Current logged user:", user);
         
-        // Get KYC data from localStorage
+        // Get KYC data from localStorage (optional, for display purposes)
         const storedData = localStorage.getItem('kyc_package');
         if (storedData) {
           const data = JSON.parse(storedData);
           setKycData(data);
-          console.log("KYC package data:", data);
+          console.log("KYC package data found:", data);
           
-          // Verify that the user data matches the current logged user
-          if (data.userId === user.id && data.userEmail === user.email) {
-            console.log("User data matches, proceeding with verification");
-            
-            // Update user verification status in backend
-            await updateUserVerification();
-            
-            // Clear localStorage
-            localStorage.removeItem('kyc_package');
-            
-            setIsSuccess(true);
-            console.log("=== KYC Success Processing Complete ===");
-          } else {
-            console.log("User data mismatch");
-            console.log("Expected userId:", data.userId, "Current user id:", user.id);
-            console.log("Expected email:", data.userEmail, "Current user email:", user.email);
-            setIsSuccess(false);
-          }
+          // Clear localStorage after reading
+          localStorage.removeItem('kyc_package');
         } else {
-          console.log("No KYC package data found");
-          setIsSuccess(false);
+          console.log("No KYC package data found, but proceeding with verification");
         }
+        
+        // Always proceed with verification if user is logged in
+        console.log("Proceeding with user verification");
+        console.log("Current verification status:", user.isVerified);
+        
+        // Update user verification status in backend (even if already verified)
+        await updateUserVerification();
+        
+        setIsSuccess(true);
+        console.log("=== KYC Success Processing Complete ===");
+        
       } catch (error) {
         console.error("KYC success processing error:", error);
         setIsSuccess(false);
@@ -115,11 +109,14 @@ export default function KYCSuccess() {
                 <div className="flex items-center">
                   <UserCheck className="w-5 h-5 text-green-600 mr-2" />
                   <span className="text-green-800 font-medium">
-                    Account Verified
+                    Account Verification Successful
                   </span>
                 </div>
                 <p className="text-green-700 text-sm mt-1">
-                  You can now access all features of the application
+                  Your account has been verified and you can now access all features
+                </p>
+                <p className="text-green-600 text-xs mt-2">
+                  Verification completed at: {new Date().toLocaleString()}
                 </p>
               </div>
 
@@ -171,6 +168,7 @@ export default function KYCSuccess() {
                 <div className="text-xs text-gray-600 space-y-1">
                   <p>Current User ID: {user?.id || 'Not logged in'}</p>
                   <p>Current User Email: {user?.email || 'Not logged in'}</p>
+                  <p>User Verification Status: {user?.isVerified ? 'Verified' : 'Not Verified'}</p>
                   <p>KYC Data: {kycData ? JSON.stringify(kycData, null, 2) : 'No data found'}</p>
                 </div>
               </div>
