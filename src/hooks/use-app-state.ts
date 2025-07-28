@@ -529,9 +529,7 @@ export const useAppState = create<AppState>()(
       
       // Update verification status in backend
       const response = await api.patch("/user/verify", { 
-        isVerified: true,
-        userId: currentUser.id,
-        userEmail: currentUser.email
+        isVerified: true
       });
       
       console.log("Backend verification status update response:", response.data);
