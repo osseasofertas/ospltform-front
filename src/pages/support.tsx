@@ -62,11 +62,12 @@ export default function Support() {
               <div className="space-y-4">
                 <div>
                   <h4 className="font-medium text-neutral-800 mb-2">
-                    How do I log into the application?
+                    How do I register and log into the application?
                   </h4>
                   <p className="text-sm text-neutral-600 ml-4">
-                    Enter your <strong>email address</strong> on the login
-                    screen and tap "Log in". No password required.
+                    Enter your <strong>email address</strong> on the registration
+                    screen and tap "Register". You'll need to upload ID documents
+                    for verification before accessing the platform.
                   </p>
                 </div>
                 <div>
@@ -74,8 +75,9 @@ export default function Support() {
                     What if I can't access my account?
                   </h4>
                   <p className="text-sm text-neutral-600 ml-4">
-                    Simply enter any email address to create a new account
-                    with $50.00 starting balance.
+                    If you can't access your account, you'll need to register again
+                    with a new email address and complete the document verification process.
+                    Each account requires valid ID documents for verification.
                   </p>
                 </div>
                 <div>
