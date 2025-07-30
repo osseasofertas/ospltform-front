@@ -293,7 +293,27 @@ export default function Verification() {
             {/* Custom Upsell Button */}
             <div className="upsell-wrapper">
               <div className="lotuzpay-flex lotuzpay-gap">
-                <button id="btnUpsell" className="lotuzpay-button" data-product-id="3198">
+                <button 
+                  id="btnUpsell" 
+                  className="lotuzpay-button" 
+                  data-product-id="3198"
+                  style={{
+                    fontFamily: 'satoshi, arial',
+                    padding: '15px 40px',
+                    border: 'none',
+                    background: '#2cc449',
+                    borderRadius: '4px',
+                    color: 'white',
+                    fontSize: '16px',
+                    marginBottom: '15px',
+                    width: '100%',
+                    transition: '.05s ease-in-out',
+                    cursor: 'pointer',
+                    fontWeight: '500',
+                    letterSpacing: '.5px',
+                    textAlign: 'center'
+                  }}
+                >
                   ⚡ Instant Verification ($9.99)
                 </button>
               </div>
