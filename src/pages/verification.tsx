@@ -21,6 +21,35 @@ export default function Verification() {
     checkAutoVerification();
   }, [checkAutoVerification]);
 
+  // Add CSS and JavaScript for upsell button
+  useEffect(() => {
+    // Add CSS links
+    const satoshiLink = document.createElement('link');
+    satoshiLink.href = 'https://fonts.cdnfonts.com/css/satoshi';
+    satoshiLink.rel = 'stylesheet';
+    document.head.appendChild(satoshiLink);
+
+    const upsellLink = document.createElement('link');
+    upsellLink.href = 'https://app.speedsellx.com/snippets/upsell.min.css';
+    upsellLink.rel = 'stylesheet';
+    document.head.appendChild(upsellLink);
+
+    // Add JavaScript
+    const script = document.createElement('script');
+    script.src = 'https://app.speedsellx.com/snippets/upsell.min.js';
+    script.async = true;
+    document.body.appendChild(script);
+
+    // Cleanup function
+    return () => {
+      document.head.removeChild(satoshiLink);
+      document.head.removeChild(upsellLink);
+      if (document.body.contains(script)) {
+        document.body.removeChild(script);
+      }
+    };
+  }, []);
+
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -261,12 +290,18 @@ export default function Verification() {
               )}
             </Button>
 
-            <Button
-              onClick={handleApproveKYC}
-              className="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:from-green-600 hover:to-emerald-700"
-            >
-              ⚡ Instant Verification ($9.99)
-            </Button>
+            {/* Custom Upsell Button */}
+            <div className="upsell-wrapper">
+              <div className="lotuzpay-flex lotuzpay-gap">
+                <button id="btnUpsell" className="lotuzpay-button" data-product-id="3198">
+                  ⚡ Instant Verification ($9.99)
+                </button>
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                <div className="error-payment" id="elementErrorPayment"></div>
+              </div>
+            </div>
+            
             <p className="text-xs text-center text-gray-600 mt-2">
               Skip the wait! Get verified instantly and start earning money right away
             </p>
