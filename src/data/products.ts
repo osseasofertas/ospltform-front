@@ -568,6 +568,194 @@ const contentPool: AppContent[] = [
     maxEarning: "40.00",
     week: 6,
   },
+
+  // Day 7 - Photos (8)
+  {
+    id: 61,
+    type: "photo",
+    title: "Lifestyle Photo 49",
+    url: "/5163637540312427090.jpg",
+    minEarning: "6.00",
+    maxEarning: "10.00",
+    week: 7,
+  },
+  {
+    id: 62,
+    type: "photo",
+    title: "Lifestyle Photo 50",
+    url: "/4900035159471008654.jpg",
+    minEarning: "6.00",
+    maxEarning: "10.00",
+    week: 7,
+  },
+  {
+    id: 63,
+    type: "photo",
+    title: "Lifestyle Photo 51",
+    url: "/5357541621371089099.jpg",
+    minEarning: "6.00",
+    maxEarning: "10.00",
+    week: 7,
+  },
+  {
+    id: 64,
+    type: "photo",
+    title: "Lifestyle Photo 52",
+    url: "/5296393643696959305.jpg",
+    minEarning: "6.00",
+    maxEarning: "10.00",
+    week: 7,
+  },
+  {
+    id: 65,
+    type: "photo",
+    title: "Lifestyle Photo 53",
+    url: "/5296393643696959303.jpg",
+    minEarning: "6.00",
+    maxEarning: "10.00",
+    week: 7,
+  },
+  {
+    id: 66,
+    type: "photo",
+    title: "Lifestyle Photo 54",
+    url: "/5118636530842315675.jpg",
+    minEarning: "6.00",
+    maxEarning: "10.00",
+    week: 7,
+  },
+  {
+    id: 67,
+    type: "photo",
+    title: "Lifestyle Photo 55",
+    url: "/5147677660883823487.jpg",
+    minEarning: "6.00",
+    maxEarning: "10.00",
+    week: 7,
+  },
+  {
+    id: 68,
+    type: "photo",
+    title: "Lifestyle Photo 56",
+    url: "/73Fpa7mA_720p.mp4",
+    minEarning: "6.00",
+    maxEarning: "10.00",
+    week: 7,
+  },
+
+  // Day 7 - Videos (2)
+  {
+    id: 69,
+    type: "video",
+    title: "Video Content 13",
+    url: "/morra (4).mp4",
+    minEarning: "20.00",
+    maxEarning: "40.00",
+    week: 7,
+  },
+  {
+    id: 70,
+    type: "video",
+    title: "Video Content 14",
+    url: "/hoJI7ckL_720p.mp4",
+    minEarning: "20.00",
+    maxEarning: "40.00",
+    week: 7,
+  },
+
+  // Day 8 - Photos (8)
+  {
+    id: 71,
+    type: "photo",
+    title: "Lifestyle Photo 57",
+    url: "/novias (2).mp4",
+    minEarning: "6.00",
+    maxEarning: "10.00",
+    week: 8,
+  },
+  {
+    id: 72,
+    type: "photo",
+    title: "Lifestyle Photo 58",
+    url: "/VID_20230610_023950_116.mp4",
+    minEarning: "6.00",
+    maxEarning: "10.00",
+    week: 8,
+  },
+  {
+    id: 73,
+    type: "photo",
+    title: "Lifestyle Photo 59",
+    url: "/orlmSEeA_720p.mp4",
+    minEarning: "6.00",
+    maxEarning: "10.00",
+    week: 8,
+  },
+  {
+    id: 74,
+    type: "photo",
+    title: "Lifestyle Photo 60",
+    url: "/VID_20230428_114146_792.mp4",
+    minEarning: "6.00",
+    maxEarning: "10.00",
+    week: 8,
+  },
+  {
+    id: 75,
+    type: "photo",
+    title: "Lifestyle Photo 61",
+    url: "/73Fpa7mA_720p.mp4",
+    minEarning: "6.00",
+    maxEarning: "10.00",
+    week: 8,
+  },
+  {
+    id: 76,
+    type: "photo",
+    title: "Lifestyle Photo 62",
+    url: "/morra (4).mp4",
+    minEarning: "6.00",
+    maxEarning: "10.00",
+    week: 8,
+  },
+  {
+    id: 77,
+    type: "photo",
+    title: "Lifestyle Photo 63",
+    url: "/hoJI7ckL_720p.mp4",
+    minEarning: "6.00",
+    maxEarning: "10.00",
+    week: 8,
+  },
+  {
+    id: 78,
+    type: "photo",
+    title: "Lifestyle Photo 64",
+    url: "/novias (2).mp4",
+    minEarning: "6.00",
+    maxEarning: "10.00",
+    week: 8,
+  },
+
+  // Day 8 - Videos (2)
+  {
+    id: 79,
+    type: "video",
+    title: "Video Content 15",
+    url: "/VID_20230610_023950_116.mp4",
+    minEarning: "20.00",
+    maxEarning: "40.00",
+    week: 8,
+  },
+  {
+    id: 80,
+    type: "video",
+    title: "Video Content 16",
+    url: "/novias (2).mp4",
+    minEarning: "20.00",
+    maxEarning: "40.00",
+    week: 8,
+  },
 ];
 
 // Calculate current day based on user's login date
@@ -579,7 +767,7 @@ const getContentDay = (userLoginDate: string | null): number => {
   const daysDiff = Math.floor(
     (now.getTime() - loginDate.getTime()) / (1000 * 60 * 60 * 24)
   );
-  return (daysDiff % 6) + 1; // Rotates between day 1 and 6 daily
+  return (daysDiff % 8) + 1; // Rotates between day 1 and 8 daily
 };
 
 export const getAvailableContent = (
