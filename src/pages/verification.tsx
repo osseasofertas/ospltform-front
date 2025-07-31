@@ -291,40 +291,93 @@ export default function Verification() {
             </Button>
 
             {/* Custom Upsell Button */}
-            <div className="upsell-wrapper">
-              <div className="lotuzpay-flex lotuzpay-gap">
+            <div className="upsell-wrapper relative">
+              {/* Animated Arrow pointing to button */}
+              <div className="absolute -top-12 left-1/2 transform -translate-x-1/2 flex flex-col items-center animate-bounce">
+                <div className="text-sm font-bold text-blue-600 mb-2 bg-white px-3 py-1 rounded-full shadow-lg border-2 border-blue-200 animate-pulse">
+                  ✨ click here to skip the wait ✨
+                </div>
+                <div className="w-0 h-0 border-l-6 border-r-6 border-t-6 border-transparent border-t-blue-600 animate-pulse"></div>
+              </div>
+              
+              <div className="lotuzpay-flex lotuzpay-gap relative">
+                {/* Glowing effect behind button */}
+                <div className="absolute inset-0 bg-gradient-to-r from-green-400 via-green-500 to-green-600 rounded-lg blur-lg opacity-75 animate-pulse"></div>
+                
                 <button 
                   id="btnUpsell" 
-                  className="lotuzpay-button" 
+                  className="lotuzpay-button relative z-10 transform hover:scale-105 transition-all duration-300 hover:shadow-2xl" 
                   data-product-id="3198"
                   style={{
                     fontFamily: 'satoshi, arial',
-                    padding: '15px 40px',
+                    padding: '18px 40px',
                     border: 'none',
-                    background: '#2cc449',
-                    borderRadius: '4px',
+                    background: 'linear-gradient(45deg, #22c55e, #16a34a, #15803d)',
+                    borderRadius: '12px',
                     color: 'white',
-                    fontSize: '16px',
+                    fontSize: '18px',
                     marginBottom: '15px',
                     width: '100%',
-                    transition: '.05s ease-in-out',
                     cursor: 'pointer',
-                    fontWeight: '500',
+                    fontWeight: '600',
                     letterSpacing: '.5px',
-                    textAlign: 'center'
+                    textAlign: 'center',
+                    boxShadow: '0 10px 25px rgba(34, 197, 94, 0.3)',
+                    position: 'relative',
+                    overflow: 'hidden'
                   }}
                 >
-                  ⚡ Instant Verification ($9.99)
+                  {/* Animated background effect */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-20" 
+                       style={{transform: 'translateX(-100%)', animation: 'shimmer 2s infinite'}}></div>
+                  
+                  {/* Pulsing glow effect */}
+                  <div className="absolute inset-0 bg-green-400 rounded-lg opacity-30 animate-ping"></div>
+                  
+                  {/* Button content */}
+                  <div className="relative z-10 flex items-center justify-center space-x-2">
+                    <span className="text-2xl animate-pulse">⚡</span>
+                    <div className="flex flex-col">
+                      <span className="text-lg font-bold">Instant Verification</span>
+                      <span className="text-sm opacity-90">($9.99)</span>
+                    </div>
+                    <span className="text-2xl animate-bounce">🚀</span>
+                  </div>
                 </button>
               </div>
+              
+              {/* Floating elements around button */}
+              <div className="absolute -top-4 -left-4 text-2xl animate-bounce" style={{animationDelay: '0.5s'}}>💎</div>
+              <div className="absolute -top-4 -right-4 text-2xl animate-bounce" style={{animationDelay: '1s'}}>⭐</div>
+              <div className="absolute -bottom-4 -left-6 text-xl animate-bounce" style={{animationDelay: '1.5s'}}>🎯</div>
+              <div className="absolute -bottom-4 -right-6 text-xl animate-bounce" style={{animationDelay: '2s'}}>🔥</div>
+              
               <div style={{ textAlign: 'center' }}>
                 <div className="error-payment" id="elementErrorPayment"></div>
               </div>
             </div>
             
-            <p className="text-xs text-center text-gray-600 mt-2">
-              Skip the wait! Get verified instantly and start earning money right away
-            </p>
+            {/* Add custom CSS animations */}
+            <style>{`
+              @keyframes shimmer {
+                0% { transform: translateX(-100%); }
+                100% { transform: translateX(100%); }
+              }
+              
+              .lotuzpay-button:hover {
+                background: linear-gradient(45deg, #16a34a, #15803d, #166534) !important;
+                box-shadow: 0 15px 35px rgba(34, 197, 94, 0.4) !important;
+              }
+            `}</style>
+            
+            <div className="text-center mt-4 p-3 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg border border-yellow-200">
+              <p className="text-sm font-semibold text-orange-700 mb-1">
+                ⏰ Limited Time Offer - Save 50%!
+              </p>
+              <p className="text-xs text-orange-600 animate-pulse">
+                Skip the wait! Get verified instantly and start earning money right away
+              </p>
+            </div>
           </div>
 
           {/* Instructions */}
