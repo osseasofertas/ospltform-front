@@ -53,7 +53,7 @@ export default function Main() {
   const isDailyLimitReached = todayEvaluations >= userEvaluationLimit;
   const evaluatedIds = new Set((evaluations ?? []).map((e) => e.productId || e.contentId));
   const content = user
-    ? getTodaysContent(user.registrationDate).filter(
+    ? getTodaysContent(user.registrationDate, userEvaluationLimit).filter(
         (item) => !evaluatedIds.has(item.id)
       )
     : [];
@@ -77,10 +77,10 @@ export default function Main() {
     console.log("Main page - Evaluated IDs count:", evaluatedIds.size);
     console.log("Main page - Available content:", content);
     console.log("Main page - Available content count:", content?.length);
-    console.log("Main page - Total content before filter:", getTodaysContent(user?.registrationDate || "").length);
+    console.log("Main page - Total content before filter:", getTodaysContent(user?.registrationDate || "", userEvaluationLimit).length);
     
     // Debug each content item
-    const allContent = getTodaysContent(user?.registrationDate || "");
+    const allContent = getTodaysContent(user?.registrationDate || "", userEvaluationLimit);
     console.log("Main page - All content items:", allContent.map(item => ({ id: item.id, title: item.title })));
     
     // Debug filtering process

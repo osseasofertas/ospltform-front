@@ -756,6 +756,476 @@ const contentPool: AppContent[] = [
     maxEarning: "40.00",
     week: 8,
   },
+
+  // Day 9 - Photos (8) - Additional content for users with >10 evaluations
+  {
+    id: 81,
+    type: "photo",
+    title: "Lifestyle Photo 65",
+    url: "/5118636530842315678.jpg",
+    minEarning: "6.00",
+    maxEarning: "10.00",
+    week: 9,
+  },
+  {
+    id: 82,
+    type: "photo",
+    title: "Lifestyle Photo 66",
+    url: "/5136402710306860133.jpg",
+    minEarning: "6.00",
+    maxEarning: "10.00",
+    week: 9,
+  },
+  {
+    id: 83,
+    type: "photo",
+    title: "Lifestyle Photo 67",
+    url: "/5136545475019779304.jpg",
+    minEarning: "6.00",
+    maxEarning: "10.00",
+    week: 9,
+  },
+  {
+    id: 84,
+    type: "photo",
+    title: "Lifestyle Photo 68",
+    url: "/5145550466661329818.jpg",
+    minEarning: "6.00",
+    maxEarning: "10.00",
+    week: 9,
+  },
+  {
+    id: 85,
+    type: "photo",
+    title: "Lifestyle Photo 69",
+    url: "/5186328200429546452.jpg",
+    minEarning: "6.00",
+    maxEarning: "10.00",
+    week: 9,
+  },
+  {
+    id: 86,
+    type: "photo",
+    title: "Lifestyle Photo 70",
+    url: "/5213073953919188680.jpg",
+    minEarning: "6.00",
+    maxEarning: "10.00",
+    week: 9,
+  },
+  {
+    id: 87,
+    type: "photo",
+    title: "Lifestyle Photo 71",
+    url: "/5031041780941958553.jpg",
+    minEarning: "6.00",
+    maxEarning: "10.00",
+    week: 9,
+  },
+  {
+    id: 88,
+    type: "photo",
+    title: "Lifestyle Photo 72",
+    url: "/5048844351664401978.jpg",
+    minEarning: "6.00",
+    maxEarning: "10.00",
+    week: 9,
+  },
+
+  // Day 9 - Videos (2)
+  {
+    id: 89,
+    type: "video",
+    title: "Video Content 17",
+    url: "/video_2023-11-14_20-56-35 (2).mp4",
+    minEarning: "20.00",
+    maxEarning: "40.00",
+    week: 9,
+  },
+  {
+    id: 90,
+    type: "video",
+    title: "Video Content 18",
+    url: "/video4922615369752905396.mp4",
+    minEarning: "20.00",
+    maxEarning: "40.00",
+    week: 9,
+  },
+
+  // Day 10 - Photos (8) - Additional content for users with >10 evaluations
+  {
+    id: 91,
+    type: "photo",
+    title: "Lifestyle Photo 73",
+    url: "/5114366259608267970.jpg",
+    minEarning: "6.00",
+    maxEarning: "10.00",
+    week: 10,
+  },
+  {
+    id: 92,
+    type: "photo",
+    title: "Lifestyle Photo 74",
+    url: "/5116545710697851820.jpg",
+    minEarning: "6.00",
+    maxEarning: "10.00",
+    week: 10,
+  },
+  {
+    id: 93,
+    type: "photo",
+    title: "Lifestyle Photo 75",
+    url: "/4925039673089306356.jpg",
+    minEarning: "6.00",
+    maxEarning: "10.00",
+    week: 10,
+  },
+  {
+    id: 94,
+    type: "photo",
+    title: "Lifestyle Photo 76",
+    url: "/4920311639945883436.jpg",
+    minEarning: "6.00",
+    maxEarning: "10.00",
+    week: 10,
+  },
+  {
+    id: 95,
+    type: "photo",
+    title: "Lifestyle Photo 77",
+    url: "/4900035159471008654.jpg",
+    minEarning: "6.00",
+    maxEarning: "10.00",
+    week: 10,
+  },
+  {
+    id: 96,
+    type: "photo",
+    title: "Lifestyle Photo 78",
+    url: "/4900035159471008655.jpg",
+    minEarning: "6.00",
+    maxEarning: "10.00",
+    week: 10,
+  },
+  {
+    id: 97,
+    type: "photo",
+    title: "Lifestyle Photo 79",
+    url: "/4900035159471008656.jpg",
+    minEarning: "6.00",
+    maxEarning: "10.00",
+    week: 10,
+  },
+  {
+    id: 98,
+    type: "photo",
+    title: "Lifestyle Photo 80",
+    url: "/4900035159471008657.jpg",
+    minEarning: "6.00",
+    maxEarning: "10.00",
+    week: 10,
+  },
+
+  // Day 10 - Videos (2)
+  {
+    id: 99,
+    type: "video",
+    title: "Video Content 19",
+    url: "/73Fpa7mA_720p.mp4",
+    minEarning: "20.00",
+    maxEarning: "40.00",
+    week: 10,
+  },
+  {
+    id: 100,
+    type: "video",
+    title: "Video Content 20",
+    url: "/98HIIH9s_720p.mp4",
+    minEarning: "20.00",
+    maxEarning: "40.00",
+    week: 10,
+  },
+
+  // Day 11 - Photos (8)
+  {
+    id: 101,
+    type: "photo",
+    title: "Lifestyle Photo 101",
+    url: "/5118797510511537026.jpg",
+    minEarning: "6.00",
+    maxEarning: "10.00",
+    week: 11,
+  },
+  {
+    id: 102,
+    type: "photo",
+    title: "Lifestyle Photo 102",
+    url: "/5134259933943016401.jpg",
+    minEarning: "6.00",
+    maxEarning: "10.00",
+    week: 11,
+  },
+  {
+    id: 103,
+    type: "photo",
+    title: "Lifestyle Photo 103",
+    url: "/5242530935579211607.jpg",
+    minEarning: "6.00",
+    maxEarning: "10.00",
+    week: 11,
+  },
+  {
+    id: 104,
+    type: "photo",
+    title: "Lifestyle Photo 104",
+    url: "/5206346274197061063.jpg",
+    minEarning: "6.00",
+    maxEarning: "10.00",
+    week: 11,
+  },
+  {
+    id: 105,
+    type: "photo",
+    title: "Lifestyle Photo 105",
+    url: "/5086911226629434068.jpg",
+    minEarning: "6.00",
+    maxEarning: "10.00",
+    week: 11,
+  },
+  {
+    id: 106,
+    type: "photo",
+    title: "Lifestyle Photo 106",
+    url: "/4933806156606975055.jpg",
+    minEarning: "6.00",
+    maxEarning: "10.00",
+    week: 11,
+  },
+  {
+    id: 107,
+    type: "photo",
+    title: "Lifestyle Photo 107",
+    url: "/4997286164083878546.jpg",
+    minEarning: "6.00",
+    maxEarning: "10.00",
+    week: 11,
+  },
+  {
+    id: 108,
+    type: "photo",
+    title: "Lifestyle Photo 108",
+    url: "/4997286164083878551.jpg",
+    minEarning: "6.00",
+    maxEarning: "10.00",
+    week: 11,
+  },
+
+  // Day 11 - Videos (2)
+  {
+    id: 109,
+    type: "video",
+    title: "Video Content 101",
+    url: "/zjd8wjlq_720p.mp4",
+    minEarning: "20.00",
+    maxEarning: "40.00",
+    week: 11,
+  },
+  {
+    id: 110,
+    type: "video",
+    title: "Video Content 102",
+    url: "/IMG_8883.MOV",
+    minEarning: "20.00",
+    maxEarning: "40.00",
+    week: 11,
+  },
+
+  // Day 12 - Photos (8)
+  {
+    id: 111,
+    type: "photo",
+    title: "Lifestyle Photo 109",
+    url: "/5078321992117103410.jpg",
+    minEarning: "6.00",
+    maxEarning: "10.00",
+    week: 12,
+  },
+  {
+    id: 112,
+    type: "photo",
+    title: "Lifestyle Photo 110",
+    url: "/5111814482098760497.jpg",
+    minEarning: "6.00",
+    maxEarning: "10.00",
+    week: 12,
+  },
+  {
+    id: 113,
+    type: "photo",
+    title: "Lifestyle Photo 111",
+    url: "/5111814482098760501.jpg",
+    minEarning: "6.00",
+    maxEarning: "10.00",
+    week: 12,
+  },
+  {
+    id: 114,
+    type: "photo",
+    title: "Lifestyle Photo 112",
+    url: "/5111814482098760509.jpg",
+    minEarning: "6.00",
+    maxEarning: "10.00",
+    week: 12,
+  },
+  {
+    id: 115,
+    type: "photo",
+    title: "Lifestyle Photo 113",
+    url: "/5111814482098760649.jpg",
+    minEarning: "6.00",
+    maxEarning: "10.00",
+    week: 12,
+  },
+  {
+    id: 116,
+    type: "photo",
+    title: "Lifestyle Photo 114",
+    url: "/5111814482098760653.jpg",
+    minEarning: "6.00",
+    maxEarning: "10.00",
+    week: 12,
+  },
+  {
+    id: 117,
+    type: "photo",
+    title: "Lifestyle Photo 115",
+    url: "/5111961215361461194.jpg",
+    minEarning: "6.00",
+    maxEarning: "10.00",
+    week: 12,
+  },
+  {
+    id: 118,
+    type: "photo",
+    title: "Lifestyle Photo 116",
+    url: "/5114213015175146020.jpg",
+    minEarning: "6.00",
+    maxEarning: "10.00",
+    week: 12,
+  },
+
+  // Day 12 - Videos (2)
+  {
+    id: 119,
+    type: "video",
+    title: "Video Content 103",
+    url: "/YZz5VwwX_720p.mp4",
+    minEarning: "20.00",
+    maxEarning: "40.00",
+    week: 12,
+  },
+  {
+    id: 120,
+    type: "video",
+    title: "Video Content 104",
+    url: "/video_2023-11-14_20-56-35 (2).mp4",
+    minEarning: "20.00",
+    maxEarning: "40.00",
+    week: 12,
+  },
+
+  // Day 13 - Photos (8)
+  {
+    id: 121,
+    type: "photo",
+    title: "Lifestyle Photo 117",
+    url: "/5114213015175146056.jpg",
+    minEarning: "6.00",
+    maxEarning: "10.00",
+    week: 13,
+  },
+  {
+    id: 122,
+    type: "photo",
+    title: "Lifestyle Photo 118",
+    url: "/5121131421509987288.jpg",
+    minEarning: "6.00",
+    maxEarning: "10.00",
+    week: 13,
+  },
+  {
+    id: 123,
+    type: "photo",
+    title: "Lifestyle Photo 119",
+    url: "/5121131421509987307.jpg",
+    minEarning: "6.00",
+    maxEarning: "10.00",
+    week: 13,
+  },
+  {
+    id: 124,
+    type: "photo",
+    title: "Lifestyle Photo 120",
+    url: "/5154475387227581379.jpg",
+    minEarning: "6.00",
+    maxEarning: "10.00",
+    week: 13,
+  },
+  {
+    id: 125,
+    type: "photo",
+    title: "Lifestyle Photo 121",
+    url: "/5154475387227581382.jpg",
+    minEarning: "6.00",
+    maxEarning: "10.00",
+    week: 13,
+  },
+  {
+    id: 126,
+    type: "photo",
+    title: "Lifestyle Photo 122",
+    url: "/5154475387227581387.jpg",
+    minEarning: "6.00",
+    maxEarning: "10.00",
+    week: 13,
+  },
+  {
+    id: 127,
+    type: "photo",
+    title: "Lifestyle Photo 123",
+    url: "/5154475387227581390.jpg",
+    minEarning: "6.00",
+    maxEarning: "10.00",
+    week: 13,
+  },
+  {
+    id: 128,
+    type: "photo",
+    title: "Lifestyle Photo 124",
+    url: "/4990512322053255276.jpg",
+    minEarning: "6.00",
+    maxEarning: "10.00",
+    week: 13,
+  },
+
+  // Day 13 - Videos (2)
+  {
+    id: 129,
+    type: "video",
+    title: "Video Content 105",
+    url: "/video4922615369752905396.mp4",
+    minEarning: "20.00",
+    maxEarning: "40.00",
+    week: 13,
+  },
+  {
+    id: 130,
+    type: "video",
+    title: "Video Content 106",
+    url: "/VID_20230610_023950_116.mp4",
+    minEarning: "20.00",
+    maxEarning: "40.00",
+    week: 13,
+  },
 ];
 
 // Calculate current day based on user's login date
@@ -767,7 +1237,7 @@ const getContentDay = (userLoginDate: string | null): number => {
   const daysDiff = Math.floor(
     (now.getTime() - loginDate.getTime()) / (1000 * 60 * 60 * 24)
   );
-  return (daysDiff % 8) + 1; // Rotates between day 1 and 8 daily
+  return (daysDiff % 13) + 1; // Rotates between day 1 and 13 daily
 };
 
 export const getAvailableContent = (
@@ -782,10 +1252,102 @@ export const getContent = (id: number): AppContent | undefined => {
 };
 
 export const getTodaysContent = (
-  userLoginDate: string | null
+  userLoginDate: string | null,
+  dailyEvaluations: number = 10
 ): AppContent[] => {
   const available = getAvailableContent(userLoginDate);
-  const photos = available.filter((c) => c.type === "photo").slice(0, 8);
-  const videos = available.filter((c) => c.type === "video").slice(0, 2);
-  return [...photos, ...videos];
+  
+  // If user has 10 or fewer evaluations, show base content (8 photos + 2 videos)
+  if (dailyEvaluations <= 10) {
+    const photos = available.filter((c) => c.type === "photo").slice(0, 8);
+    const videos = available.filter((c) => c.type === "video").slice(0, 2);
+    return [...photos, ...videos];
+  }
+  
+  // If user has more than 10 evaluations, distribute content intelligently
+  // This ensures no repetition by:
+  // 1. Prioritizing current day content first
+  // 2. Adding content from days furthest from current day (maximizing variety)
+  // 3. Tracking used IDs to prevent duplicates
+  // 4. Distributing content evenly across 7 days
+  const currentDay = getContentDay(userLoginDate);
+  
+  // Calculate how many items we need from each day to reach the total
+  const itemsPerDay = Math.ceil(dailyEvaluations / 7); // Distribute across 7 days
+  const remainingItems = dailyEvaluations % 7;
+  
+  let result: AppContent[] = [];
+  const usedIds = new Set<number>();
+  
+  // Start with current day content
+  const currentDayContent = available;
+  const currentDayPhotos = currentDayContent.filter((c) => c.type === "photo");
+  const currentDayVideos = currentDayContent.filter((c) => c.type === "video");
+  
+  // Add current day content (prioritize current day)
+  const currentDayItems = Math.min(itemsPerDay + (remainingItems > 0 ? 1 : 0), currentDayPhotos.length + currentDayVideos.length);
+  const currentDayPhotosToAdd = currentDayPhotos.slice(0, Math.min(Math.floor(currentDayItems * 0.8), currentDayPhotos.length));
+  const currentDayVideosToAdd = currentDayVideos.slice(0, Math.min(Math.floor(currentDayItems * 0.2), currentDayVideos.length));
+  
+  result = [...currentDayPhotosToAdd, ...currentDayVideosToAdd];
+  
+  // Track used IDs to avoid duplicates
+  result.forEach(item => usedIds.add(item.id));
+  
+  // If we still need more content, add from other days in a smart order
+  if (result.length < dailyEvaluations) {
+    const remainingNeeded = dailyEvaluations - result.length;
+    
+    // Create a smart order of days to pull content from
+    // Start with days that are furthest from current day to avoid repetition
+    const dayOrder = [];
+    for (let i = 1; i <= 13; i++) {
+      if (i !== currentDay) {
+        const distance = Math.min(Math.abs(i - currentDay), Math.abs(i - currentDay + 13), Math.abs(i - currentDay - 13));
+        dayOrder.push({ day: i, distance });
+      }
+    }
+    
+    // Sort by distance (furthest first) to maximize variety
+    dayOrder.sort((a, b) => b.distance - a.distance);
+    
+    let itemsAdded = 0;
+    let dayIndex = 0;
+    
+    while (itemsAdded < remainingNeeded && dayIndex < dayOrder.length) {
+      const targetDay = dayOrder[dayIndex].day;
+      const dayContent = contentPool.filter((content) => content.week === targetDay);
+      
+      if (dayContent.length > 0) {
+        // Filter out already used content
+        const unusedContent = dayContent.filter((c) => !usedIds.has(c.id));
+        const dayPhotos = unusedContent.filter((c) => c.type === "photo");
+        const dayVideos = unusedContent.filter((c) => c.type === "video");
+        
+        // Calculate how many items to take from this day
+        const itemsFromThisDay = Math.min(
+          itemsPerDay,
+          remainingNeeded - itemsAdded,
+          dayPhotos.length + dayVideos.length
+        );
+        
+        if (itemsFromThisDay > 0) {
+          const photosToAdd = dayPhotos.slice(0, Math.min(Math.floor(itemsFromThisDay * 0.8), dayPhotos.length));
+          const videosToAdd = dayVideos.slice(0, Math.min(Math.floor(itemsFromThisDay * 0.2), dayVideos.length));
+          
+          const newItems = [...photosToAdd, ...videosToAdd];
+          result = [...result, ...newItems];
+          
+          // Track new IDs
+          newItems.forEach(item => usedIds.add(item.id));
+          itemsAdded += newItems.length;
+        }
+      }
+      
+      dayIndex++;
+    }
+  }
+  
+  // Ensure we don't return more items than the user's daily limit
+  return result.slice(0, dailyEvaluations);
 };
