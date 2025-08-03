@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { useAppState } from "@/hooks/use-app-state";
+import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle, UserCheck, ArrowRight } from "lucide-react";
@@ -8,6 +9,7 @@ import { CheckCircle, UserCheck, ArrowRight } from "lucide-react";
 export default function KYCSuccess() {
   const [, setLocation] = useLocation();
   const { user, updateUserVerification, fetchUser } = useAppState();
+  const { toast } = useToast();
   const [kycData, setKycData] = useState<any>(null);
   const [isProcessing, setIsProcessing] = useState(true);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -53,9 +55,23 @@ export default function KYCSuccess() {
         setIsSuccess(true);
         console.log("=== KYC Success Processing Complete ===");
         
-      } catch (error) {
-        console.error("KYC success processing error:", error);
-        setIsSuccess(false);
+        // Show success toast
+        toast({
+          title: "Verification Successful! / Verificação Concluída!",
+          description: "Your account has been verified successfully. / Sua conta foi verificada com sucesso.",
+          variant: "default",
+        });
+        
+              } catch (error) {
+          console.error("KYC success processing error:", error);
+          setIsSuccess(false);
+          
+          // Show error toast
+          toast({
+            title: "Verification Error / Erro na Verificação",
+            description: "There was an issue processing your verification. Please try again. / Houve um problema ao processar sua verificação. Tente novamente.",
+            variant: "destructive",
+          });
       } finally {
         setIsProcessing(false);
       }
@@ -69,8 +85,41 @@ export default function KYCSuccess() {
     return () => clearTimeout(timer);
   }, [updateUserVerification, user, fetchUser]);
 
-  const handleContinue = () => {
-    setLocation("/main");
+  const handleContinue = async () => {
+    try {
+      // Show loading toast
+      toast({
+        title: "Redirecting... / Redirecionando...",
+        description: "Please wait while we redirect you to the main page. / Aguarde enquanto redirecionamos você para a página principal.",
+      });
+      
+      // Ensure user data is fresh before navigation
+      await fetchUser();
+      
+      // Wait a bit more to ensure the state is properly updated
+      await new Promise(resolve => setTimeout(resolve, 200));
+      
+      // Check if user is properly loaded and verified
+      console.log("Navigation check - User:", user);
+      console.log("Navigation check - User verified:", user?.isVerified);
+      
+      if (user && user.isVerified) {
+        console.log("User is verified, navigating to main");
+        setLocation("/main");
+      } else {
+        console.log("User not properly loaded, trying again");
+        // If user is not properly loaded, try one more time
+        await fetchUser();
+        setTimeout(() => {
+          console.log("Fallback navigation to main");
+          setLocation("/main");
+        }, 100);
+      }
+    } catch (error) {
+      console.error("Error fetching user before navigation:", error);
+      // Fallback: navigate anyway
+      setLocation("/main");
+    }
   };
 
   if (isProcessing) {
