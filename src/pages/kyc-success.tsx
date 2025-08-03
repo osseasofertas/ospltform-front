@@ -57,8 +57,8 @@ export default function KYCSuccess() {
         
         // Show success toast
         toast({
-          title: "Verification Successful! / Verificação Concluída!",
-          description: "Your account has been verified successfully. / Sua conta foi verificada com sucesso.",
+          title: "Verification Successful!",
+          description: "Your account has been verified successfully.",
           variant: "default",
         });
         
@@ -68,8 +68,8 @@ export default function KYCSuccess() {
           
           // Show error toast
           toast({
-            title: "Verification Error / Erro na Verificação",
-            description: "There was an issue processing your verification. Please try again. / Houve um problema ao processar sua verificação. Tente novamente.",
+            title: "Verification Error",
+            description: "There was an issue processing your verification. Please try again.",
             variant: "destructive",
           });
       } finally {
@@ -89,8 +89,8 @@ export default function KYCSuccess() {
     try {
       // Show loading toast
       toast({
-        title: "Redirecting... / Redirecionando...",
-        description: "Please wait while we redirect you to the main page. / Aguarde enquanto redirecionamos você para a página principal.",
+        title: "Redirecting...",
+        description: "Please wait while we redirect you to the main page.",
       });
       
       // Ensure user data is fresh before navigation
