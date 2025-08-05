@@ -106,34 +106,7 @@ export default function Profile() {
           </CardContent>
         </Card>
 
-        {/* Support Section */}
-        <Card className="border border-neutral-200">
-          <CardContent className="p-6">
-            <h3 className="text-lg font-semibold text-neutral-800 mb-4">Support</h3>
-            <div className="space-y-3">
-              <Button
-                variant="outline"
-                className="w-full flex items-center justify-between p-3 border border-neutral-200 hover:border-primary"
-              >
-                <div className="flex items-center">
-                  <HelpCircle className="text-primary h-4 w-4 mr-3" />
-                  <span className="text-neutral-700">Frequently asked questions</span>
-                </div>
-                <ArrowLeft className="h-4 w-4 rotate-180 text-neutral-400" />
-              </Button>
-              <Button
-                variant="outline"
-                className="w-full flex items-center justify-between p-3 border border-neutral-200 hover:border-primary"
-              >
-                <div className="flex items-center">
-                  <Headphones className="text-primary h-4 w-4 mr-3" />
-                  <span className="text-neutral-700">Contact support</span>
-                </div>
-                <ArrowLeft className="h-4 w-4 rotate-180 text-neutral-400" />
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+      
 
 
       </div>
