@@ -638,7 +638,14 @@ export const useAppState = create<AppState>()(
       console.log("=== requestWithdrawal START ===");
       console.log("Requesting withdrawal for amount:", amount);
       
-      const response = await api.post("/withdrawal/requests", { amount });
+      // Calculate current balance from transactions
+      const currentBalance = get().transactions.reduce((sum, t) => sum + Number(t.amount), 0);
+      console.log("Current balance from transactions:", currentBalance);
+      
+      const response = await api.post("/withdrawal/requests", { 
+        amount,
+        currentBalance: currentBalance.toFixed(2) // Send calculated balance to backend
+      });
       console.log("Withdrawal request response:", response.data);
       
       // Update local state
@@ -646,7 +653,7 @@ export const useAppState = create<AppState>()(
         withdrawalRequests: [...state.withdrawalRequests, response.data],
         user: state.user ? {
           ...state.user,
-          balance: (parseFloat(state.user.balance || "0") - parseFloat(amount)).toFixed(2),
+          balance: (currentBalance - parseFloat(amount)).toFixed(2),
         } : null,
       }));
       

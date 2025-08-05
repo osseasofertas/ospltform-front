@@ -90,7 +90,8 @@ export default function Wallet() {
       return;
     }
 
-    if (parseFloat(withdrawalAmount) > parseFloat(user?.balance || "0")) {
+    // Use the calculated balance from transactions (which is what's displayed)
+    if (parseFloat(withdrawalAmount) > balance) {
       toast({
         title: "Insufficient balance",
         description: "You don't have enough balance for this withdrawal.",
@@ -411,14 +412,14 @@ export default function Wallet() {
                   type="number"
                   step="0.01"
                   min="0.01"
-                  max={user?.balance || "0"}
+                  max={balance}
                   placeholder="Enter amount"
                   value={withdrawalAmount}
                   onChange={(e) => setWithdrawalAmount(e.target.value)}
                   required
                 />
                 <p className="text-xs text-neutral-500 mt-1">
-                  Available balance: ${parseFloat(user?.balance || "0").toFixed(2)}
+                  Available balance: ${balance.toFixed(2)}
                 </p>
               </div>
               
