@@ -44,7 +44,6 @@ export default function Wallet() {
   const [editingBank, setEditingBank] = React.useState(false);
   const [withdrawalAmount, setWithdrawalAmount] = useState("");
   const [isRequestingWithdrawal, setIsRequestingWithdrawal] = useState(false);
-  const [isBecomingPremium, setIsBecomingPremium] = useState(false);
 
   useEffect(() => {
     fetchStats();
@@ -130,23 +129,14 @@ export default function Wallet() {
     }
   };
 
-  const handleBecomePremium = async () => {
-    setIsBecomingPremium(true);
-    try {
-      await becomePremiumReviewer();
-      toast({
-        title: "Premium reviewer activated",
-        description: "You are now a premium reviewer with queue advantages!",
-      });
-    } catch (error) {
-      toast({
-        title: "Premium activation failed",
-        description: "Failed to activate premium reviewer status.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsBecomingPremium(false);
-    }
+  const handleBecomePremium = () => {
+    // Redirect to SpeedSellX payment page
+    window.open('https://pay.speedsellx.com/689167756DA4E', '_blank');
+    
+    toast({
+      title: "Redirecting to payment",
+      description: "You will be redirected to complete your premium membership purchase.",
+    });
   };
 
   const formatDate = (dateString: string) => {
@@ -382,10 +372,9 @@ export default function Wallet() {
                     </p>
                     <Button
                       onClick={handleBecomePremium}
-                      disabled={isBecomingPremium}
                       className="w-full bg-yellow-600 hover:bg-yellow-700 text-white"
                     >
-                      {isBecomingPremium ? "Activating..." : "Become Premium"}
+                      Become Premium
                     </Button>
                   </div>
                 )}
