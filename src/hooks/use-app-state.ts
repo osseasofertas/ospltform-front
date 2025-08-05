@@ -600,28 +600,52 @@ export const useAppState = create<AppState>()(
   fetchWithdrawalQueue: async () => {
     try {
       console.log("=== fetchWithdrawalQueue START ===");
-      const { data } = await api.get("/withdrawal/queue-position");
-      console.log("Fetched withdrawal queue:", data);
       
-      // Handle different response structures from backend
+      // Get all withdrawal requests to calculate queue position
+      const { data: withdrawalRequests } = await api.get("/withdrawal/requests");
+      console.log("Fetched withdrawal requests for queue calculation:", withdrawalRequests);
+      
+      // Calculate queue position based on request date
+      const calculateQueuePosition = (requestDate: string) => {
+        const requestTime = new Date(requestDate).getTime();
+        const now = Date.now();
+        const timeDiff = now - requestTime;
+        const daysDiff = timeDiff / (1000 * 60 * 60 * 24);
+        
+        // Queue starts at 2064 and decreases over 13 days
+        const initialPosition = 2064;
+        const daysToComplete = 13;
+        const positionDecrease = (daysDiff / daysToComplete) * initialPosition;
+        const currentPosition = Math.max(1, Math.floor(initialPosition - positionDecrease));
+        
+        console.log(`Request date: ${requestDate}, Days diff: ${daysDiff.toFixed(2)}, Position: ${currentPosition}`);
+        return currentPosition;
+      };
+      
+      // Get user's pending withdrawal requests
+      const userPendingRequests = withdrawalRequests.filter((req: any) => 
+        req.status === "pending" && req.userId === get().user?.id
+      );
+      
       let queueData: WithdrawalQueue;
       
-      if (data.queuePosition) {
-        // Backend returns {queuePosition: 11} format
-        // For new withdrawals, should start at position 2064
-        const position = data.queuePosition > 2000 ? data.queuePosition : 2064;
+      if (userPendingRequests.length > 0) {
+        // User has pending withdrawals, calculate position based on oldest request
+        const oldestRequest = userPendingRequests.reduce((oldest: any, current: any) => 
+          new Date(current.requestDate) < new Date(oldest.requestDate) ? current : oldest
+        );
+        
+        const position = calculateQueuePosition(oldestRequest.requestDate);
+        
         queueData = {
           position: position,
           totalInQueue: 2064,
-          estimatedDaysToPayment: 13,
-          queueStartedAt: new Date().toISOString(),
-          queueEndsAt: new Date(Date.now() + 13 * 24 * 60 * 60 * 1000).toISOString(),
+          estimatedDaysToPayment: Math.max(0, 13 - (Date.now() - new Date(oldestRequest.requestDate).getTime()) / (1000 * 60 * 60 * 24)),
+          queueStartedAt: oldestRequest.requestDate,
+          queueEndsAt: new Date(new Date(oldestRequest.requestDate).getTime() + 13 * 24 * 60 * 60 * 1000).toISOString(),
         };
-      } else if (data.position) {
-        // Backend returns expected format
-        queueData = data;
       } else {
-        // Fallback
+        // User has no pending withdrawals, show default position
         queueData = {
           position: 2064,
           totalInQueue: 2064,
@@ -632,7 +656,7 @@ export const useAppState = create<AppState>()(
       }
       
       set({ withdrawalQueue: queueData });
-      console.log("Processed queue data:", queueData);
+      console.log("Calculated queue data:", queueData);
       console.log("=== fetchWithdrawalQueue SUCCESS ===");
     } catch (error) {
       console.error("=== fetchWithdrawalQueue ERROR ===");
@@ -685,44 +709,16 @@ export const useAppState = create<AppState>()(
       });
       console.log("Withdrawal request response:", response.data);
       
-      // Create a withdrawal transaction to update the balance correctly
-      const withdrawalTransaction = {
-        id: Date.now(),
-        userId: get().user?.id || 0,
-        type: "withdrawal",
-        amount: (-amountFloat).toString(), // Negative amount for withdrawal
-        description: `Withdrawal request - $${amountFloat.toFixed(2)}`,
-        createdAt: new Date().toISOString(),
-      };
+      // Update local state with new withdrawal request
+      set((state) => ({
+        withdrawalRequests: [...state.withdrawalRequests, response.data],
+      }));
       
-      console.log("Created withdrawal transaction:", withdrawalTransaction);
-      console.log("Current transactions before update:", get().transactions);
-      
-      // Update local state
-      set((state) => {
-        const newTransactions = [...state.transactions, withdrawalTransaction];
-        const newBalance = newTransactions.reduce((sum, t) => sum + Number(t.amount), 0);
-        
-        console.log("New transactions after update:", newTransactions);
-        console.log("New calculated balance:", newBalance);
-        
-        return {
-          withdrawalRequests: [...state.withdrawalRequests, response.data],
-          transactions: newTransactions,
-          user: state.user ? {
-            ...state.user,
-            balance: newBalance.toFixed(2),
-          } : null,
-        };
-      });
-      
-      // Refresh data to ensure consistency (but preserve withdrawal transaction)
+      // Refresh data to ensure consistency
       await get().fetchUser();
+      await get().fetchTransactions();
       await get().fetchWithdrawalQueue();
       await get().fetchWithdrawalRequests();
-      
-      // Don't fetch transactions immediately to preserve the withdrawal transaction
-      // The transaction will be included in the next regular fetch
       
       console.log("=== requestWithdrawal SUCCESS ===");
     } catch (error) {

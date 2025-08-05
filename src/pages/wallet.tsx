@@ -112,12 +112,12 @@ export default function Wallet() {
         description: "Your withdrawal has been added to the queue.",
       });
       
-      // Force refresh all data (but preserve withdrawal transaction)
+      // Force refresh all data
       setTimeout(async () => {
         await fetchStats();
+        await fetchTransactions();
         await fetchWithdrawalQueue();
         await fetchWithdrawalRequests();
-        // Don't fetch transactions immediately to preserve the withdrawal transaction
       }, 1000);
       
     } catch (error) {
@@ -191,13 +191,27 @@ export default function Wallet() {
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
 
-  // Calculate balance from transactions (more accurate)
-  const balance = transactions.reduce((sum, t) => {
+  // Calculate balance from transactions minus pending withdrawals
+  const earningsFromTransactions = transactions.reduce((sum, t) => {
     const amount = Number(t.amount);
     console.log(`Transaction ${t.id}: ${t.type} - ${amount} (${t.description})`);
     return sum + amount;
   }, 0);
   
+  // Calculate total pending withdrawals
+  const totalPendingWithdrawals = withdrawalRequests
+    .filter(request => request.status === "pending")
+    .reduce((sum, request) => {
+      const amount = typeof request.amount === 'string' ? parseFloat(request.amount) : request.amount;
+      console.log(`Pending withdrawal ${request.id}: ${amount}`);
+      return sum + amount;
+    }, 0);
+  
+  // Final balance = earnings - pending withdrawals
+  const balance = earningsFromTransactions - totalPendingWithdrawals;
+  
+  console.log("Earnings from transactions:", earningsFromTransactions);
+  console.log("Total pending withdrawals:", totalPendingWithdrawals);
   console.log("Final calculated balance:", balance);
 
   // Debug logs
@@ -527,11 +541,11 @@ export default function Wallet() {
                           Withdrawal Request
                         </div>
                         <div className="text-sm text-neutral-600">
-                          {request.requestedAt ? (
+                          {request.requestDate || request.requestedAt ? (
                             <>
-                              {formatDate(request.requestedAt)}
+                              {formatDate(request.requestDate || request.requestedAt!)}
                               <span className="text-xs text-neutral-500 ml-2">
-                                {formatTime(request.requestedAt)}
+                                {formatTime(request.requestDate || request.requestedAt!)}
                               </span>
                             </>
                           ) : (

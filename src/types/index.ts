@@ -89,7 +89,10 @@ export interface WithdrawalRequest {
   userId: number;
   amount: string | number; // Can be string or number from backend
   status: "pending" | "processing" | "completed" | "failed";
-  requestedAt: string;
+  requestedAt?: string; // For frontend compatibility
+  requestDate?: string; // From backend
   processedAt?: string;
-  queuePosition: number;
+  processedDate?: string; // From backend
+  queuePosition?: number; // Calculated in frontend
+  notes?: string | null;
 }
