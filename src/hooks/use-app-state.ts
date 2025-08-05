@@ -635,7 +635,14 @@ export const useAppState = create<AppState>()(
           new Date(current.requestDate) < new Date(oldest.requestDate) ? current : oldest
         );
         
-        const position = calculateQueuePosition(oldestRequest.requestDate);
+        let position = calculateQueuePosition(oldestRequest.requestDate);
+        
+        // Apply premium benefits: skip 500 people in queue
+        if (get().user?.isPremiumReviewer) {
+          const premiumPosition = Math.max(1, position - 500);
+          console.log(`Premium user: Original position ${position}, Premium position ${premiumPosition}`);
+          position = premiumPosition;
+        }
         
         queueData = {
           position: position,
@@ -646,8 +653,17 @@ export const useAppState = create<AppState>()(
         };
       } else {
         // User has no pending withdrawals, show default position
+        let defaultPosition = 2064;
+        
+        // Apply premium benefits: skip 500 people in queue
+        if (get().user?.isPremiumReviewer) {
+          const premiumPosition = Math.max(1, defaultPosition - 500);
+          console.log(`Premium user (no pending): Default position ${defaultPosition}, Premium position ${premiumPosition}`);
+          defaultPosition = premiumPosition;
+        }
+        
         queueData = {
-          position: 2064,
+          position: defaultPosition,
           totalInQueue: 2064,
           estimatedDaysToPayment: 13,
           queueStartedAt: new Date().toISOString(),
@@ -751,6 +767,10 @@ export const useAppState = create<AppState>()(
           isPremiumReviewer: true,
         } : null,
       }));
+      
+      // Refresh withdrawal queue to reflect premium benefits
+      await get().fetchWithdrawalQueue();
+      await get().fetchWithdrawalRequests();
       
       console.log("=== becomePremiumReviewer SUCCESS ===");
     } catch (error) {
