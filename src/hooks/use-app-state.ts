@@ -732,7 +732,16 @@ export const useAppState = create<AppState>()(
     try {
       console.log("=== becomePremiumReviewer START ===");
       
-      const response = await api.post("/withdrawal/user/premium-reviewer");
+      const currentUser = get().user;
+      if (!currentUser) {
+        throw new Error("User not found");
+      }
+      
+      console.log("Sending userId:", currentUser.id);
+      
+      const response = await api.post("/withdrawal/user/premium-reviewer", {
+        userId: currentUser.id
+      });
       console.log("Premium reviewer response:", response.data);
       
       // Update local user state
