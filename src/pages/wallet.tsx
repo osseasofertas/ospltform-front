@@ -337,68 +337,66 @@ export default function Wallet() {
         </Card>
 
         {/* Withdrawal Queue Section */}
-        <Card className="border border-neutral-200 mb-6">
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Users className="h-5 w-5 text-primary" />
-              Withdrawal Queue
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {withdrawalQueue ? (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Users className="h-4 w-4 text-neutral-600" />
-                    <span className="text-sm text-neutral-600">Your Position</span>
+        {withdrawalRequests.length > 0 && (
+          <Card className="border border-neutral-200 mb-6">
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Users className="h-5 w-5 text-primary" />
+                Withdrawal Queue
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {withdrawalQueue ? (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Users className="h-4 w-4 text-neutral-600" />
+                      <span className="text-sm text-neutral-600">Your Position</span>
+                    </div>
+                    <Badge variant="outline" className="text-lg font-semibold">
+                      #{withdrawalQueue.position || 2064}
+                    </Badge>
                   </div>
-                  <Badge variant="outline" className="text-lg font-semibold">
-                    #{withdrawalQueue.position || 2064}
-                  </Badge>
+                  
+                  {!user?.isPremiumReviewer && (
+                    <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-lg p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Crown className="h-4 w-4 text-yellow-600" />
+                        <span className="font-medium text-yellow-800">Become a Premium Reviewer</span>
+                      </div>
+                      <p className="text-sm text-yellow-700 mb-3">
+                        Get priority in the withdrawal queue and other exclusive benefits!
+                      </p>
+                      <Button
+                        onClick={handleBecomePremium}
+                        className="w-full bg-yellow-600 hover:bg-yellow-700 text-white"
+                      >
+                        Become Premium
+                      </Button>
+                    </div>
+                  )}
+
+                  {user?.isPremiumReviewer && (
+                    <div className="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-lg p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Crown className="h-4 w-4 text-purple-600" />
+                        <span className="font-medium text-purple-800">Premium Reviewer</span>
+                      </div>
+                      <p className="text-sm text-purple-700">
+                        You have priority in the withdrawal queue!
+                      </p>
+                    </div>
+                  )}
                 </div>
-                
-
-
-
-
-                {!user?.isPremiumReviewer && (
-                  <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-lg p-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Crown className="h-4 w-4 text-yellow-600" />
-                      <span className="font-medium text-yellow-800">Become a Premium Reviewer</span>
-                    </div>
-                    <p className="text-sm text-yellow-700 mb-3">
-                      Get priority in the withdrawal queue and other exclusive benefits!
-                    </p>
-                    <Button
-                      onClick={handleBecomePremium}
-                      className="w-full bg-yellow-600 hover:bg-yellow-700 text-white"
-                    >
-                      Become Premium
-                    </Button>
-                  </div>
-                )}
-
-                {user?.isPremiumReviewer && (
-                  <div className="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-lg p-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Crown className="h-4 w-4 text-purple-600" />
-                      <span className="font-medium text-purple-800">Premium Reviewer</span>
-                    </div>
-                    <p className="text-sm text-purple-700">
-                      You have priority in the withdrawal queue!
-                    </p>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="text-center py-4">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto mb-2"></div>
-                <p className="text-sm text-neutral-500">Loading queue information...</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+              ) : (
+                <div className="text-center py-4">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto mb-2"></div>
+                  <p className="text-sm text-neutral-500">Loading queue information...</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
 
         {/* Withdrawal Request Section */}
         <Card className="border border-neutral-200 mb-6">
