@@ -81,7 +81,10 @@ export default function Wallet() {
 
   const handleWithdrawalRequest = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!withdrawalAmount || parseFloat(withdrawalAmount) <= 0) {
+    
+    // Convert and validate amount
+    const amountFloat = parseFloat(withdrawalAmount);
+    if (!withdrawalAmount || isNaN(amountFloat) || amountFloat <= 0) {
       toast({
         title: "Invalid amount",
         description: "Please enter a valid withdrawal amount.",
@@ -91,7 +94,7 @@ export default function Wallet() {
     }
 
     // Use the calculated balance from transactions (which is what's displayed)
-    if (parseFloat(withdrawalAmount) > balance) {
+    if (amountFloat > balance) {
       toast({
         title: "Insufficient balance",
         description: "You don't have enough balance for this withdrawal.",
@@ -415,7 +418,13 @@ export default function Wallet() {
                   max={balance}
                   placeholder="Enter amount"
                   value={withdrawalAmount}
-                  onChange={(e) => setWithdrawalAmount(e.target.value)}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    // Only allow valid numbers
+                    if (value === '' || /^\d*\.?\d{0,2}$/.test(value)) {
+                      setWithdrawalAmount(value);
+                    }
+                  }}
                   required
                 />
                 <p className="text-xs text-neutral-500 mt-1">
@@ -425,7 +434,7 @@ export default function Wallet() {
               
               <Button
                 type="submit"
-                disabled={isRequestingWithdrawal || !withdrawalAmount || parseFloat(withdrawalAmount) <= 0}
+                disabled={isRequestingWithdrawal || !withdrawalAmount || isNaN(parseFloat(withdrawalAmount)) || parseFloat(withdrawalAmount) <= 0}
                 className="w-full"
               >
                 {isRequestingWithdrawal ? "Requesting..." : "Request Withdrawal"}

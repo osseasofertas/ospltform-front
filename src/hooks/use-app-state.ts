@@ -638,13 +638,20 @@ export const useAppState = create<AppState>()(
       console.log("=== requestWithdrawal START ===");
       console.log("Requesting withdrawal for amount:", amount);
       
+      // Convert amount to float
+      const amountFloat = parseFloat(amount);
+      if (isNaN(amountFloat) || amountFloat <= 0) {
+        throw new Error("Invalid amount");
+      }
+      
       // Calculate current balance from transactions
       const currentBalance = get().transactions.reduce((sum, t) => sum + Number(t.amount), 0);
       console.log("Current balance from transactions:", currentBalance);
+      console.log("Amount as float:", amountFloat);
       
       const response = await api.post("/withdrawal/requests", { 
-        amount,
-        currentBalance: currentBalance.toFixed(2) // Send calculated balance to backend
+        amount: amountFloat, // Send as float instead of string
+        currentBalance: currentBalance // Send as number instead of string
       });
       console.log("Withdrawal request response:", response.data);
       
@@ -653,7 +660,7 @@ export const useAppState = create<AppState>()(
         withdrawalRequests: [...state.withdrawalRequests, response.data],
         user: state.user ? {
           ...state.user,
-          balance: (currentBalance - parseFloat(amount)).toFixed(2),
+          balance: (currentBalance - amountFloat).toFixed(2),
         } : null,
       }));
       
