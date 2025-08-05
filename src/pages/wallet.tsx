@@ -369,15 +369,7 @@ export default function Wallet() {
                 
 
 
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Users className="h-4 w-4 text-neutral-600" />
-                    <span className="text-sm text-neutral-600">Total in Queue</span>
-                  </div>
-                  <span className="text-sm font-medium text-neutral-800">
-                    {withdrawalQueue.totalInQueue} people
-                  </span>
-                </div>
+
 
                 {!user?.isPremiumReviewer && (
                   <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-lg p-4">
