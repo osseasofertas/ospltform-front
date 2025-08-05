@@ -111,6 +111,15 @@ export default function Wallet() {
         title: "Withdrawal requested",
         description: "Your withdrawal has been added to the queue.",
       });
+      
+      // Force refresh all data
+      setTimeout(async () => {
+        await fetchStats();
+        await fetchTransactions();
+        await fetchWithdrawalQueue();
+        await fetchWithdrawalRequests();
+      }, 1000);
+      
     } catch (error) {
       toast({
         title: "Withdrawal failed",
@@ -187,16 +196,16 @@ export default function Wallet() {
 
   // Debug logs
   useEffect(() => {
-    console.log("Wallet page - User balance (backend):", user?.balance);
-    console.log("Wallet page - Calculated balance (transactions):", balance);
-    console.log("Wallet page - Transactions count:", transactions?.length);
-    console.log("Wallet page - Current evaluations:", evaluations);
-    console.log("Wallet page - Current stats:", stats);
-    console.log("Wallet page - Current transactions:", transactions);
-    console.log("Wallet page - Filtered evaluations:", evaluations?.filter(evaluation => evaluation.completed));
-    console.log("Wallet page - Sorted transactions:", sortedTransactions);
-    console.log("Wallet page - Withdrawal queue:", withdrawalQueue);
-    console.log("Wallet page - Withdrawal requests:", withdrawalRequests);
+    console.log("=== WALLET DEBUG ===");
+    console.log("User balance (backend):", user?.balance);
+    console.log("Calculated balance (transactions):", balance);
+    console.log("Transactions count:", transactions?.length);
+    console.log("Withdrawal transactions:", transactions?.filter(t => t.type === "withdrawal"));
+    console.log("Withdrawal queue:", withdrawalQueue);
+    console.log("Withdrawal requests:", withdrawalRequests);
+    console.log("Current transactions:", transactions);
+    console.log("Sorted transactions:", sortedTransactions);
+    console.log("=== END WALLET DEBUG ===");
   }, [evaluations, stats, transactions, sortedTransactions, user?.balance, balance, withdrawalQueue, withdrawalRequests]);
 
   return (

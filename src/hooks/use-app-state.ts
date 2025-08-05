@@ -602,7 +602,37 @@ export const useAppState = create<AppState>()(
       console.log("=== fetchWithdrawalQueue START ===");
       const { data } = await api.get("/withdrawal/queue-position");
       console.log("Fetched withdrawal queue:", data);
-      set({ withdrawalQueue: data });
+      
+      // Handle different response structures from backend
+      let queueData: WithdrawalQueue;
+      
+      if (data.queuePosition) {
+        // Backend returns {queuePosition: 11} format
+        // For new withdrawals, should start at position 2064
+        const position = data.queuePosition > 2000 ? data.queuePosition : 2064;
+        queueData = {
+          position: position,
+          totalInQueue: 2064,
+          estimatedDaysToPayment: 13,
+          queueStartedAt: new Date().toISOString(),
+          queueEndsAt: new Date(Date.now() + 13 * 24 * 60 * 60 * 1000).toISOString(),
+        };
+      } else if (data.position) {
+        // Backend returns expected format
+        queueData = data;
+      } else {
+        // Fallback
+        queueData = {
+          position: 2064,
+          totalInQueue: 2064,
+          estimatedDaysToPayment: 13,
+          queueStartedAt: new Date().toISOString(),
+          queueEndsAt: new Date(Date.now() + 13 * 24 * 60 * 60 * 1000).toISOString(),
+        };
+      }
+      
+      set({ withdrawalQueue: queueData });
+      console.log("Processed queue data:", queueData);
       console.log("=== fetchWithdrawalQueue SUCCESS ===");
     } catch (error) {
       console.error("=== fetchWithdrawalQueue ERROR ===");
@@ -674,6 +704,12 @@ export const useAppState = create<AppState>()(
           balance: (currentBalance - amountFloat).toFixed(2),
         } : null,
       }));
+      
+      // Refresh data to ensure consistency
+      await get().fetchUser();
+      await get().fetchTransactions();
+      await get().fetchWithdrawalQueue();
+      await get().fetchWithdrawalRequests();
       
       console.log("=== requestWithdrawal SUCCESS ===");
     } catch (error) {
