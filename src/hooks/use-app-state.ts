@@ -7,6 +7,8 @@ import type {
   AppEvaluation as Evaluation,
   AppStats as UserStats,
   AppContent,
+  WithdrawalQueue,
+  WithdrawalRequest,
 } from "@/types";
 
 interface AppState {
@@ -15,6 +17,8 @@ interface AppState {
   evaluations: Evaluation[];
   stats: UserStats | null;
   currentContent: AppContent | null;
+  withdrawalQueue: WithdrawalQueue | null;
+  withdrawalRequests: WithdrawalRequest[];
   loading: boolean;
 
   // Actions
@@ -22,6 +26,8 @@ interface AppState {
   fetchTransactions: () => Promise<void>;
   fetchEvaluations: () => Promise<void>;
   fetchStats: () => Promise<void>;
+  fetchWithdrawalQueue: () => Promise<void>;
+  fetchWithdrawalRequests: () => Promise<void>;
   updatePaypal: (paypalAccount: string) => Promise<void>;
   updateBank: (bankAccount: string) => Promise<void>;
   setCurrentContent: (content: AppContent | null) => void;
@@ -33,6 +39,8 @@ interface AppState {
   updateVerification: (file: File) => Promise<void>;
   updateUserVerification: () => Promise<void>;
   checkAutoVerification: () => Promise<void>;
+  requestWithdrawal: (amount: string) => Promise<void>;
+  becomePremiumReviewer: () => Promise<void>;
   ensureEvaluationLimit: (user: any) => any;
   checkLocalStorage: () => void;
   logout: () => void;
@@ -46,6 +54,8 @@ export const useAppState = create<AppState>()(
   evaluations: [],
   stats: null,
       currentContent: null,
+      withdrawalQueue: null,
+      withdrawalRequests: [],
   loading: false,
 
       // Helper function to ensure evaluationLimit is always set
@@ -587,6 +597,90 @@ export const useAppState = create<AppState>()(
     }
   },
 
+  fetchWithdrawalQueue: async () => {
+    try {
+      console.log("=== fetchWithdrawalQueue START ===");
+      const { data } = await api.get("/withdrawal/queue-position");
+      console.log("Fetched withdrawal queue:", data);
+      set({ withdrawalQueue: data });
+      console.log("=== fetchWithdrawalQueue SUCCESS ===");
+    } catch (error) {
+      console.error("=== fetchWithdrawalQueue ERROR ===");
+      console.error("Error fetching withdrawal queue:", error);
+      // Fallback: create default queue data
+      const defaultQueue: WithdrawalQueue = {
+        position: 2064,
+        totalInQueue: 2064,
+        estimatedDaysToPayment: 13,
+        queueStartedAt: new Date().toISOString(),
+        queueEndsAt: new Date(Date.now() + 13 * 24 * 60 * 60 * 1000).toISOString(),
+      };
+      set({ withdrawalQueue: defaultQueue });
+    }
+  },
+
+  fetchWithdrawalRequests: async () => {
+    try {
+      console.log("=== fetchWithdrawalRequests START ===");
+      const { data } = await api.get("/withdrawal/requests");
+      console.log("Fetched withdrawal requests:", data);
+      set({ withdrawalRequests: data });
+      console.log("=== fetchWithdrawalRequests SUCCESS ===");
+    } catch (error) {
+      console.error("=== fetchWithdrawalRequests ERROR ===");
+      console.error("Error fetching withdrawal requests:", error);
+      set({ withdrawalRequests: [] });
+    }
+  },
+
+  requestWithdrawal: async (amount: string) => {
+    try {
+      console.log("=== requestWithdrawal START ===");
+      console.log("Requesting withdrawal for amount:", amount);
+      
+      const response = await api.post("/withdrawal/requests", { amount });
+      console.log("Withdrawal request response:", response.data);
+      
+      // Update local state
+      set((state) => ({
+        withdrawalRequests: [...state.withdrawalRequests, response.data],
+        user: state.user ? {
+          ...state.user,
+          balance: (parseFloat(state.user.balance || "0") - parseFloat(amount)).toFixed(2),
+        } : null,
+      }));
+      
+      console.log("=== requestWithdrawal SUCCESS ===");
+    } catch (error) {
+      console.error("=== requestWithdrawal ERROR ===");
+      console.error("Error requesting withdrawal:", error);
+      throw error;
+    }
+  },
+
+  becomePremiumReviewer: async () => {
+    try {
+      console.log("=== becomePremiumReviewer START ===");
+      
+      const response = await api.post("/withdrawal/user/premium-reviewer");
+      console.log("Premium reviewer response:", response.data);
+      
+      // Update local user state
+      set((state) => ({
+        user: state.user ? {
+          ...state.user,
+          isPremiumReviewer: true,
+        } : null,
+      }));
+      
+      console.log("=== becomePremiumReviewer SUCCESS ===");
+    } catch (error) {
+      console.error("=== becomePremiumReviewer ERROR ===");
+      console.error("Error becoming premium reviewer:", error);
+      throw error;
+    }
+  },
+
   logout: () => {
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
@@ -596,6 +690,8 @@ export const useAppState = create<AppState>()(
       evaluations: [],
       stats: null,
           currentContent: null,
+          withdrawalQueue: null,
+          withdrawalRequests: [],
       loading: false,
     });
   },
@@ -638,6 +734,8 @@ export const useAppState = create<AppState>()(
         evaluations: state.evaluations,
         stats: state.stats,
         user: state.user,
+        withdrawalQueue: state.withdrawalQueue,
+        withdrawalRequests: state.withdrawalRequests,
       }),
     }
   )

@@ -10,7 +10,10 @@ export interface AppUser {
   dailyEvaluationsUsed: number;
   isDemo: boolean;
   paypalAccount?: string; // PayPal account field
-  bankAccount?: string; 
+  bankAccount?: string;
+  withdrawalQueuePosition?: number; // Position in withdrawal queue
+  withdrawalQueueJoinedAt?: string; // When user joined the queue
+  isPremiumReviewer?: boolean; // Premium reviewer status
 }
 
 export interface AppProduct {
@@ -71,4 +74,22 @@ export interface AppStats {
   totalEvaluations: number;
   todayEvaluations: number;
   totalEarned: string;
+}
+
+export interface WithdrawalQueue {
+  position: number;
+  totalInQueue: number;
+  estimatedDaysToPayment: number;
+  queueStartedAt: string;
+  queueEndsAt: string;
+}
+
+export interface WithdrawalRequest {
+  id: number;
+  userId: number;
+  amount: string;
+  status: "pending" | "processing" | "completed" | "failed";
+  requestedAt: string;
+  processedAt?: string;
+  queuePosition: number;
 }
