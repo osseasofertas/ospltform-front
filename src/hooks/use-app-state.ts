@@ -695,21 +695,34 @@ export const useAppState = create<AppState>()(
         createdAt: new Date().toISOString(),
       };
       
-      // Update local state
-      set((state) => ({
-        withdrawalRequests: [...state.withdrawalRequests, response.data],
-        transactions: [...state.transactions, withdrawalTransaction],
-        user: state.user ? {
-          ...state.user,
-          balance: (currentBalance - amountFloat).toFixed(2),
-        } : null,
-      }));
+      console.log("Created withdrawal transaction:", withdrawalTransaction);
+      console.log("Current transactions before update:", get().transactions);
       
-      // Refresh data to ensure consistency
+      // Update local state
+      set((state) => {
+        const newTransactions = [...state.transactions, withdrawalTransaction];
+        const newBalance = newTransactions.reduce((sum, t) => sum + Number(t.amount), 0);
+        
+        console.log("New transactions after update:", newTransactions);
+        console.log("New calculated balance:", newBalance);
+        
+        return {
+          withdrawalRequests: [...state.withdrawalRequests, response.data],
+          transactions: newTransactions,
+          user: state.user ? {
+            ...state.user,
+            balance: newBalance.toFixed(2),
+          } : null,
+        };
+      });
+      
+      // Refresh data to ensure consistency (but preserve withdrawal transaction)
       await get().fetchUser();
-      await get().fetchTransactions();
       await get().fetchWithdrawalQueue();
       await get().fetchWithdrawalRequests();
+      
+      // Don't fetch transactions immediately to preserve the withdrawal transaction
+      // The transaction will be included in the next regular fetch
       
       console.log("=== requestWithdrawal SUCCESS ===");
     } catch (error) {

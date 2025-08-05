@@ -112,12 +112,12 @@ export default function Wallet() {
         description: "Your withdrawal has been added to the queue.",
       });
       
-      // Force refresh all data
+      // Force refresh all data (but preserve withdrawal transaction)
       setTimeout(async () => {
         await fetchStats();
-        await fetchTransactions();
         await fetchWithdrawalQueue();
         await fetchWithdrawalRequests();
+        // Don't fetch transactions immediately to preserve the withdrawal transaction
       }, 1000);
       
     } catch (error) {
@@ -192,7 +192,13 @@ export default function Wallet() {
   );
 
   // Calculate balance from transactions (more accurate)
-  const balance = transactions.reduce((sum, t) => sum + Number(t.amount), 0);
+  const balance = transactions.reduce((sum, t) => {
+    const amount = Number(t.amount);
+    console.log(`Transaction ${t.id}: ${t.type} - ${amount} (${t.description})`);
+    return sum + amount;
+  }, 0);
+  
+  console.log("Final calculated balance:", balance);
 
   // Debug logs
   useEffect(() => {
