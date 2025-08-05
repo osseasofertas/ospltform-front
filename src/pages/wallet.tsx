@@ -7,7 +7,6 @@ import {
   Calendar,
   Video,
   Award,
-  Clock,
   Users,
   Crown,
   ArrowUp,
@@ -351,7 +350,7 @@ export default function Wallet() {
         <Card className="border border-neutral-200 mb-6">
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
-              <Clock className="h-5 w-5 text-primary" />
+              <Users className="h-5 w-5 text-primary" />
               Withdrawal Queue
             </CardTitle>
           </CardHeader>
@@ -368,15 +367,7 @@ export default function Wallet() {
                   </Badge>
                 </div>
                 
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-neutral-600" />
-                    <span className="text-sm text-neutral-600">Estimated Wait</span>
-                  </div>
-                  <span className="text-sm font-medium text-neutral-800">
-                    {withdrawalQueue.estimatedDaysToPayment} days
-                  </span>
-                </div>
+
 
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
