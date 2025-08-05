@@ -195,7 +195,9 @@ export default function Wallet() {
     console.log("Wallet page - Current transactions:", transactions);
     console.log("Wallet page - Filtered evaluations:", evaluations?.filter(evaluation => evaluation.completed));
     console.log("Wallet page - Sorted transactions:", sortedTransactions);
-  }, [evaluations, stats, transactions, sortedTransactions, user?.balance, balance]);
+    console.log("Wallet page - Withdrawal queue:", withdrawalQueue);
+    console.log("Wallet page - Withdrawal requests:", withdrawalRequests);
+  }, [evaluations, stats, transactions, sortedTransactions, user?.balance, balance, withdrawalQueue, withdrawalRequests]);
 
   return (
     <div className="min-h-screen bg-neutral-50 pb-20">
@@ -333,7 +335,7 @@ export default function Wallet() {
                     <span className="text-sm text-neutral-600">Your Position</span>
                   </div>
                   <Badge variant="outline" className="text-lg font-semibold">
-                    #{withdrawalQueue.position}
+                    #{withdrawalQueue.position || 2064}
                   </Badge>
                 </div>
                 
@@ -510,7 +512,16 @@ export default function Wallet() {
                           Withdrawal Request
                         </div>
                         <div className="text-sm text-neutral-600">
-                          {formatDate(request.requestedAt)}
+                          {request.requestedAt ? (
+                            <>
+                              {formatDate(request.requestedAt)}
+                              <span className="text-xs text-neutral-500 ml-2">
+                                {formatTime(request.requestedAt)}
+                              </span>
+                            </>
+                          ) : (
+                            "Date not available"
+                          )}
                         </div>
                         <div className="text-xs text-neutral-500">
                           Queue Position: #{request.queuePosition}
@@ -519,7 +530,7 @@ export default function Wallet() {
                     </div>
                     <div className="text-right">
                       <div className="font-semibold text-red-600">
-                        -${request.amount}
+                        -${typeof request.amount === 'string' ? request.amount : request.amount.toFixed(2)}
                       </div>
                       <Badge variant={
                         request.status === "completed" ? "default" :

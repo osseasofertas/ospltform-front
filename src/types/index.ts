@@ -87,7 +87,7 @@ export interface WithdrawalQueue {
 export interface WithdrawalRequest {
   id: number;
   userId: number;
-  amount: string;
+  amount: string | number; // Can be string or number from backend
   status: "pending" | "processing" | "completed" | "failed";
   requestedAt: string;
   processedAt?: string;

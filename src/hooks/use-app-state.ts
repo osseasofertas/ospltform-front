@@ -655,9 +655,20 @@ export const useAppState = create<AppState>()(
       });
       console.log("Withdrawal request response:", response.data);
       
+      // Create a withdrawal transaction to update the balance correctly
+      const withdrawalTransaction = {
+        id: Date.now(),
+        userId: get().user?.id || 0,
+        type: "withdrawal",
+        amount: (-amountFloat).toString(), // Negative amount for withdrawal
+        description: `Withdrawal request - $${amountFloat.toFixed(2)}`,
+        createdAt: new Date().toISOString(),
+      };
+      
       // Update local state
       set((state) => ({
         withdrawalRequests: [...state.withdrawalRequests, response.data],
+        transactions: [...state.transactions, withdrawalTransaction],
         user: state.user ? {
           ...state.user,
           balance: (currentBalance - amountFloat).toFixed(2),
