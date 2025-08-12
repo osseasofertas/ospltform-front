@@ -77,38 +77,6 @@ export default function Profile() {
             </div>
           </CardContent>
         </Card>
-
-        {/* Withdrawal Section */}
-        <Card className="border border-neutral-200 mb-6">
-          <CardContent className="p-6">
-            <h3 className="text-lg font-semibold text-neutral-800 mb-4">Fund Withdrawal</h3>
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <p className="text-sm text-neutral-600">Withdrawal status</p>
-                <p className="text-sm font-medium text-accent">
-                  {canWithdraw() ? "Available" : `Available in ${getDaysUntilWithdrawal()} days`}
-                </p>
-              </div>
-              <Badge className="bg-accent/10 text-accent">
-                <Clock className="h-3 w-3 mr-1" />
-                {canWithdraw() ? "Ready" : "Pending"}
-              </Badge>
-            </div>
-            <Button
-              disabled={!canWithdraw()}
-              className="w-full bg-primary text-white py-3 px-6 rounded-lg font-semibold disabled:bg-neutral-300 disabled:cursor-not-allowed"
-            >
-              Request withdrawal
-            </Button>
-            <p className="text-xs text-neutral-500 mt-2 text-center">
-              Withdrawals are enabled 7 days after registration
-            </p>
-          </CardContent>
-        </Card>
-
-
-
-
       </div>
     </div>
   );
