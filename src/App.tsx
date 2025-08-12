@@ -6,6 +6,7 @@ import Main from "@/pages/main";
 import Evaluation from "@/pages/evaluation";
 import Results from "@/pages/results";
 import Wallet from "@/pages/wallet";
+import Wheel from "@/pages/wheel";
 import Profile from "@/pages/profile";
 import Support from "@/pages/support";
 import LimitUpgrade from "@/pages/limit-upgrade";
@@ -36,6 +37,7 @@ function Router() {
         <Route path="/evaluation" component={user ? Evaluation : Login} />
         <Route path="/results" component={user ? Results : Login} />
         <Route path="/wallet" component={user ? Wallet : Login} />
+        <Route path="/wheel" component={user ? Wheel : Login} />
         <Route path="/profile" component={user ? Profile : Login} />
         <Route path="/support" component={user ? Support : Login} />
         <Route path="/limit-upgrade" component={user ? LimitUpgrade : Login} />

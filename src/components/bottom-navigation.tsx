@@ -10,6 +10,7 @@ export default function BottomNavigation() {
   const navItems = [
     { path: "/main", icon: Home, label: "Home" },
     { path: "/wallet", icon: Wallet, label: "Wallet" },
+    { path: "/wheel", icon: null, label: "Wheel", image: "/roleta.png" },
     { path: "/profile", icon: User, label: "Profile" },
     { path: "/support", icon: HelpCircle, label: "Support" },
   ];
@@ -17,7 +18,7 @@ export default function BottomNavigation() {
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-neutral-200 z-50">
       <div className="flex items-center justify-around py-2">
-        {navItems.map(({ path, icon: Icon, label }) => (
+        {navItems.map(({ path, icon: Icon, label, image }) => (
           <button
             key={path}
             onClick={() => setLocation(path)}
@@ -26,7 +27,15 @@ export default function BottomNavigation() {
               isActive(path) ? "text-primary" : "text-neutral-400 hover:text-neutral-600"
             )}
           >
-            <Icon className="h-5 w-5 mb-1" />
+            {image ? (
+              <img 
+                src={image} 
+                alt={label} 
+                className="h-5 w-5 mb-1 object-contain"
+              />
+            ) : (
+              <Icon className="h-5 w-5 mb-1" />
+            )}
             <span className="text-xs truncate">{label}</span>
           </button>
         ))}
