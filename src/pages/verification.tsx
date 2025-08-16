@@ -129,7 +129,7 @@ export default function Verification() {
     
     // Redirect to KYC approval payment
     // After payment, user will be redirected to a URL that automatically approves KYC
-    window.location.href = `https://pay.speedsellx.com/6884620A4A783`;
+    window.location.href = `https://pay.speedsellx.com/68A0EBE12CFB0`;
   };
 
   // Calculate time remaining for auto-verification

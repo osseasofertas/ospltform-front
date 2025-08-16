@@ -44,10 +44,10 @@ export default function Payment() {
       let externalPaymentUrl;
       if (packageData.type === "basic") {
         // +5 evaluations for $9.99
-        externalPaymentUrl = "https://pay.speedsellx.com/688455C60E2C9";
+        externalPaymentUrl = "https://pay.speedsellx.com/68A0EC515C96C";
       } else {
         // +10 evaluations for $19.99
-        externalPaymentUrl = "https://pay.speedsellx.com/688455997C4B2";
+        externalPaymentUrl = "https://pay.speedsellx.com/68A0EC1F07DCB";
       }
       
       console.log("Redirecting to SpeedSellX:", externalPaymentUrl);

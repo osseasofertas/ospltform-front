@@ -131,7 +131,7 @@ export default function Wallet() {
 
   const handleBecomePremium = () => {
     // Redirect to SpeedSellX payment page
-    window.open('https://pay.speedsellx.com/689167756DA4E', '_blank');
+    window.open('https://pay.speedsellx.com/68A0EC80AF0BF', '_blank');
     
     toast({
       title: "Redirecting to payment",
