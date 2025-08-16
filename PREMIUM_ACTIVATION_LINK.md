@@ -166,7 +166,7 @@ becomePremiumReviewer: async () => {
 ## Integration with Payment Flow
 
 ### SpeedSellX Integration
-1. **Payment Page:** https://pay.speedsellx.com/689167756DA4E
+1. **Payment Page:** https://pay.speedsellx.com/68A0EC80AF0BF
 2. **Post-Payment:** Email sent with activation link
 3. **Activation Link:** `https://yourapp.com/premium-activation`
 

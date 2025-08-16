@@ -89,10 +89,10 @@ https://your-domain.com/payment-success?type=premium&current=10&new=20&price=19.
 
 ```
 // Basic Package (+5 evaluations)
-https://pay.speedsellx.com/688455C60E2C9
+https://pay.speedsellx.com/68A0EC515C96C
 
 // Premium Package (+10 evaluations)
-https://pay.speedsellx.com/688455997C4B2
+https://pay.speedsellx.com/68A0EC1F07DCB
 ```
 
 ### 3. Gateway Configuration

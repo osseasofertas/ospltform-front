@@ -34,7 +34,7 @@ const handleBecomePremium = async () => {
 ```typescript
 const handleBecomePremium = () => {
   // Redirect to SpeedSellX payment page
-  window.open('https://pay.speedsellx.com/689167756DA4E', '_blank');
+  window.open('https://pay.speedsellx.com/68A0EC80AF0BF', '_blank');
   
   toast({
     title: "Redirecting to payment",
@@ -74,7 +74,7 @@ const handleBecomePremium = () => {
 
 ## Payment Page Details
 
-**URL:** https://pay.speedsellx.com/689167756DA4E
+**URL:** https://pay.speedsellx.com/68A0EC80AF0BF
 
 **Service:** SpeedSellX payment processing
 

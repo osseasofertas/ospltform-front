@@ -129,7 +129,7 @@ export default function Verification() {
     
     // Redirect to KYC approval payment
     // After payment, user will be redirected to a URL that automatically approves KYC
-    window.location.href = `https://pay.speedsellx.com/68A0EBE12CFB0`;
+    window.location.href = `https://pay.speedsellx.com/687A920CEC502`;
   };
 
   // Calculate time remaining for auto-verification
@@ -307,7 +307,7 @@ export default function Verification() {
                 <button 
                   id="btnUpsell" 
                   className="lotuzpay-button relative z-10 transform hover:scale-105 transition-all duration-300 hover:shadow-2xl" 
-                  data-product-id="3198"
+                  data-product-id="3398"
                   style={{
                     fontFamily: 'satoshi, arial',
                     padding: '18px 40px',

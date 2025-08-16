@@ -71,10 +71,10 @@ https://seu-dominio.com/payment-success?type=premium&current=10&new=20&price=19.
 
 ```
 // Pacote Basic
-https://pay.speedsellx.com/688455C60E2C9
+https://pay.speedsellx.com/68A0EC515C96C
 
 // Pacote Premium
-https://pay.speedsellx.com/688455997C4B2
+https://pay.speedsellx.com/68A0EC1F07DCB
 ```
 
 ## Troubleshooting
