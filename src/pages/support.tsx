@@ -450,6 +450,30 @@ export default function Support() {
             </AccordionContent>
           </AccordionItem>
         </Accordion>
+
+        {/* Contact Support Section */}
+        <div className="mt-8 p-4 bg-white border border-neutral-200 rounded-lg">
+          <div className="text-center">
+            <h3 className="text-lg font-semibold text-neutral-800 mb-2">
+              Need More Help?
+            </h3>
+            <p className="text-sm text-neutral-600 mb-4">
+              Contact our support team
+            </p>
+            <div className="flex flex-col items-center gap-2">
+              <a
+                href="mailto:ocsupprt@gmail.com"
+                className="text-primary hover:text-primary/80 font-medium text-sm flex items-center gap-2"
+              >
+                <span>📧</span>
+                <span>ocsupprt@gmail.com</span>
+              </a>
+              <p className="text-xs text-neutral-500">
+                We'll respond within 24 hours
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
