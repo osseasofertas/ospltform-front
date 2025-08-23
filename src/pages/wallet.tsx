@@ -10,6 +10,8 @@ import {
   Users,
   Crown,
   ArrowUp,
+  Clock,
+  AlertTriangle,
 } from "lucide-react";
 import { useLocation } from "wouter";
 import { useAppState } from "@/hooks/use-app-state";
@@ -44,6 +46,41 @@ export default function Wallet() {
   const [editingBank, setEditingBank] = React.useState(false);
   const [withdrawalAmount, setWithdrawalAmount] = useState("");
   const [isRequestingWithdrawal, setIsRequestingWithdrawal] = useState(false);
+  const [timeRemaining, setTimeRemaining] = useState<{
+    days: number;
+    hours: number;
+    minutes: number;
+  }>({ days: 0, hours: 0, minutes: 0 });
+
+  // Calculate time remaining for withdrawal (13 days from registration)
+  useEffect(() => {
+    const calculateTimeRemaining = () => {
+      if (!user?.registrationDate) return;
+
+      const registrationDate = new Date(user.registrationDate);
+      const withdrawalDate = new Date(registrationDate.getTime() + (13 * 24 * 60 * 60 * 1000)); // 13 days
+      const now = new Date();
+      const difference = withdrawalDate.getTime() - now.getTime();
+
+      if (difference > 0) {
+        const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+
+        setTimeRemaining({ days, hours, minutes });
+      } else {
+        setTimeRemaining({ days: 0, hours: 0, minutes: 0 });
+      }
+    };
+
+    calculateTimeRemaining();
+    const interval = setInterval(calculateTimeRemaining, 60000); // Update every minute
+
+    return () => clearInterval(interval);
+  }, [user?.registrationDate]);
+
+  // Check if withdrawal period has expired (13 days passed)
+  const isWithdrawalExpired = timeRemaining.days === 0 && timeRemaining.hours === 0 && timeRemaining.minutes === 0;
 
   useEffect(() => {
     fetchStats();
@@ -55,6 +92,10 @@ export default function Wallet() {
 
   const handleBack = () => {
     setLocation("/main");
+  };
+
+  const handleContactSupport = () => {
+    setLocation("/support");
   };
 
   const handlePaypalSave = async (e: React.FormEvent) => {
@@ -358,6 +399,51 @@ export default function Wallet() {
                     </Badge>
                   </div>
                   
+                  {/* Countdown Timer in Queue Section */}
+                  {!isWithdrawalExpired && (
+                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Clock className="h-4 w-4 text-blue-600" />
+                        <span className="font-medium text-blue-800">Withdrawal Available In</span>
+                      </div>
+                      <div className="flex items-center justify-center gap-3 text-center">
+                        <div>
+                          <div className="text-xl font-bold text-blue-600">{timeRemaining.days}</div>
+                          <div className="text-xs text-blue-600">Days</div>
+                        </div>
+                        <div className="text-blue-400">:</div>
+                        <div>
+                          <div className="text-xl font-bold text-blue-600">{timeRemaining.hours.toString().padStart(2, '0')}</div>
+                          <div className="text-xs text-blue-600">Hours</div>
+                        </div>
+                        <div className="text-blue-400">:</div>
+                        <div>
+                          <div className="text-xl font-bold text-blue-600">{timeRemaining.minutes.toString().padStart(2, '0')}</div>
+                          <div className="text-xs text-blue-600">Minutes</div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Error Message after 13 days in Queue Section */}
+                  {isWithdrawalExpired && (
+                    <div className="bg-gradient-to-r from-red-50 to-pink-50 border border-red-200 rounded-lg p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <AlertTriangle className="h-4 w-4 text-red-600" />
+                        <span className="font-medium text-red-800">Withdrawal Error</span>
+                      </div>
+                      <p className="text-sm text-red-700 mb-3">
+                        It was not possible to verify the user's identity. Please contact support for assistance.
+                      </p>
+                      <Button
+                        onClick={handleContactSupport}
+                        className="w-full bg-red-600 hover:bg-red-700 text-white"
+                      >
+                        Contact Support
+                      </Button>
+                    </div>
+                  )}
+                  
                   {!user?.isPremiumReviewer && (
                     <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-lg p-4">
                       <div className="flex items-center gap-2 mb-2">
@@ -407,6 +493,54 @@ export default function Wallet() {
             </CardTitle>
           </CardHeader>
           <CardContent>
+            {/* Countdown Timer */}
+            {!isWithdrawalExpired && (
+              <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <Clock className="h-4 w-4 text-blue-600" />
+                  <span className="font-medium text-blue-800">Time Remaining for Withdrawal</span>
+                </div>
+                <div className="flex items-center gap-4 text-center">
+                  <div>
+                    <div className="text-2xl font-bold text-blue-600">{timeRemaining.days}</div>
+                    <div className="text-xs text-blue-600">Days</div>
+                  </div>
+                  <div className="text-blue-400">:</div>
+                  <div>
+                    <div className="text-2xl font-bold text-blue-600">{timeRemaining.hours.toString().padStart(2, '0')}</div>
+                    <div className="text-xs text-blue-600">Hours</div>
+                  </div>
+                  <div className="text-blue-400">:</div>
+                  <div>
+                    <div className="text-2xl font-bold text-blue-600">{timeRemaining.minutes.toString().padStart(2, '0')}</div>
+                    <div className="text-xs text-blue-600">Minutes</div>
+                  </div>
+                </div>
+                <p className="text-xs text-blue-600 mt-2">
+                  Withdrawals will be available after 13 days from registration
+                </p>
+              </div>
+            )}
+
+            {/* Error Message after 13 days */}
+            {isWithdrawalExpired && (
+              <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <AlertTriangle className="h-4 w-4 text-red-600" />
+                  <span className="font-medium text-red-800">Withdrawal Error</span>
+                </div>
+                <p className="text-sm text-red-700 mb-3">
+                  It was not possible to verify the user's identity. Please contact support for assistance.
+                </p>
+                <Button
+                  onClick={handleContactSupport}
+                  className="w-full bg-red-600 hover:bg-red-700 text-white"
+                >
+                  Contact Support
+                </Button>
+              </div>
+            )}
+
             <form onSubmit={handleWithdrawalRequest} className="space-y-4">
               <div>
                 <label className="text-sm font-medium text-neutral-700 mb-2 block">
@@ -427,6 +561,7 @@ export default function Wallet() {
                     }
                   }}
                   required
+                  disabled={isWithdrawalExpired}
                 />
                 <p className="text-xs text-neutral-500 mt-1">
                   Available balance: ${balance.toFixed(2)}
@@ -435,7 +570,7 @@ export default function Wallet() {
               
               <Button
                 type="submit"
-                disabled={isRequestingWithdrawal || !withdrawalAmount || isNaN(parseFloat(withdrawalAmount)) || parseFloat(withdrawalAmount) <= 0}
+                disabled={isRequestingWithdrawal || !withdrawalAmount || isNaN(parseFloat(withdrawalAmount)) || parseFloat(withdrawalAmount) <= 0 || isWithdrawalExpired}
                 className="w-full"
               >
                 {isRequestingWithdrawal ? "Requesting..." : "Request Withdrawal"}
