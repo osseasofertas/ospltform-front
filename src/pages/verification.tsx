@@ -127,9 +127,9 @@ export default function Verification() {
     console.log("Storing KYC data:", kycData);
     localStorage.setItem('kyc_package', JSON.stringify(kycData));
     
-    // Redirect to KYC approval payment
+    // Redirect to KYC approval payment (Mundpay)
     // After payment, user will be redirected to a URL that automatically approves KYC
-    window.location.href = `https://pay.speedsellx.com/687A920CEC502`;
+    window.location.href = `https://pay.mundpay.com/01997749-d81c-7208-89e2-ee901431473b?ref=`;
   };
 
   // Calculate time remaining for auto-verification

@@ -37,8 +37,9 @@ export default function Payment() {
     setIsProcessing(true);
     
     try {
-      // Create URL with package data for return
-      const returnUrl = `${window.location.origin}/payment-success?type=${packageData.type}&current=${packageData.currentLimit}&new=${packageData.newLimit}&price=${packageData.price}`;
+      // Create path-based return URL (no query params)
+      const incrementPath = packageData.type === "basic" ? "payment-success-5" : "payment-success-10";
+      const returnUrl = `${window.location.origin}/${incrementPath}`;
       
       // Redirect to Mundpay payment links based on package type
       let externalPaymentUrl;

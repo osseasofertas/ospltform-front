@@ -6,7 +6,7 @@ import { useAppState } from "@/hooks/use-app-state";
 import { useEffect, useState } from "react";
 
 export default function PaymentSuccess() {
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
   const { user, updateEvaluationLimit } = useAppState();
   const [isUpdating, setIsUpdating] = useState(true);
   const [updateSuccess, setUpdateSuccess] = useState(false);
@@ -20,25 +20,45 @@ export default function PaymentSuccess() {
       }
 
       try {
-        // Get package info from URL parameters
-        const urlParams = new URLSearchParams(window.location.search);
-        const type = urlParams.get("type");
-        const current = urlParams.get("current");
-        const newLimit = urlParams.get("new");
-        const price = urlParams.get("price");
-
-        if (!type || !current || !newLimit || !price) {
-          console.error("Missing package parameters");
-          setLocation("/main");
-          return;
+        // Prefer path-based format: /payment-success-5 or /payment-success-10
+        const path = location || window.location.pathname;
+        let inferredNewLimit: number | null = null;
+        if (path.endsWith("/payment-success-5")) {
+          inferredNewLimit = (user.evaluationLimit || 10) + 5;
+        } else if (path.endsWith("/payment-success-10")) {
+          inferredNewLimit = (user.evaluationLimit || 10) + 10;
         }
 
-        const packageData = {
-          type,
-          currentLimit: parseInt(current),
-          newLimit: parseInt(newLimit),
-          price: parseFloat(price),
-        };
+        let packageData: any;
+        if (inferredNewLimit !== null) {
+          // Build minimal package data for UI
+          packageData = {
+            type: inferredNewLimit - (user.evaluationLimit || 10) === 5 ? "basic" : "premium",
+            currentLimit: user.evaluationLimit || 10,
+            newLimit: inferredNewLimit,
+            price: 0,
+          };
+        } else {
+          // Fallback to legacy query params
+          const urlParams = new URLSearchParams(window.location.search);
+          const type = urlParams.get("type");
+          const current = urlParams.get("current");
+          const newLimitParam = urlParams.get("new");
+          const price = urlParams.get("price");
+
+          if (!type || !current || !newLimitParam) {
+            console.error("Missing package data");
+            setLocation("/main");
+            return;
+          }
+
+          packageData = {
+            type,
+            currentLimit: parseInt(current),
+            newLimit: parseInt(newLimitParam),
+            price: price ? parseFloat(price) : 0,
+          };
+        }
 
         setPackageInfo(packageData);
 

@@ -41,6 +41,8 @@ function Router() {
         <Route path="/limit-upgrade" component={user ? LimitUpgrade : Login} />
         <Route path="/payment" component={user ? Payment : Login} />
         <Route path="/payment-success" component={PaymentSuccess} />
+        <Route path="/payment-success-5" component={PaymentSuccess} />
+        <Route path="/payment-success-10" component={PaymentSuccess} />
         <Route path="/verification" component={user ? Verification : Login} />
         <Route path="/kyc-success" component={KYCSuccess} />
         <Route path="/premium-activation" component={user ? PremiumActivation : Login} />
