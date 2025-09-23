@@ -171,8 +171,8 @@ export default function Wallet() {
   };
 
   const handleBecomePremium = () => {
-    // Redirect to SpeedSellX payment page
-    window.open('https://pay.speedsellx.com/68A0EC80AF0BF', '_blank');
+    // Redirect to Mundpay payment page
+    window.open('https://pay.mundpay.com/01997747-2c9e-70bb-968a-42cee05e17d8?ref=', '_blank');
     
     toast({
       title: "Redirecting to payment",

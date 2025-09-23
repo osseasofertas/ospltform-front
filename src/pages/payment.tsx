@@ -40,20 +40,20 @@ export default function Payment() {
       // Create URL with package data for return
       const returnUrl = `${window.location.origin}/payment-success?type=${packageData.type}&current=${packageData.currentLimit}&new=${packageData.newLimit}&price=${packageData.price}`;
       
-      // Redirect to SpeedSellX payment links based on package type
+      // Redirect to Mundpay payment links based on package type
       let externalPaymentUrl;
       if (packageData.type === "basic") {
         // +5 evaluations for $9.99
-        externalPaymentUrl = "https://pay.speedsellx.com/68A0EC515C96C";
+        externalPaymentUrl = "https://pay.mundpay.com/01997745-ab8f-71a7-bcbb-a9057da2a26f?ref=";
       } else {
         // +10 evaluations for $19.99
-        externalPaymentUrl = "https://pay.speedsellx.com/68A0EC1F07DCB";
+        externalPaymentUrl = "https://pay.mundpay.com/01997746-78e5-730e-9821-56d49c83ad1b?ref=";
       }
       
-      console.log("Redirecting to SpeedSellX:", externalPaymentUrl);
+      console.log("Redirecting to Mundpay:", externalPaymentUrl);
       console.log("Return URL will be:", returnUrl);
       
-      // Store return URL in localStorage for SpeedSellX to use
+      // Store return URL in localStorage for Mundpay to use
       localStorage.setItem("paymentReturnUrl", returnUrl);
       
       window.location.href = externalPaymentUrl;
