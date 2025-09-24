@@ -52,15 +52,14 @@ export default function Wallet() {
     minutes: number;
   }>({ days: 0, hours: 0, minutes: 0 });
 
-  // Calculate time remaining for withdrawal (13 days from registration)
+  // Calculate time remaining for withdrawal (based on queue end time)
   useEffect(() => {
     const calculateTimeRemaining = () => {
-      if (!user?.registrationDate) return;
+      if (!withdrawalQueue?.queueEndsAt) return;
 
-      const registrationDate = new Date(user.registrationDate);
-      const withdrawalDate = new Date(registrationDate.getTime() + (13 * 24 * 60 * 60 * 1000)); // 13 days
-      const now = new Date();
-      const difference = withdrawalDate.getTime() - now.getTime();
+      const queueEndTime = new Date(withdrawalQueue.queueEndsAt).getTime();
+      const now = Date.now();
+      const difference = queueEndTime - now;
 
       if (difference > 0) {
         const days = Math.floor(difference / (1000 * 60 * 60 * 24));
@@ -77,10 +76,10 @@ export default function Wallet() {
     const interval = setInterval(calculateTimeRemaining, 60000); // Update every minute
 
     return () => clearInterval(interval);
-  }, [user?.registrationDate]);
+  }, [withdrawalQueue?.queueEndsAt]);
 
-  // Check if withdrawal period has expired (13 days passed)
-  const isWithdrawalExpired = timeRemaining.days === 0 && timeRemaining.hours === 0 && timeRemaining.minutes === 0;
+  // Check if withdrawal period has expired (queue countdown reached zero)
+  const isWithdrawalExpired = withdrawalQueue ? new Date(withdrawalQueue.queueEndsAt).getTime() <= Date.now() : false;
 
   useEffect(() => {
     fetchStats();
@@ -243,6 +242,11 @@ export default function Wallet() {
   console.log("Earnings from transactions:", earningsFromTransactions);
   console.log("Total pending withdrawals:", totalPendingWithdrawals);
   console.log("Final calculated balance:", balance);
+
+  // Queue/form rules
+  const hasActiveWithdrawalRequest = withdrawalRequests.some(
+    (r) => r.status === "pending" || r.status === "processing"
+  );
 
   // Debug logs
   useEffect(() => {
@@ -468,6 +472,64 @@ export default function Wallet() {
               Request Withdrawal
             </CardTitle>
           </CardHeader>
+          <CardContent>
+            <form onSubmit={handleWithdrawalRequest} className="space-y-3">
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-1">
+                  Amount
+                </label>
+                <Input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  placeholder="0.00"
+                  value={withdrawalAmount}
+                  onChange={(e) => setWithdrawalAmount(e.target.value)}
+                />
+                <p className="text-xs text-neutral-500 mt-1">
+                  Available: ${balance.toFixed(2)}
+                </p>
+              </div>
+
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={
+                  isRequestingWithdrawal ||
+                  balance <= 0 ||
+                  (!user?.paypalAccount && !user?.bankAccount) ||
+                  hasActiveWithdrawalRequest ||
+                  isWithdrawalExpired
+                }
+              >
+                {isRequestingWithdrawal ? "Requesting..." : "Request Withdrawal"}
+              </Button>
+
+              {(!user?.paypalAccount && !user?.bankAccount) && (
+                <p className="text-xs text-amber-600">
+                  Add your PayPal or bank account above to receive withdrawals.
+                </p>
+              )}
+
+              {hasActiveWithdrawalRequest && (
+                <p className="text-xs text-neutral-600">
+                  You already have a withdrawal request in the queue. Please wait until it is processed.
+                </p>
+              )}
+
+              {isWithdrawalExpired && (
+                <div className="bg-gradient-to-r from-red-50 to-pink-50 border border-red-200 rounded-md p-3">
+                  <div className="flex items-center gap-2 mb-1">
+                    <AlertTriangle className="h-4 w-4 text-red-600" />
+                    <span className="text-sm font-medium text-red-800">Withdrawal Error</span>
+                  </div>
+                  <p className="text-xs text-red-700">
+                    It was not possible to verify the user's identity. Please contact support for assistance.
+                  </p>
+                </div>
+              )}
+            </form>
+          </CardContent>
         </Card>
         {/* Balance Overview */}
         <Card className="border border-neutral-200 mb-6">
