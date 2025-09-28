@@ -21,7 +21,7 @@ export default function Verification() {
     checkAutoVerification();
   }, [checkAutoVerification]);
 
-  // Add CSS and JavaScript for upsell button
+  // Add CSS for upsell button (removed external scripts that were interfering)
   useEffect(() => {
     // Add CSS links
     const satoshiLink = document.createElement('link');
@@ -29,23 +29,10 @@ export default function Verification() {
     satoshiLink.rel = 'stylesheet';
     document.head.appendChild(satoshiLink);
 
-    const upsellLink = document.createElement('link');
-    upsellLink.href = 'https://app.speedsellx.com/snippets/upsell.min.css';
-    upsellLink.rel = 'stylesheet';
-    document.head.appendChild(upsellLink);
-
-    // Add JavaScript
-    const script = document.createElement('script');
-    script.src = 'https://app.speedsellx.com/snippets/upsell.min.js';
-    script.async = true;
-    document.body.appendChild(script);
-
     // Cleanup function
     return () => {
-      document.head.removeChild(satoshiLink);
-      document.head.removeChild(upsellLink);
-      if (document.body.contains(script)) {
-        document.body.removeChild(script);
+      if (document.head.contains(satoshiLink)) {
+        document.head.removeChild(satoshiLink);
       }
     };
   }, []);
@@ -129,7 +116,11 @@ export default function Verification() {
     
     // Redirect to KYC approval payment (Mundpay)
     // After payment, user will be redirected to a URL that automatically approves KYC
-    window.location.href = `https://pay.mundpay.com/01997749-d81c-7208-89e2-ee901431473b?ref=`;
+    const mundpayUrl = `https://pay.mundpay.com/01997749-d81c-7208-89e2-ee901431473b?ref=${user.id}`;
+    console.log("Redirecting to Mundpay:", mundpayUrl);
+    
+    // Use window.open for better compatibility
+    window.open(mundpayUrl, '_blank');
   };
 
   // Calculate time remaining for auto-verification
@@ -306,6 +297,7 @@ export default function Verification() {
                 
                 <button 
                   id="btnUpsell" 
+                  onClick={handleApproveKYC}
                   className="lotuzpay-button relative z-10 transform hover:scale-105 transition-all duration-300 hover:shadow-2xl" 
                   data-product-id="3399"
                   style={{
