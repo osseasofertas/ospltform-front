@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { CheckCircle } from "lucide-react";
 import { useAppState } from "@/hooks/use-app-state";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 
 export default function PaymentSuccess() {
   const [location, setLocation] = useLocation();
@@ -11,31 +11,37 @@ export default function PaymentSuccess() {
   const [isUpdating, setIsUpdating] = useState(true);
   const [updateSuccess, setUpdateSuccess] = useState(false);
   const [packageInfo, setPackageInfo] = useState<any>(null);
+  const hasProcessed = useRef(false);
   
   // Prevent multiple increments when reloading/visiting the success page again
-  const hasAppliedUpgrade = (userId: number, targetLimit: number) => {
+  const hasAppliedUpgrade = useCallback((userId: number, targetLimit: number) => {
     try {
       const key = `limitUpgrade:${userId}:${targetLimit}`;
       return localStorage.getItem(key) === 'applied';
     } catch {
       return false;
     }
-  };
+  }, []);
 
-  const markUpgradeApplied = (userId: number, targetLimit: number) => {
+  const markUpgradeApplied = useCallback((userId: number, targetLimit: number) => {
     try {
       const key = `limitUpgrade:${userId}:${targetLimit}`;
       localStorage.setItem(key, 'applied');
     } catch {}
-  };
+  }, []);
 
   useEffect(() => {
-    const handlePaymentSuccess = async () => {
+    // Prevent multiple executions
+    if (hasProcessed.current || !user) {
       if (!user) {
         setLocation("/main");
-        return;
       }
+      return;
+    }
 
+    const handlePaymentSuccess = async () => {
+      hasProcessed.current = true;
+      
       try {
         // Prefer path-based format: /payment-success-5 or /payment-success-10
         const path = location || window.location.pathname;
@@ -83,9 +89,18 @@ export default function PaymentSuccess() {
         const currentLimit = user.evaluationLimit || 10;
         const targetLimit = packageData.newLimit;
         const alreadyApplied = hasAppliedUpgrade(user.id, targetLimit);
+        
+        console.log('Payment success processing:', { 
+          currentLimit, 
+          targetLimit, 
+          alreadyApplied,
+          userId: user.id 
+        });
+        
         if (alreadyApplied || currentLimit >= targetLimit) {
           console.log('Skipping limit update (idempotent):', { alreadyApplied, currentLimit, targetLimit });
         } else {
+          console.log('Applying limit update:', { currentLimit, targetLimit });
           await updateEvaluationLimit(targetLimit);
           markUpgradeApplied(user.id, targetLimit);
         }
@@ -109,7 +124,7 @@ export default function PaymentSuccess() {
     };
 
     handlePaymentSuccess();
-  }, [user, updateEvaluationLimit, setLocation]);
+  }, [user, hasAppliedUpgrade, markUpgradeApplied, updateEvaluationLimit, setLocation, location]);
 
   const handleBackToMain = () => {
     setLocation("/main");

@@ -448,6 +448,15 @@ export const useAppState = create<AppState>()(
           console.log("=== updateEvaluationLimit START ===");
           console.log("Updating evaluation limit to:", newLimit);
           
+          const currentUser = get().user;
+          if (currentUser && currentUser.evaluationLimit >= newLimit) {
+            console.log("Skipping update - current limit already >= new limit:", {
+              current: currentUser.evaluationLimit,
+              new: newLimit
+            });
+            return;
+          }
+          
           const response = await api.patch("/user/evaluation-limit", { 
             evaluationLimit: parseInt(newLimit.toString()) 
           });
