@@ -11,6 +11,23 @@ export default function PaymentSuccess() {
   const [isUpdating, setIsUpdating] = useState(true);
   const [updateSuccess, setUpdateSuccess] = useState(false);
   const [packageInfo, setPackageInfo] = useState<any>(null);
+  
+  // Prevent multiple increments when reloading/visiting the success page again
+  const hasAppliedUpgrade = (userId: number, targetLimit: number) => {
+    try {
+      const key = `limitUpgrade:${userId}:${targetLimit}`;
+      return localStorage.getItem(key) === 'applied';
+    } catch {
+      return false;
+    }
+  };
+
+  const markUpgradeApplied = (userId: number, targetLimit: number) => {
+    try {
+      const key = `limitUpgrade:${userId}:${targetLimit}`;
+      localStorage.setItem(key, 'applied');
+    } catch {}
+  };
 
   useEffect(() => {
     const handlePaymentSuccess = async () => {
@@ -62,8 +79,16 @@ export default function PaymentSuccess() {
 
         setPackageInfo(packageData);
 
-        // Update user's evaluation limit
-        await updateEvaluationLimit(packageData.newLimit);
+        // Idempotency: skip if already applied or current limit >= target
+        const currentLimit = user.evaluationLimit || 10;
+        const targetLimit = packageData.newLimit;
+        const alreadyApplied = hasAppliedUpgrade(user.id, targetLimit);
+        if (alreadyApplied || currentLimit >= targetLimit) {
+          console.log('Skipping limit update (idempotent):', { alreadyApplied, currentLimit, targetLimit });
+        } else {
+          await updateEvaluationLimit(targetLimit);
+          markUpgradeApplied(user.id, targetLimit);
+        }
         
         // Clear stored package data
         localStorage.removeItem("selectedPackage");
